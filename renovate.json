@@ -1,0 +1,66 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":separateMultipleMajorReleases",
+    ":semanticCommits"
+  ],
+  "prConcurrentLimit": 10,
+  "dependencyDashboard": true,
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "Playwright's npm package and its container image must move together. The image ships the browser binaries built for that exact release, and a mismatch changes text rendering, which silently invalidates every visual regression baseline. Splitting them across two pull requests would leave the repository broken in between.",
+      "groupName": "playwright",
+      "matchPackageNames": [
+        "@playwright/test",
+        "@playwright/mcp",
+        "mcr.microsoft.com/playwright"
+      ],
+      "semanticCommitType": "chore",
+      "prBodyNotes": [
+        ":warning: After merging, regenerate the visual baselines with `yarn docker:vr:update` and commit them. A browser update moves glyph rendering, so the committed baselines will no longer match.",
+        "Check that the Dockerfile tags in `env/docker/` and the `@playwright/test` version in `package.json` all name the same release."
+      ]
+    },
+    {
+      "description": "Agent definitions are generated from the installed Playwright version, so they drift when it moves.",
+      "matchPackageNames": ["@playwright/test"],
+      "prBodyNotes": [
+        "Regenerate the agents with `npx playwright init-agents --loop=claude`, then re-append the project rules section each definition ends with."
+      ]
+    },
+    {
+      "description": "Linters and formatters land together. They are the static gate, they never affect what the suite tests, and reviewing them one by one is noise.",
+      "groupName": "linting",
+      "matchPackageNames": [
+        "eslint",
+        "eslint-**",
+        "@typescript-eslint/**",
+        "prettier",
+        "@microsoft/eslint-formatter-sarif"
+      ],
+      "semanticCommitType": "chore"
+    },
+    {
+      "description": "Workflow actions, kept current so the pipeline keeps running on a supported runtime. Node 20 leaving the runners is exactly the kind of change that arrives this way.",
+      "groupName": "github actions",
+      "matchManagers": ["github-actions"],
+      "semanticCommitType": "ci"
+    },
+    {
+      "description": "Allure reporting, grouped because the reporter and the command line generator have to agree on the results format.",
+      "groupName": "allure",
+      "matchPackageNames": ["allure-playwright", "allure-commandline"],
+      "semanticCommitType": "chore"
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"],
+    "semanticCommitType": "chore"
+  },
+  "vulnerabilityAlerts": {
+    "labels": ["security"]
+  }
+}

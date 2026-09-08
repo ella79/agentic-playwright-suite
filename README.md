@@ -177,6 +177,18 @@ the pull request line by line. A red job says something is wrong; an annotation 
 Suppressed rules carry their suppression into the SARIF, so an intentional inline disable does not
 surface as an open alert.
 
+## Dependency Updates
+
+[`renovate.json`](renovate.json) configures Renovate, which needs the app installed on the
+repository to act. The configuration encodes one constraint the project cannot survive without:
+`@playwright/test` and the `mcr.microsoft.com/playwright` image tag are grouped into a single pull
+request. The image ships browser binaries built for that exact release, so letting them move
+separately would leave the repository in a state where the rendering the baselines were captured
+with no longer matches the rendering they are compared against.
+
+Any Playwright update carries a note to regenerate the baselines afterwards, and to regenerate the
+agent definitions, since both are tied to the installed version.
+
 ## The Published Report
 
 Playwright project names match the CI job names, so a merged report labels every result
