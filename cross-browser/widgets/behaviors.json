@@ -1,1 +1,1 @@
-{"total":1,"items":[{"uid":"2089e1c4a7affb723d6b019d29a1231a","name":"Functional E2E","statistic":{"failed":0,"broken":0,"skipped":0,"passed":5,"unknown":0,"total":5}}]}
+{"total":2,"items":[{"uid":"6ae3502d373c755db6e5622cdba35d1b","name":"WebKit","statistic":{"failed":0,"broken":0,"skipped":0,"passed":5,"unknown":0,"total":5}},{"uid":"3d16ca5be9bde8804ae4ae86cdb54511","name":"Mobile Safari","statistic":{"failed":0,"broken":0,"skipped":0,"passed":5,"unknown":0,"total":5}}]}
