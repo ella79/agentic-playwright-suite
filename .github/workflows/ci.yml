@@ -248,15 +248,18 @@ jobs:
   # rendering and layout problems, which is not the feedback a review needs
   # within seconds.
   #
-  # It runs beside the other test jobs, and the concurrency is what keeps that
-  # honest. The target is a shared public demo host. At six concurrent browsers
-  # the two heaviest cases hit the sixty second test timeout, while the same
-  # checkout passed on WebKit in that same run: the suite had become the cause
-  # of its own flakiness. Four browsers is the level that held across every run
-  # before that, so the budget is spent deliberately: one worker each for the
-  # functional and visual jobs, two here because this job carries forty cases
-  # and would otherwise become the critical path. The load on the target is the
-  # number that matters, not how it is spread across jobs.
+  # It runs beside the other test jobs under a deliberate worker budget: one
+  # each for the functional and visual jobs, two here because this job carries
+  # forty cases and would otherwise become the critical path.
+  #
+  # The budget is a precaution rather than a measured limit. One run failed with
+  # six browser instances against the shared demo host, the two heaviest cases
+  # timing out while the same checkout passed on WebKit in that same run. Later
+  # runs then passed with roughly twelve instances against it, from several pull
+  # requests at once, so the host's capacity is variable rather than a clean
+  # threshold and that single failure is not proof of one. Keeping the budget
+  # costs nothing here and removes the suite as a suspect when something does
+  # time out.
   cross-browser:
     name: cross-browser
     needs: [prepare-playwright-image, static-checks]
