@@ -21,20 +21,27 @@ test.describe("Engagement", () => {
 
     const visitor = buildAccount();
 
-    await contactUsPage.gotoContactUsPage();
-    await expect(contactUsPage.getInTouchHeading).toBeVisible();
+    await test.step("fill the contact form and attach a file", async () => {
+      await contactUsPage.gotoContactUsPage();
+      await expect(contactUsPage.getInTouchHeading).toBeVisible();
 
-    await contactUsPage.fillForm({
-      name: visitor.name,
-      email: visitor.email,
-      subject: "Portfolio suite contact check",
-      message: "Submitted by the automated engagement suite.",
-      filePath: ATTACHMENT,
+      await contactUsPage.fillForm({
+        name: visitor.name,
+        email: visitor.email,
+        subject: "Portfolio suite contact check",
+        message: "Submitted by the automated engagement suite.",
+        filePath: ATTACHMENT,
+      });
     });
-    await contactUsPage.submit();
 
-    // Multipart POST to the demo host: consistently slower than the 5s default.
-    await expect(contactUsPage.successMessage).toBeVisible({ timeout: 15_000 });
+    await test.step("the site confirms the message was sent", async () => {
+      await contactUsPage.submit();
+
+      // Multipart POST to the demo host: consistently slower than the 5s default.
+      await expect(contactUsPage.successMessage).toBeVisible({
+        timeout: 15_000,
+      });
+    });
   });
 
   test("TC-19: a product review can be submitted from the detail page", async ({
