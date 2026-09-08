@@ -37,7 +37,7 @@ utils/
   fixtures/           Custom Playwright fixtures (account lifecycle)
   testData.ts         Unique data generators
   url.ts              URL constants
-playwright.config.ts  Playwright configuration (chromium + visual projects)
+playwright.config.ts  Playwright configuration (e2e-playwright, visual-regression, seed projects)
 .github/workflows/    CI pipeline: prepare-playwright-image, static-checks, e2e-playwright, visual-regression, publish-dashboard
 ```
 

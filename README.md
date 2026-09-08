@@ -185,6 +185,26 @@ generated on a laptop can be trusted against a runner.
 
 Traces, screenshots, and visual diffs upload as artifacts on failure.
 
+### The published report
+
+Playwright's project names match the CI job names, so a merged report labels every result as
+`e2e-playwright` or `visual-regression` rather than leaving forty rows to be told apart by path.
+
+The Allure side is labelled by an automatic fixture rather than by hand, since a label applied only
+where someone remembered is one the report cannot rely on. Each result carries:
+
+- `parentSuite`, splitting the dashboard into **Functional E2E** and **Visual regression**, each
+  broken down by area, under every status filter
+- `epic` / `feature` / `story`, which is what populates the Behaviours tab
+- `severity`, critical only where a failure means a user cannot buy or cannot reach their account
+- a link to the plan that justifies the case, read from its own `// spec:` header so it cannot go
+  stale, and a link to the source
+
+`categories.json` classifies failures, because a screenshot diff, a host 5xx and a real assertion
+failure are three different conversations and an unclassified report makes them look like one.
+`environment.properties` records the base URL, browser, viewport, commit and branch behind a run,
+and `executor.json` links the published report back to the pipeline run that produced it.
+
 ## What Broke While Building This
 
 Kept because the failures are more informative than the passes.

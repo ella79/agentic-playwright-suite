@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Visual difference",
+    "messageRegex": ".*Screenshot comparison failed.*",
+    "matchedStatuses": ["failed"]
+  },
+  {
+    "name": "Missing baseline",
+    "messageRegex": ".*snapshot doesn't exist.*",
+    "matchedStatuses": ["failed"]
+  },
+  {
+    "name": "Application defect",
+    "messageRegex": ".*",
+    "matchedStatuses": ["skipped"],
+    "description": "Cases parked with test.fixme() against a defect in the application under test rather than in the suite."
+  },
+  {
+    "name": "Host unavailable",
+    "messageRegex": ".*(503|502|504|ECONNREFUSED|ERR_CONNECTION).*",
+    "matchedStatuses": ["failed", "broken"],
+    "description": "The public demo host shed the request. Infrastructure noise, not a product regression."
+  },
+  {
+    "name": "Timed out waiting for state",
+    "messageRegex": ".*(Timeout .* exceeded|Test timeout of).*",
+    "matchedStatuses": ["failed", "broken"]
+  },
+  {
+    "name": "Assertion failed",
+    "messageRegex": ".*expect.*",
+    "matchedStatuses": ["failed"]
+  }
+]

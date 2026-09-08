@@ -1,4 +1,32 @@
-import { defineConfig, devices } from "@playwright/test";
+import {
+  defineConfig,
+  devices,
+  type ReporterDescription,
+} from "@playwright/test";
+
+const BASE_URL = process.env.E2E_BASE_URL || "https://automationexercise.com";
+
+/**
+ * The published dashboard is built from these results. environmentInfo fills
+ * the report's Environment widget, so a run says what it executed against
+ * instead of leaving a reader to guess which branch or host produced it.
+ */
+const allureReporter: ReporterDescription = [
+  "allure-playwright",
+  {
+    resultsDir: "allure-results",
+    environmentInfo: {
+      base_url: BASE_URL,
+      browser: "Chromium",
+      viewport: "1920x1080",
+      node: process.version,
+      os: `${process.platform} ${process.arch}`,
+      ci: process.env.CI ? "GitHub Actions" : "local",
+      commit: process.env.GITHUB_SHA?.slice(0, 8) ?? "working tree",
+      branch: process.env.GITHUB_REF_NAME ?? "local",
+    },
+  },
+];
 
 export default defineConfig({
   timeout: 60_000,
@@ -6,23 +34,23 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
-  // Sharded CI runs use the blob reporter, which is the only one that can be
-  // merged back into a single correct report across shards; locally the HTML
-  // report is more useful. Allure runs in both because the published dashboard
-  // is built from its results.
+  // CI uses the blob reporter because the functional and visual jobs each
+  // produce one, and only blobs merge into a single correct HTML report;
+  // locally the HTML report is more useful directly. Allure runs in both,
+  // since the published dashboard is built from its results.
   reporter: process.env.CI
     ? [
         ["blob"],
-        ["allure-playwright", { resultsDir: "allure-results" }],
+        allureReporter,
         ["junit", { outputFile: "reports/junit/results.xml" }],
       ]
     : [
         ["html", { open: "never" }],
-        ["allure-playwright", { resultsDir: "allure-results" }],
+        allureReporter,
         ["junit", { outputFile: "reports/junit/results.xml" }],
       ],
   use: {
-    baseURL: process.env.E2E_BASE_URL || "https://automationexercise.com",
+    baseURL: BASE_URL,
     testIdAttribute: "data-qa",
     trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
     screenshot: "only-on-failure",
@@ -36,7 +64,7 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "chromium",
+      name: "e2e-playwright",
       testDir: "./tests",
       use: {
         ...devices["Desktop Chrome"],
@@ -57,7 +85,7 @@ export default defineConfig({
       },
     },
     {
-      name: "visual",
+      name: "visual-regression",
       testDir: "./vr-tests",
       use: {
         ...devices["Desktop Chrome"],

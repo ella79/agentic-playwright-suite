@@ -1,4 +1,5 @@
 import { expect, test as base } from "@playwright/test";
+import { applyAllureLabels } from "./allureLabels";
 import {
   AccountInfoPage,
   CartPage,
@@ -57,7 +58,24 @@ const THIRD_PARTY_HOSTS =
 const CART_WRITE_ENDPOINTS =
   /automationexercise\.com\/(add_to_cart|delete_cart)\//;
 
-export const test = base.extend<Fixtures>({
+export const test = base.extend<Fixtures & { allureLabels: void }>({
+  /**
+   * Labels every result so the dashboard can group and filter it: the two
+   * suites separate, each area becomes its own branch, and a case links to the
+   * plan that justifies it. Automatic, because a label applied only where
+   * someone remembered is a label the report cannot rely on.
+   */
+  allureLabels: [
+    // The empty pattern is Playwright's own signature for a fixture that
+    // depends on nothing; naming a dependency here would force it to be built.
+    // eslint-disable-next-line no-empty-pattern
+    async ({}, use, testInfo) => {
+      await applyAllureLabels(testInfo);
+      await use();
+    },
+    { auto: true },
+  ],
+
   page: async ({ page }, use) => {
     await page.route(THIRD_PARTY_HOSTS, (route) => route.abort());
 

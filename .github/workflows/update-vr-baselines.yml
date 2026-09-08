@@ -7,6 +7,9 @@ name: Update VR baselines
 #
 # Run this deliberately, after verifying a visual change was intended.
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   workflow_dispatch:
     inputs:
@@ -23,11 +26,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "24"
           cache: yarn
 
       - run: yarn install --frozen-lockfile
@@ -55,7 +58,7 @@ jobs:
 
       - name: Upload the regenerated set for review
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: regenerated-baselines
           path: vr-tests/**/*-snapshots/**
