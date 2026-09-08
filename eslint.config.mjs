@@ -37,6 +37,16 @@ export default [
     },
   },
   {
+    // Node scripts run outside the TypeScript program, so they need their
+    // runtime globals declared rather than inherited from the type checker.
+    files: ["utils/scripts/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: { process: "readonly", console: "readonly" },
+    },
+  },
+  {
     // Spec files only. Page objects legitimately use APIs that are
     // anti-patterns inside a test, such as scoping with first().
     files: ["tests/**/*.ts", "vr-tests/**/*.ts", "specs/**/*.ts"],
