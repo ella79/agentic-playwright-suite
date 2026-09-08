@@ -80,8 +80,10 @@ Browser access goes through the MCP servers in `.mcp.json`: `playwright-test` fo
 
 ## CI/CD
 
-GitHub Actions (`.github/workflows/ci.yml`), five jobs in three stages:
+GitHub Actions (`.github/workflows/ci.yml`), seven jobs in three stages:
 
-1. **build**: `prepare-playwright-image`: builds `env/docker/e2e-playwright.Dockerfile` and pushes it to ghcr.io. Every later job runs inside that image, so dependencies and browsers install once. The tag hashes `package.json` + `yarn.lock`, so a dependency change forces a rebuild.
-2. **check**: `static-checks`: typecheck, lint, format check. Gates everything after it.
-3. **end2end**: `e2e-playwright` and `visual-regression` in parallel, then `publish-dashboard` merges both reports, restores Allure trend history from the published site, and deploys to GitHub Pages (push to `main` only).
+1. **build**: `prepare-playwright-image` builds `env/docker/e2e-playwright.Dockerfile` and pushes it to ghcr.io. Every later job runs inside that image, so dependencies and browsers install once. The tag hashes `package.json` plus `yarn.lock`, so a dependency change forces a rebuild.
+2. **check**: `static-checks` runs typecheck, lint and format check, and uploads lint findings to code scanning. It gates everything after it.
+3. **end2end**: `e2e-playwright`, `visual-regression` and `cross-browser` run in parallel under a worker budget of four browser instances against the shared demo host. `cross-browser` runs the same twenty functional cases on WebKit and mobile Safari and is skipped on pull requests. `publish-dashboard` then merges the reports, restores Allure trend history, builds the suite health page and deploys everything to GitHub Pages, on `main` only.
+
+`ci-gate` runs last and reads every other job's result. It is the single check the branch protection requires: `main` takes no direct pushes, from anyone, and a pull request cannot merge until the gate is green. Adding a job means adding it to the gate's `needs` list rather than editing repository settings.

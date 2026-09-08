@@ -43,7 +43,12 @@ The full command list is in [`docs/architecture.md`](docs/architecture.md).
 | Image or lockfile change | The execution image is rebuilt and pushed to the registry first       |
 
 Every job runs inside an image built by the first job, so browsers and dependencies install once
-rather than three times, and a local run uses that same image.
+rather than four times, and a local run uses that same image.
+
+`main` is protected and takes no direct pushes, including from its owner. Every change arrives
+through a pull request, and the only check the protection requires is `ci-gate`, a job that reads
+the result of all the others. A job that stops running therefore cannot quietly stop being
+enforced.
 
 The test jobs run in parallel under a worker budget: one each for the functional and visual jobs,
 two for cross browser, which carries twice the cases. The budget is a precaution, not a measured
@@ -89,6 +94,6 @@ env/docker/   Execution images for CI and local use
 | ---------------------------------------------- | -------------------------------------------------------------------------- |
 | [`specs/STATUS.md`](specs/STATUS.md)           | Coverage per area, findings raised against the application, open decisions |
 | [`docs/architecture.md`](docs/architecture.md) | Page objects, fixtures, locator policy, visual regression                  |
-| [`docs/pipeline.md`](docs/pipeline.md)         | The five jobs, the published reports, dependency updates                   |
+| [`docs/pipeline.md`](docs/pipeline.md)         | The seven jobs, the published reports, dependency updates                  |
 | [`docs/agents.md`](docs/agents.md)             | The six agents, the two MCP servers, how the skills are enforced           |
 | [`docs/decisions.md`](docs/decisions.md)       | The calls a reviewer would question, and what broke while building this    |
