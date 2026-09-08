@@ -188,6 +188,11 @@ only where someone remembered is one the report cannot rely on. Each result carr
 | `severity`                 | Critical only where a failure means a user cannot buy or cannot reach their account      |
 | `link`                     | The plan that justifies the case, read from its own `// spec:` header, plus its source   |
 
+Three reports are published rather than one. Allure plots status over time for whatever it was
+given, so a combined report can only ever draw a single line for both suites. The functional and
+visual reports each keep their own history, which is what makes one trend readable next to the
+other.
+
 `categories.json` classifies failures, since a screenshot diff, a host 5xx and a real assertion
 failure are three different conversations. `environmentInfo` records the base URL, browser,
 viewport, commit and branch behind a run. `executor.json` links the published report back to the

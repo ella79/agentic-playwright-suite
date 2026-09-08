@@ -225,53 +225,82 @@ jobs:
 
       - run: yarn install --frozen-lockfile
 
-      - name: Collect results from every test job
+      - name: Collect functional results
         uses: actions/download-artifact@v8
         with:
-          pattern: allure-results-*
-          path: downloaded-results
-          merge-multiple: true
+          name: allure-results-e2e
+          path: results/functional
 
-      # categories.json classifies failures in the report: a screenshot diff, a
-      # host 5xx and a real assertion failure are three different conversations,
-      # and an unclassified report makes them look like one.
-      # executor.json is what links a published report back to the run that
-      # produced it.
+      - name: Collect visual results
+        uses: actions/download-artifact@v8
+        with:
+          name: allure-results-vr
+          path: results/visual
+
+      # Three reports are generated, not one. Allure's trend chart plots status
+      # over time for whatever it was given, so a single combined report can
+      # only ever show one line for both suites. The per suite reports each
+      # keep their own history, which is what makes a visual regression trend
+      # readable next to a functional one.
+      #
+      # categories.json classifies failures: a screenshot diff, a host 5xx and a
+      # real assertion failure are three different conversations, and an
+      # unclassified report makes them look like one. executor.json links a
+      # published report back to the run that produced it.
       - name: Stage results
         run: |
-          mkdir -p allure-results
-          cp -r downloaded-results/. allure-results/ 2>/dev/null || true
-          cp env/allure/categories.json allure-results/categories.json
-          cat > allure-results/executor.json <<JSON
+          mkdir -p results/combined
+          cp -r results/functional/. results/combined/ 2>/dev/null || true
+          cp -r results/visual/. results/combined/ 2>/dev/null || true
+
+          write_meta() {
+            dir=$1; label=$2; path=$3
+            cp env/allure/categories.json "$dir/categories.json"
+            cat > "$dir/executor.json" <<JSON
           {
             "name": "GitHub Actions",
             "type": "github",
-            "reportName": "Agentic Playwright Suite",
+            "reportName": "$label",
             "buildOrder": ${{ github.run_number }},
             "buildName": "CI #${{ github.run_number }}",
             "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-            "reportUrl": "https://ella79.github.io/agentic-playwright-suite/"
+            "reportUrl": "https://ella79.github.io/agentic-playwright-suite/$path"
           }
           JSON
-          ls allure-results | head
+          }
+
+          write_meta results/combined "Agentic Playwright Suite" ""
+          write_meta results/functional "Functional E2E" "functional/"
+          write_meta results/visual "Visual regression" "visual/"
 
       # Trend graphs only exist if the previous report's history is carried
-      # forward, so it is restored from the published site before generating.
+      # forward, so each report restores its own from the published site.
       - name: Restore trend history
         run: |
           if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
             git fetch origin gh-pages --depth=1
             git worktree add gh-pages-tmp origin/gh-pages
-            if [ -d gh-pages-tmp/history ]; then
-              cp -r gh-pages-tmp/history allure-results/history
-              echo "Restored history from the published dashboard"
-            fi
+            for suite in combined functional visual; do
+              case $suite in
+                combined) source=gh-pages-tmp/history ;;
+                *) source=gh-pages-tmp/$suite/history ;;
+              esac
+              if [ -d "$source" ]; then
+                cp -r "$source" "results/$suite/history"
+                echo "Restored history for $suite"
+              else
+                echo "No published history for $suite yet"
+              fi
+            done
           else
             echo "No gh-pages branch yet: this run seeds the history"
           fi
 
-      - name: Generate Allure report
-        run: yarn allure:generate
+      - name: Generate the reports
+        run: |
+          npx allure generate results/combined --clean -o allure-report
+          npx allure generate results/functional --clean -o allure-report/functional
+          npx allure generate results/visual --clean -o allure-report/visual
 
       # The HTML report is published alongside Allure because it carries the
       # traces: Allure shows what failed, the trace viewer shows why.
