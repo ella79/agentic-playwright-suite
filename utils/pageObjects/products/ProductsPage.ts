@@ -36,7 +36,10 @@ export class ProductsPage extends BaseAppPage {
     subCategory: string,
   ): Locator {
     return this.page.getByRole("heading", {
-      name: new RegExp(`${parentCategory}\\s*-\\s*${subCategory} products`, "i"),
+      name: new RegExp(
+        `${parentCategory}\\s*-\\s*${subCategory} products`,
+        "i",
+      ),
     });
   }
 

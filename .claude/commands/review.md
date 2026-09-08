@@ -1,6 +1,7 @@
 ---
 description: Audit test code against the repository conventions
-argument-hint: [file or directory, defaults to everything changed on this branch]
+argument-hint:
+  [file or directory, defaults to everything changed on this branch]
 allowed-tools: Task, Read, Grep, Glob, Bash
 ---
 

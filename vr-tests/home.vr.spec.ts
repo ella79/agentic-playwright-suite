@@ -13,9 +13,7 @@ test.describe("Visual regression - home", () => {
   test("VR-01: site header for an anonymous visitor", async () => {
     await expect(homePage.signupLoginLink).toBeVisible();
 
-    await expect(homePage.header).toHaveScreenshot(
-      "home-header-anonymous.png",
-    );
+    await expect(homePage.header).toHaveScreenshot("home-header-anonymous.png");
   });
 
   test("VR-02: featured products section", async () => {

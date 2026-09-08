@@ -18,28 +18,28 @@ and would never match, so locally generated baselines are gitignored rather than
 
 ## Test Cases
 
-| ID | Screenshot | State captured |
-|---|---|---|
-| VR-01 | `home-header-anonymous` | Site header for a visitor with no session |
-| VR-02 | `home-features-items` | Featured products section on the landing page |
-| VR-03 | `home-subscription` | Footer newsletter block |
-| VR-04 | `products-catalog-grid` | Full catalog grid |
-| VR-05 | `products-card-default` | A single product card in its resting state |
-| VR-06 | `products-category-sidebar` | Category accordion |
+| ID    | Screenshot                   | State captured                                   |
+| ----- | ---------------------------- | ------------------------------------------------ |
+| VR-01 | `home-header-anonymous`      | Site header for a visitor with no session        |
+| VR-02 | `home-features-items`        | Featured products section on the landing page    |
+| VR-03 | `home-subscription`          | Footer newsletter block                          |
+| VR-04 | `products-catalog-grid`      | Full catalog grid                                |
+| VR-05 | `products-card-default`      | A single product card in its resting state       |
+| VR-06 | `products-category-sidebar`  | Category accordion                               |
 | VR-07 | `products-search-no-results` | Catalog area after a search that matches nothing |
-| VR-08 | `product-detail-information` | Product information panel |
-| VR-09 | `product-detail-review-form` | Write-a-review form |
-| VR-10 | `cart-empty` | Empty cart state |
-| VR-11 | `cart-single-item` | Cart table holding one product |
-| VR-12 | `cart-added-modal` | Add-to-cart confirmation modal |
-| VR-13 | `cart-checkout-guard-modal` | Account guard shown to anonymous visitors |
-| VR-14 | `auth-login-form` | Login form |
-| VR-15 | `auth-signup-form` | Signup entry form |
-| VR-16 | `auth-account-info-form` | Full registration form |
-| VR-17 | `contact-form` | Contact form |
-| VR-18 | `header-signed-in` | Site header for a signed-in user |
-| VR-19 | `checkout-address-details` | Delivery and billing address blocks |
-| VR-20 | `payment-form` | Card entry form |
+| VR-08 | `product-detail-information` | Product information panel                        |
+| VR-09 | `product-detail-review-form` | Write-a-review form                              |
+| VR-10 | `cart-empty`                 | Empty cart state                                 |
+| VR-11 | `cart-single-item`           | Cart table holding one product                   |
+| VR-12 | `cart-added-modal`           | Add-to-cart confirmation modal                   |
+| VR-13 | `cart-checkout-guard-modal`  | Account guard shown to anonymous visitors        |
+| VR-14 | `auth-login-form`            | Login form                                       |
+| VR-15 | `auth-signup-form`           | Signup entry form                                |
+| VR-16 | `auth-account-info-form`     | Full registration form                           |
+| VR-17 | `contact-form`               | Contact form                                     |
+| VR-18 | `header-signed-in`           | Site header for a signed-in user                 |
+| VR-19 | `checkout-address-details`   | Delivery and billing address blocks              |
+| VR-20 | `payment-form`               | Card entry form                                  |
 
 ## Thresholds
 

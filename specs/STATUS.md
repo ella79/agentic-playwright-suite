@@ -2,18 +2,18 @@
 
 ## Current Coverage
 
-| Suite | Cases | Cap | State |
-|---|---|---|---|
-| Functional E2E (`tests/`) | 20 | 20 | Implemented, passing |
-| Visual regression (`vr-tests/`) | 20 | 20 | Implemented; Linux baselines generated in CI |
+| Suite                           | Cases | Cap | State                                        |
+| ------------------------------- | ----- | --- | -------------------------------------------- |
+| Functional E2E (`tests/`)       | 20    | 20  | Implemented, passing                         |
+| Visual regression (`vr-tests/`) | 20    | 20  | Implemented; Linux baselines generated in CI |
 
-| Area | Plan | Cases |
-|---|---|---|
-| Authentication | `specs/test-plans/authentication-test-plan.md` | TC-01 to TC-06 |
-| Product browsing | `specs/test-plans/product-browsing-test-plan.md` | TC-07 to TC-11 |
-| Cart | `specs/test-plans/cart-test-plan.md` | TC-12 to TC-16 |
-| Checkout | `specs/test-plans/checkout-test-plan.md` | TC-17 |
-| Engagement | `specs/test-plans/engagement-test-plan.md` | TC-18 to TC-20 |
+| Area              | Plan                                                 | Cases          |
+| ----------------- | ---------------------------------------------------- | -------------- |
+| Authentication    | `specs/test-plans/authentication-test-plan.md`       | TC-01 to TC-06 |
+| Product browsing  | `specs/test-plans/product-browsing-test-plan.md`     | TC-07 to TC-11 |
+| Cart              | `specs/test-plans/cart-test-plan.md`                 | TC-12 to TC-16 |
+| Checkout          | `specs/test-plans/checkout-test-plan.md`             | TC-17          |
+| Engagement        | `specs/test-plans/engagement-test-plan.md`           | TC-18 to TC-20 |
 | Visual regression | `specs/vr-test-plans/visual-regression-test-plan.md` | VR-01 to VR-20 |
 
 ## Findings Raised Against the Application
