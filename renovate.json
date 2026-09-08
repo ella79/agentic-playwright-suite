@@ -33,6 +33,25 @@
       "groupName": "github actions",
       "matchManagers": ["github-actions"],
       "semanticCommitType": "ci"
+    },
+    {
+      "description": "Linters and formatters merge themselves once the gate is green, on non major updates only. Renovate's automerge guidance names development dependencies, and linters and formatters in particular, as the safest category, and limits the practice to non major updates. Nothing here changes what the application does, and the pipeline still has to pass first.",
+      "extends": ["packages:linters"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "minimumReleaseAge": "14 days"
+    },
+    {
+      "description": "Playwright is never automerged. A version change moves glyph rendering, so it needs the baselines regenerated and the agent definitions rebuilt before it can be believed. This is exactly the case Renovate's guidance describes as one to read before merging.",
+      "matchPackageNames": [
+        "@playwright/test",
+        "@playwright/mcp",
+        "mcr.microsoft.com/playwright"
+      ],
+      "automerge": false
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "automerge": true
+  }
 }
