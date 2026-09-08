@@ -315,6 +315,32 @@ jobs:
           path: test-results
           retention-days: 7
 
+  # The single check the branch protection requires.
+  #
+  # GitHub counts a skipped job as a satisfied requirement, so requiring the
+  # test jobs directly would be hollow: cross browser is skipped on pull
+  # requests by design, and any job that stops running would silently stop
+  # being enforced. This job always runs, reads the results of the others, and
+  # fails on anything that is not success or a deliberate skip. Adding a job
+  # later means adding it here rather than editing repository settings.
+  ci-gate:
+    name: ci-gate
+    needs: [static-checks, e2e-playwright, visual-regression, cross-browser]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the results of every job
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          echo "Upstream results: $results"
+          for result in $results; do
+            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
+              echo "::error::A required job reported '$result'"
+              exit 1
+            fi
+          done
+          echo "Every required job passed or was deliberately skipped."
+
   publish-dashboard:
     name: publish-dashboard
     needs: [e2e-playwright, visual-regression, cross-browser]
