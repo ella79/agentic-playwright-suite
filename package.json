@@ -33,17 +33,17 @@
     "playwright:install:chromium": "playwright install --with-deps chromium"
   },
   "devDependencies": {
-    "@microsoft/eslint-formatter-sarif": "^3.1.0",
+    "@microsoft/eslint-formatter-sarif": "3.1.0",
     "@playwright/test": "1.63.0",
     "@types/node": "^24.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.18.0",
-    "@typescript-eslint/parser": "^8.18.0",
+    "@typescript-eslint/eslint-plugin": "8.70.0",
+    "@typescript-eslint/parser": "8.70.0",
     "allure-commandline": "^2.32.0",
     "allure-playwright": "^3.0.0",
-    "eslint": "^9.17.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-playwright": "^2.1.0",
-    "prettier": "^3.4.2",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "9.1.2",
+    "eslint-plugin-playwright": "2.11.0",
+    "prettier": "3.9.6",
     "typescript": "^5.7.2"
   }
 }
