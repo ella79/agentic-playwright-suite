@@ -8,10 +8,26 @@ against an account the suite has to create in the first place. Sharing one accou
 deletion test destroys the session every other test depends on, and parallel workers competing over
 one identity. Isolation is worth more than the second it saves.
 
-**Page objects are not fixtures.** Playwright's documentation shows a page object as one possible
-fixture example, but its page object guide instantiates directly, and a fixture earns its place when
-it owns setup and teardown rather than when it wraps an empty constructor. Specs construct what they
-use. The account, which has a real lifecycle, stays a fixture.
+**Page objects are constructed, the account is a fixture.** The two solve different problems, and the
+choice only makes sense once they are told apart.
+
+A page object, in the original sense of the pattern, "wraps an HTML page, or fragment, with an
+application specific API, allowing you to manipulate page elements without digging around in the
+HTML". It is a vocabulary: it lets a test say what a person does rather than which element is
+clicked.
+
+A fixture, in Playwright's own words, exists "to establish the environment for each test, giving the
+test everything it needs and nothing else", and it owns both halves of that, the setup and the
+teardown, in one place.
+
+The page objects here hold locators and methods and nothing else. There is no state to prepare
+before one is used and nothing to clean up after, so turning each into a fixture would use an
+environment mechanism to do a constructor's job. A spec builds the pages it works with, which is
+also what Playwright's own page object guide does.
+
+The account is the opposite case, and it is why the distinction matters. A test that needs a signed
+in user needs that user to exist before it starts and to be gone when it ends, or every run leaves
+another account behind on a public site. That is environment, so that is a fixture.
 
 **No custom screenshot runtime.** A wrapper enforcing named capture strategies pays for itself
 across hundreds of visual tests. Across twenty it is indirection with nobody to pay for it. Native
