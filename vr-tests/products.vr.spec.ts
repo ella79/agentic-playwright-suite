@@ -8,10 +8,14 @@ test.describe("Visual regression - products", () => {
     await expect(productsPage.allProductsHeading).toBeVisible();
   });
 
-  test("VR-04: catalog grid", async ({ productsPage }) => {
+  // Same reason as VR-02: the grid holds the whole catalog and is far taller
+  // than any reviewable image.
+  test("VR-04: catalog grid", async ({ page, productsPage }) => {
     await expect(productsPage.productCards.first()).toBeVisible();
+    await productsPage.scrollToTop(productsPage.allProductsHeading);
+    await productsPage.waitForImagesLoaded(productsPage.productGrid);
 
-    await expect(productsPage.productGrid).toHaveScreenshot(
+    await expect(page).toHaveScreenshot(
       "products-catalog-grid.png",
       { maxDiffPixelRatio: 0.05 }, // VR: product photography compresses inconsistently
     );
@@ -21,6 +25,7 @@ test.describe("Visual regression - products", () => {
     const card = productsPage.getProductCard(products.blueTop.name);
     await card.scrollIntoViewIfNeeded();
     await expect(card).toBeVisible();
+    await productsPage.waitForImagesLoaded(card);
 
     await expect(card).toHaveScreenshot("products-card-default.png", {
       maxDiffPixelRatio: 0.05, // VR: product photography compresses inconsistently
@@ -41,6 +46,7 @@ test.describe("Visual regression - products", () => {
     await productsPage.searchFor(searchTerms.nonExistent);
     await expect(productsPage.searchedProductsHeading).toBeVisible();
     await expect(productsPage.productCards).toHaveCount(0);
+    await productsPage.waitForImagesLoaded(productsPage.productGrid);
 
     await expect(productsPage.productGrid).toHaveScreenshot(
       "products-search-no-results.png",

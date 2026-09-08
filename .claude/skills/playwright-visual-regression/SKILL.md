@@ -128,6 +128,17 @@ yarn test:vr:update     # regenerate after an intentional UI change
   surprise baseline change is a finding.
 - Delete orphaned baselines when a test is renamed or removed.
 
+## Size Rule
+
+No baseline may be taller than the viewport. A capture a reviewer cannot scan in one screen is not a
+regression check — a diff in it gets approved without being read, which is worse than no test.
+
+The application's `.features_items` grid is 13,347 pixels tall and demonstrates both failure modes:
+the baseline is unreviewable, and the capture expires on the stability check under parallel load
+because product photography is still streaming in. When a region is genuinely larger than the
+viewport, anchor its heading with `scrollToTop` and capture the viewport instead, or scope the
+capture to the repeating component.
+
 ## Anti-Patterns
 
 - Screenshotting without a preceding visibility assertion

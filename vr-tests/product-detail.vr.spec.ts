@@ -9,6 +9,9 @@ test.describe("Visual regression - product detail", () => {
 
   test("VR-08: product information panel", async ({ productDetailPage }) => {
     await expect(productDetailPage.productName).toBeVisible();
+    await productDetailPage.waitForImagesLoaded(
+      productDetailPage.productInformation,
+    );
 
     await expect(productDetailPage.productInformation).toHaveScreenshot(
       "product-detail-information.png",

@@ -19,6 +19,8 @@ test.describe("Visual regression - cart", () => {
     await modal.viewCart();
     await expect(cartPage.getRow(products.blueTop.name)).toBeVisible();
 
+    await cartPage.waitForImagesLoaded(cartPage.cartTable);
+
     await expect(cartPage.cartTable).toHaveScreenshot("cart-single-item.png", {
       maxDiffPixelRatio: 0.05, // VR: the row carries the product thumbnail
     });

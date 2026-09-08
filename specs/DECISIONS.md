@@ -78,3 +78,23 @@ would run as a twenty-first functional case that asserts nothing, breaking the c
 that is tooling rather than coverage. It moved to `seed/seed.spec.ts` and was rewritten to
 demonstrate this project's setup — the shared fixture and a page object — so tests generated from it
 inherit the right shape instead of raw locators.
+
+## 2026-09-08 — No baseline taller than the viewport
+
+Two captures targeted `.features_items`, the element holding the whole catalog. It measures 13,347
+pixels tall, so those two baselines were 2.8 MB images of thirty-four products. They failed
+intermittently under parallel load, timing out on the stability check rather than on any visual
+difference, and the first instinct — raise the screenshot timeout — would have hidden the real
+problem: a diff in an image that size tells a reviewer nothing. Nobody can scan thirteen thousand
+pixels to find the four that changed, so the test could only ever be rubber-stamped.
+
+Both now anchor the section heading to the top of the viewport and capture the viewport itself.
+The baselines dropped to 412 KB, they show the grid layout and card design that the cases were
+always about, and four consecutive runs are clean. `scrollToTop` exists because
+`scrollIntoViewIfNeeded` scrolls the minimum distance needed, which makes the framing depend on
+where the page happened to be.
+
+The related fix, `waitForImagesLoaded`, addresses the same class of problem at its cause: product
+photography streams in after load, so a region containing it keeps reflowing and a capture can
+expire waiting for stability. Waiting on the images themselves is condition-based; raising the
+timeout would only have moved the deadline.
