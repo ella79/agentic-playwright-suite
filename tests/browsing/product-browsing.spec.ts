@@ -10,19 +10,23 @@ test.describe("Product browsing", () => {
     const productsPage = new ProductsPage(page);
     const productDetailPage = new ProductDetailPage(page);
 
-    await productsPage.gotoProductsPage();
-    await expect(productsPage.allProductsHeading).toBeVisible();
-    await expect(productsPage.productCards.first()).toBeVisible();
+    await test.step("the catalog page lists products", async () => {
+      await productsPage.gotoProductsPage();
+      await expect(productsPage.allProductsHeading).toBeVisible();
+      await expect(productsPage.productCards.first()).toBeVisible();
+    });
 
-    await productsPage.openProductDetail(products.blueTop.name);
+    await test.step("opening one shows its name, price and availability", async () => {
+      await productsPage.openProductDetail(products.blueTop.name);
 
-    await expect(productDetailPage.productName).toHaveText(
-      products.blueTop.name,
-    );
-    await expect(productDetailPage.productPrice).toHaveText(
-      products.blueTop.price,
-    );
-    await expect(productDetailPage.availability).toContainText("In Stock");
+      await expect(productDetailPage.productName).toHaveText(
+        products.blueTop.name,
+      );
+      await expect(productDetailPage.productPrice).toHaveText(
+        products.blueTop.price,
+      );
+      await expect(productDetailPage.availability).toContainText("In Stock");
+    });
   });
 
   test("TC-08: search returns only products matching the term", async ({

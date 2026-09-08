@@ -82,7 +82,10 @@ test.describe("Cart", () => {
 
 - The `// spec:` header is mandatory. It is how coverage is traced back to a plan.
 - `test.describe` groups related scenarios. `test.step` marks distinct phases **within one
-  scenario**, not every action.
+  scenario**, not every action. A step is worth adding when a failure would otherwise leave the
+  reader guessing which phase broke, typically an arrange phase followed by the behaviour under
+  test. A scenario that is one action and its verification takes no steps: the step title would
+  only repeat the test title in the report.
 - Test titles state the behaviour being verified, in the user's language. `TC-05: cart shows the
 added product`, not `TC-05: test cart`.
 
