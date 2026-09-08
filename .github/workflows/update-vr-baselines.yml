@@ -33,7 +33,7 @@ jobs:
       - run: yarn install --frozen-lockfile
 
       - name: Install Chromium
-        run: yarn playwright:install
+        run: yarn playwright:install:chromium
 
       - name: Regenerate baselines
         run: yarn test:vr:update

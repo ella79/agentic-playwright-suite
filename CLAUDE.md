@@ -18,7 +18,7 @@ E2E and visual regression test suite for [Automation Exercise](https://automatio
 | `yarn test:e2e:ui`                  | Playwright interactive UI                              |
 | `yarn test:vr`                      | Run all visual regression tests                        |
 | `yarn test:vr:update`               | Regenerate VR baselines after an intentional UI change |
-| `yarn test:report`                  | Open last Playwright HTML report                       |
+| `yarn test:e2e:report`              | Open last Playwright HTML report                       |
 | `yarn typecheck`                    | TypeScript check (no emit)                             |
 | `yarn lint` / `yarn lint:fix`       | ESLint check / auto-fix                                |
 | `yarn stylecheck` / `yarn stylefix` | Prettier check / auto-fix                              |
@@ -38,7 +38,7 @@ utils/
   testData.ts         Unique data generators
   url.ts              URL constants
 playwright.config.ts  Playwright configuration (chromium + visual projects)
-.github/workflows/    CI pipeline: static-checks, e2e-tests, visual-regression, publish-dashboard
+.github/workflows/    CI pipeline: prepare-playwright-image, static-checks, e2e-playwright, visual-regression, publish-dashboard
 ```
 
 ## Writing Tests
@@ -81,9 +81,8 @@ Browser access goes through the MCP servers in `.mcp.json` — `playwright-test`
 
 ## CI/CD
 
-GitHub Actions (`.github/workflows/ci.yml`), four jobs:
+GitHub Actions (`.github/workflows/ci.yml`), five jobs in three stages:
 
-1. `static-checks` — every push/PR: typecheck, lint, format check
-2. `e2e-tests` — functional suite, sharded
-3. `visual-regression` — VR suite, separate job so a broken screenshot doesn't block functional signal
-4. `publish-dashboard` — merges results into an Allure report with trend history, deploys to GitHub Pages (push to `main` only)
+1. **build** — `prepare-playwright-image`: builds `env/docker/e2e-playwright.Dockerfile` and pushes it to ghcr.io. Every later job runs inside that image, so dependencies and browsers install once. The tag hashes `package.json` + `yarn.lock`, so a dependency change forces a rebuild.
+2. **check** — `static-checks`: typecheck, lint, format check. Gates everything after it.
+3. **end2end** — `e2e-playwright` and `visual-regression` in parallel, then `publish-dashboard` merges both reports, restores Allure trend history from the published site, and deploys to GitHub Pages (push to `main` only).

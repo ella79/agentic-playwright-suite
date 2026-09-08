@@ -21,7 +21,7 @@ judgment than two hundred that nobody can explain.
 
 ```bash
 yarn install
-yarn playwright:install
+yarn playwright:install:chromium
 yarn test:e2e
 ```
 
@@ -31,7 +31,7 @@ yarn test:e2e
 | `yarn test:vr`                                     | Visual suite against committed baselines         |
 | `yarn docker:vr`                                   | Visual suite in the same Linux image CI uses     |
 | `yarn docker:vr:update`                            | Regenerate baselines with CI-identical rendering |
-| `yarn test:report`                                 | Open the last HTML report                        |
+| `yarn test:e2e:report`                             | Open the last HTML report                        |
 | `yarn typecheck` / `yarn lint` / `yarn stylecheck` | The three static gates CI runs first             |
 
 ## Architecture
@@ -85,9 +85,11 @@ second it saves.
 across hundreds of visual tests. Across twenty it is indirection with no payer. Native
 `toHaveScreenshot()` with documented thresholds does the same work in less code.
 
-**Baselines are generated in CI, never on a laptop.** Screenshots are platform-specific. A baseline
-produced on Windows will not match a Linux runner, so locally generated ones are gitignored and a
-separate manual workflow regenerates the authoritative set on the platform that compares them.
+**Baselines are generated in a container, never on the host.** Screenshots are platform-specific: one
+produced on Windows will not match a Linux runner. `yarn docker:vr:update` regenerates them inside
+the same image CI runs, so a developer on any host produces the authoritative set. Baselines written
+directly on Windows or macOS are gitignored, and the visual job fails outright rather than seeding
+its own.
 
 ## The Agent Workflow
 
@@ -153,20 +155,33 @@ Both of these were live in the suite and would have shipped:
 ## CI/CD
 
 ```
-static-checks ──┬──▶ e2e-tests (2 shards) ──┐
-                │                           ├──▶ publish-dashboard
-                └──▶ visual-regression ─────┘
+   build              check                    end2end
+
+prepare-        ──▶ static-checks ──┬──▶ e2e-playwright ────┐
+playwright-image                    │                       ├──▶ publish-dashboard
+                                    └──▶ visual-regression ─┘
 ```
 
 Runs on every push and pull request to `main`.
 
+- `prepare-playwright-image` — builds the execution image from
+  [`env/docker/e2e-playwright.Dockerfile`](env/docker/e2e-playwright.Dockerfile) and pushes it to
+  the GitHub Container Registry. Every job after it runs **inside** that image, so browsers and
+  dependencies are installed once rather than three times. The tag carries the Playwright version
+  and a hash of `package.json` plus `yarn.lock`, so a dependency change produces a new tag and no
+  job can run against an image whose `node_modules` no longer match the lockfile.
 - `static-checks` — typecheck, lint, format. Gates everything else.
-- `e2e-tests` — functional suite across two shards.
+- `e2e-playwright` — the functional suite.
 - `visual-regression` — separate job, so a screenshot diff never hides functional signal. It fails
   fast if no Linux baselines are committed, because with no baseline Playwright writes one and
   reports success: the job would go green while comparing nothing.
-- `publish-dashboard` — merges results from every shard, restores the previous run's trend history
-  from the published site, and deploys the Allure report to GitHub Pages. Runs on `main` only.
+- `publish-dashboard` — merges the reports from both test jobs, restores the previous run's trend
+  history from the published site, and deploys the Allure report to GitHub Pages. Runs on `main`
+  only.
+
+The image is the point of the `build` stage: it is what makes the container the tests run in
+identical to the one `yarn docker:vr` uses locally, which is the only reason a visual baseline
+generated on a laptop can be trusted against a runner.
 
 Traces, screenshots, and visual diffs upload as artifacts on failure.
 

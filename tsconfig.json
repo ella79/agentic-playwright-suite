@@ -1,14 +1,24 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
     "target": "ES2022",
-    "module": "commonjs",
+    "module": "CommonJS",
     "lib": ["ES2022", "DOM"],
+    "types": ["node", "@playwright/test"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "skipLibCheck": true,
+    // Traces and stack frames point back at the source rather than at
+    // compiled output, which is what makes a CI failure readable.
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "noEmit": true
   },
   "include": [
@@ -17,5 +27,6 @@
     "vr-tests/**/*.ts",
     "utils/**/*.ts",
     "playwright.config.ts"
-  ]
+  ],
+  "exclude": ["node_modules"]
 }

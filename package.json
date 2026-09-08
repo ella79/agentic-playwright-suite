@@ -7,6 +7,7 @@
     "stylecheck": "prettier --check .",
     "stylecheck:ci": "yarn stylecheck",
     "stylefix": "prettier --write .",
+    "stylefix:ci": "yarn stylefix",
     "typecheck": "tsc --noEmit",
     "typecheck:ci": "yarn typecheck",
     "lint": "eslint .",
@@ -21,13 +22,13 @@
     "test:vr": "playwright test --project=visual",
     "test:vr:update": "playwright test --project=visual --update-snapshots",
     "test:vr:headed": "playwright test --project=visual --headed",
-    "test:report": "playwright show-report",
+    "test:e2e:report": "playwright show-report",
     "docker:e2e": "docker compose run --rm e2e",
     "docker:vr": "docker compose run --rm vr",
     "docker:vr:update": "docker compose run --rm vr-update",
     "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
     "allure:open": "allure open ./allure-report",
-    "playwright:install": "playwright install --with-deps chromium"
+    "playwright:install:chromium": "playwright install --with-deps chromium"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

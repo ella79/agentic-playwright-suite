@@ -12,21 +12,77 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "20"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/e2e-exec-playwright
 
 jobs:
-  static-checks:
-    name: Static checks
+  # Stage: build
+  #
+  # Builds the execution image every other job runs inside, so the test jobs
+  # start with browsers and dependencies already present instead of installing
+  # them three times over. The tag carries the Playwright version and a hash of
+  # the dependency manifests: any change to either produces a new tag, which is
+  # what keeps a job from running against an image whose node_modules no longer
+  # match the lockfile.
+  prepare-playwright-image:
+    name: prepare-playwright-image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: yarn
+      - name: Resolve image tag
+        id: meta
+        run: |
+          version=$(node -p "require('./package.json').devDependencies['@playwright/test']")
+          deps=$(cat package.json yarn.lock | sha256sum | cut -c1-12)
+          image="${REGISTRY}/${IMAGE_NAME}:v${version}-${deps}"
+          echo "image=${image,,}" >> "$GITHUB_OUTPUT"
+          echo "Image: ${image,,}"
 
-      - run: yarn install --frozen-lockfile
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to the container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: env/docker/e2e-playwright.Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.image }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Stage: check
+  static-checks:
+    name: static-checks
+    needs: prepare-playwright-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    container:
+      image: ${{ needs.prepare-playwright-image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The image installed dependencies at /workspace; the checkout lands
+      # elsewhere, so the job points at them rather than installing again.
+      - name: Link dependencies from the image
+        run: ln -s /workspace/node_modules node_modules
 
       - name: TypeScript
         run: yarn typecheck:ci
@@ -37,45 +93,44 @@ jobs:
       - name: Prettier
         run: yarn stylecheck:ci
 
-  e2e-tests:
-    name: E2E (shard ${{ matrix.shard }}/2)
-    needs: static-checks
+  # Stage: end2end
+  e2e-playwright:
+    name: e2e-playwright
+    needs: [prepare-playwright-image, static-checks]
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2]
+    permissions:
+      contents: read
+      packages: read
+    container:
+      image: ${{ needs.prepare-playwright-image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: yarn
-
-      - run: yarn install --frozen-lockfile
-
-      - name: Install Chromium
-        run: yarn playwright:install
+      - name: Link dependencies from the image
+        run: ln -s /workspace/node_modules node_modules
 
       - name: Run functional suite
-        run: yarn test:e2e --shard=${{ matrix.shard }}/2
+        run: yarn test:e2e
 
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results-e2e-${{ matrix.shard }}
+          name: allure-results-e2e
           path: allure-results
           retention-days: 7
 
-      # Blob is the only report format that merges correctly across shards.
+      # Blob is the format merge-reports consumes, so the published HTML report
+      # can hold both this job's run and the visual one's.
       - name: Upload blob report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-e2e-${{ matrix.shard }}
+          name: blob-report-e2e
           path: blob-report
           retention-days: 7
 
@@ -83,38 +138,38 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-traces-${{ matrix.shard }}
+          name: e2e-traces
           path: test-results
           retention-days: 7
 
   visual-regression:
-    name: Visual regression
-    needs: static-checks
+    name: visual-regression
+    needs: [prepare-playwright-image, static-checks]
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    container:
+      image: ${{ needs.prepare-playwright-image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: yarn
+      - name: Link dependencies from the image
+        run: ln -s /workspace/node_modules node_modules
 
-      - run: yarn install --frozen-lockfile
-
-      - name: Install Chromium
-        run: yarn playwright:install
-
-      # Baselines are committed from this same platform by the
-      # update-vr-baselines workflow. Without them Playwright would write new
-      # ones and report success, so their absence is treated as a failure
-      # rather than silently self-seeding a green run.
+      # Baselines are committed from this same platform. Without them Playwright
+      # would write new ones and report success, so their absence is a failure
+      # rather than a silently self-seeded green run.
       - name: Verify Linux baselines exist
         run: |
           count=$(find vr-tests -name '*-linux.png' | wc -l)
           echo "Found $count Linux baselines"
           if [ "$count" -eq 0 ]; then
-            echo "::error::No Linux baselines committed. Run the update-vr-baselines workflow first."
+            echo "::error::No Linux baselines committed. Run yarn docker:vr:update and commit the result."
             exit 1
           fi
 
@@ -146,8 +201,8 @@ jobs:
           retention-days: 7
 
   publish-dashboard:
-    name: Publish dashboard
-    needs: [e2e-tests, visual-regression]
+    name: publish-dashboard
+    needs: [e2e-playwright, visual-regression]
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
@@ -157,7 +212,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: "20"
           cache: yarn
 
       - uses: actions/setup-java@v4
@@ -207,7 +262,7 @@ jobs:
           path: all-blob-reports
           merge-multiple: true
 
-      - name: Merge sharded reports
+      - name: Merge reports from both test jobs
         run: |
           npx playwright merge-reports --reporter html ./all-blob-reports
           mv playwright-report allure-report/playwright-report
