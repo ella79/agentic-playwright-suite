@@ -1,4 +1,4 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { BaseAppPage } from "../baseAppPage";
 import { url } from "../../url";
 
@@ -32,6 +32,7 @@ export class HomePage extends BaseAppPage {
 
   async gotoHomePage(): Promise<void> {
     await this.goto(url.home);
+    await expect(this.featuresItemsHeading).toBeVisible();
   }
 
   async subscribeToNewsletter(email: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { BaseAppPage } from "../baseAppPage";
 import { AddToCartModal } from "../shared/addToCartModal";
 import { url } from "../../url";
@@ -44,6 +44,10 @@ export class ProductDetailPage extends BaseAppPage {
 
   async gotoProductDetailPage(productId: number): Promise<void> {
     await this.goto(url.productDetail(productId));
+    await expect(this.page).toHaveURL(
+      new RegExp(`${url.productDetail(productId)}$`),
+    );
+    await expect(this.productName).toBeVisible();
   }
 
   async setQuantity(quantity: number): Promise<void> {

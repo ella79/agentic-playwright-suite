@@ -1,4 +1,4 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { BaseAppPage } from "../baseAppPage";
 import { url } from "../../url";
 
@@ -49,6 +49,8 @@ export class LoginPage extends BaseAppPage {
 
   async gotoLoginPage(): Promise<void> {
     await this.goto(url.login);
+    await expect(this.page).toHaveURL(new RegExp(`${url.login}$`));
+    await expect(this.loginHeading).toBeVisible();
   }
 
   async login(email: string, password: string): Promise<void> {

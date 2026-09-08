@@ -38,6 +38,18 @@ test that needs an account registers its own and deletes it afterwards.
 | `E2E_BASE_URL` | Point the suite at a different host. Defaults to `https://automationexercise.com`       |
 | `CI`           | Set by the pipeline. Switches reporters to blob, enables one retry, caps workers at two |
 
+## The Standards Behind This
+
+The conventions below are not only prose. Three skills in `.claude/skills/` hold them, agents read
+them before writing anything, and four of the rules are ESLint errors so a violation fails the
+pipeline rather than waiting for a reviewer to notice.
+
+| Skill                                                                                       | Holds                                                                                                                                                      |
+| ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`playwright-pageobject-testing`](../.claude/skills/playwright-pageobject-testing/SKILL.md) | The coding standard: locator priority, page object structure, fixtures, assertions, and the anti-patterns that get a change rejected                       |
+| [`playwright-visual-regression`](../.claude/skills/playwright-visual-regression/SKILL.md)   | What to capture and what not to, state preparation before a screenshot, threshold selection, and the rule that no baseline may be taller than the viewport |
+| [`playwright-mcp`](../.claude/skills/playwright-mcp/SKILL.md)                               | How agents drive the live application, which MCP server to use for which job, and the traps this particular site sets                                      |
+
 ## Design
 
 **Two page object bases.** `BaseAppPage` owns navigation and the shared chrome. `BaseComponentPage`

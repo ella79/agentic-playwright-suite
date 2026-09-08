@@ -40,3 +40,26 @@ The skills are enforced rather than suggested. Four rules from
 forced clicks and every test must assert, are configured as ESLint errors scoped to spec files. A
 violation fails `static-checks` before any test runs, because a standard that lives only in prose is
 a standard that erodes.
+
+## The Loop
+
+The agents are not six ways to ask for a test. They are one chain, and each link hands the next
+something narrower than it received.
+
+1. **Explore.** The planner opens the application through MCP and reads the accessibility tree, so
+   the locators that end up in code were seen rather than guessed.
+2. **Plan.** It writes the area's plan into `specs/test-plans/`, with the cases, the states worth
+   covering, and an explicit list of what it is leaving out.
+3. **Implement one case.** The generator takes a single case from that plan, walks it in the
+   browser, and writes the spec, whose `// spec:` header points back at the plan that justifies it.
+4. **Page object first.** If a locator it needs does not exist, it goes into the page object before
+   it is used. The generated agent's own example writes `page.click(...)` directly, which is exactly
+   why the project rules section overrides it.
+5. **Review.** The reviewer audits the result against the coding standard and reports. It cannot
+   edit, so it cannot quietly fix what it should be reporting.
+6. **Heal.** If a case fails, the healer establishes the cause before changing anything, and
+   classifies it: application changed, test raced the UI, state left by another test, third party
+   noise, or a genuine defect, which is parked with `test.fixme()` rather than repaired.
+
+The companion runs that chain for one area. The manager decides which area is next, and owns the
+caps. Skills are not chosen by the agents: they are the standards each step is measured against.

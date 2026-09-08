@@ -1,4 +1,4 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { BaseAppPage } from "../baseAppPage";
 import { url } from "../../url";
 
@@ -37,6 +37,8 @@ export class ContactUsPage extends BaseAppPage {
 
   async gotoContactUsPage(): Promise<void> {
     await this.goto(url.contactUs);
+    await expect(this.page).toHaveURL(new RegExp(`${url.contactUs}$`));
+    await expect(this.getInTouchHeading).toBeVisible();
   }
 
   async fillForm(details: {
