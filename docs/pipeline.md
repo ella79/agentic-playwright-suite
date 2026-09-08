@@ -57,12 +57,26 @@ pipeline run that produced it.
 
 ## Dependency Updates
 
-[`renovate.json`](renovate.json) configures Renovate, which needs the app installed on the
-repository to act. The configuration encodes one constraint the project cannot survive without:
-`@playwright/test` and the `mcr.microsoft.com/playwright` image tag are grouped into a single pull
-request. The image ships browser binaries built for that exact release, so letting them move
-separately would leave the repository in a state where the rendering the baselines were captured
-with no longer matches the rendering they are compared against.
+[`renovate.json`](../renovate.json) extends `config:best-practices`, which is what Renovate's own
+upgrade guidance recommends over `config:recommended`. That preset is where most of the behaviour
+comes from: it pins Docker images to digests, pins GitHub Actions to commit SHAs, pins dev
+dependencies, maintains lock files weekly, and holds npm releases for a minimum age before offering
+them. Every dependency pull request this repository has received came from those rules rather than
+from anything written here.
 
-Any Playwright update carries a note to regenerate the baselines afterwards, and to regenerate the
-agent definitions, since both are tied to the installed version.
+Three rules are local, because no preset can know them:
+
+| Rule             | Why it cannot come from a preset                                                                                                                                                                                                                                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `playwright`     | The npm package and the `mcr.microsoft.com/playwright` image must move together. The image ships browser binaries built for that release, so splitting them would leave the suite comparing screenshots against baselines captured by a different renderer. The pull request also carries the instructions to regenerate baselines and agent definitions afterwards |
+| `allure`         | The reporter and the command line generator have to agree on the results format                                                                                                                                                                                                                                                                                     |
+| `github actions` | Keeps the pipeline's own updates in one review                                                                                                                                                                                                                                                                                                                      |
+
+Linting is grouped by the official `group:linters` preset rather than by hand. It covers `eslint**`,
+`@typescript-eslint/**`, `@stylistic/eslint-plugin**` and `prettier`, and its documented reason is
+better than the one a local rule would give: upgrading linters individually means reasoning about
+peer dependencies one package at a time.
+
+Nothing else is configured. `dependencyDashboard`, weekly lock file maintenance and a concurrent
+pull request limit of ten are all already what the presets or the defaults give, so setting them
+again would only be noise that reads like configuration.
