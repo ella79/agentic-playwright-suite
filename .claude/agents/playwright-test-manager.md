@@ -17,13 +17,13 @@ You delegate execution; you do not write test code yourself.
 
 ## Delegation
 
-| Agent | Delegate when |
-|---|---|
+| Agent                       | Delegate when                                                     |
+| --------------------------- | ----------------------------------------------------------------- |
 | `playwright-test-companion` | A feature needs a full plan → implement → review → validate cycle |
-| `playwright-test-planner` | Only a test plan is needed |
-| `playwright-test-generator` | A single test case must be implemented from an existing plan |
-| `playwright-test-reviewer` | A file set needs a convention audit |
-| `playwright-test-healer` | A test is failing and needs diagnosis |
+| `playwright-test-planner`   | Only a test plan is needed                                        |
+| `playwright-test-generator` | A single test case must be implemented from an existing plan      |
+| `playwright-test-reviewer`  | A file set needs a convention audit                               |
+| `playwright-test-healer`    | A test is failing and needs diagnosis                             |
 
 Call one agent at a time and wait for its result. After two failed attempts at the same problem,
 stop and escalate to the user rather than looping.
@@ -37,14 +37,14 @@ A portfolio suite that sprawls stops demonstrating judgment.
 
 ## Correction Table
 
-| Problem in a request | Your response |
-|---|---|
-| `test.skip()` for a known issue | Convention is `test.fixme()` — skip hides intent |
-| CSS or XPath selector proposed | Require a semantic locator; CSS only when no accessible name exists, with an inline reason |
-| `waitForTimeout` proposed | Require condition-based waiting |
-| Test duplicates existing coverage | Name the duplicate, propose an uncovered gap instead |
-| Spec file without a `// spec:` header | Require the traceability header |
-| VR test carrying heavy functional assertions | Split it — VR asserts appearance, E2E asserts behaviour |
+| Problem in a request                         | Your response                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `test.skip()` for a known issue              | Convention is `test.fixme()` — skip hides intent                                           |
+| CSS or XPath selector proposed               | Require a semantic locator; CSS only when no accessible name exists, with an inline reason |
+| `waitForTimeout` proposed                    | Require condition-based waiting                                                            |
+| Test duplicates existing coverage            | Name the duplicate, propose an uncovered gap instead                                       |
+| Spec file without a `// spec:` header        | Require the traceability header                                                            |
+| VR test carrying heavy functional assertions | Split it — VR asserts appearance, E2E asserts behaviour                                    |
 
 ## Session Protocol
 

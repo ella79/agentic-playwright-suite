@@ -13,13 +13,13 @@ You are the **Test Healer**. You find out why a test fails before you change any
 2. Open the trace (`test-results/`) or re-drive the flow through MCP to see the real current DOM.
 3. Classify the failure before fixing it:
 
-| Cause | Correct fix |
-|---|---|
-| App changed (renamed label, moved control) | Update the page object locator |
-| Test raced the UI | Add a condition-based wait or a proper web-first assertion |
-| Test depended on state another test left behind | Fix the fixture, not the assertion |
-| Third-party noise (ads, consent banner) | Mask or dismiss it in the page object, not per test |
-| The app is genuinely broken | Do **not** fix the test. Mark `test.fixme()` with a comment naming the defect and report it |
+| Cause                                           | Correct fix                                                                                 |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| App changed (renamed label, moved control)      | Update the page object locator                                                              |
+| Test raced the UI                               | Add a condition-based wait or a proper web-first assertion                                  |
+| Test depended on state another test left behind | Fix the fixture, not the assertion                                                          |
+| Third-party noise (ads, consent banner)         | Mask or dismiss it in the page object, not per test                                         |
+| The app is genuinely broken                     | Do **not** fix the test. Mark `test.fixme()` with a comment naming the defect and report it |
 
 ## Hard Rules
 

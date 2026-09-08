@@ -12,15 +12,15 @@ cries wolf gets ignored, which is worse than having none.
 
 ## Repository Conventions
 
-| Path | Purpose |
-|---|---|
-| `vr-tests/` | VR spec files, one per feature area |
+| Path                                    | Purpose                                               |
+| --------------------------------------- | ----------------------------------------------------- |
+| `vr-tests/`                             | VR spec files, one per feature area                   |
 | `vr-tests/<name>.vr.spec.ts-snapshots/` | Baseline PNGs, created by Playwright next to the spec |
-| `specs/vr-test-plans/` | VR test plans |
+| `specs/vr-test-plans/`                  | VR test plans                                         |
 
-| Item | Pattern | Example |
-|---|---|---|
-| Spec file | `<area>.vr.spec.ts` | `cart.vr.spec.ts` |
+| Item       | Pattern              | Example                     |
+| ---------- | -------------------- | --------------------------- |
+| Spec file  | `<area>.vr.spec.ts`  | `cart.vr.spec.ts`           |
 | Screenshot | `<area>-<state>.png` | `cart-with-single-item.png` |
 
 Playwright appends the platform suffix (`-chromium-linux.png`) itself. Baselines are generated on
@@ -37,11 +37,11 @@ populated cart), an open modal, a form's layout, a confirmation page.
 
 ## The VR / E2E Boundary
 
-| Question | Where it belongs |
-|---|---|
-| Does it look right? | VR test |
-| Does it work? | Functional E2E |
-| Is the label correct? | Functional E2E |
+| Question              | Where it belongs |
+| --------------------- | ---------------- |
+| Does it look right?   | VR test          |
+| Does it work?         | Functional E2E   |
+| Is the label correct? | Functional E2E   |
 
 A VR test contains the minimum interaction needed to reach the state, then one screenshot. If a VR
 test has five assertions, it is a functional test wearing a costume.
@@ -56,7 +56,9 @@ await expect(productsPage.productGrid).toBeVisible();
 await productsPage.productGrid.scrollIntoViewIfNeeded();
 await expect(productsPage.firstProductCard).toBeVisible();
 
-await expect(productsPage.firstProductCard).toHaveScreenshot("products-card-default.png");
+await expect(productsPage.firstProductCard).toHaveScreenshot(
+  "products-card-default.png",
+);
 ```
 
 1. Navigate.
@@ -77,17 +79,19 @@ application, from ad iframes that inject at unpredictable offsets.
 await expect(cartPage.cartTable).toHaveScreenshot("cart-with-single-item.png");
 
 // Only when the visual genuinely spans the viewport (modal over the page)
-await expect(page).toHaveScreenshot("checkout-guard-modal.png", { maxDiffPixelRatio: 0.03 });
+await expect(page).toHaveScreenshot("checkout-guard-modal.png", {
+  maxDiffPixelRatio: 0.03,
+});
 ```
 
 ## Thresholds
 
-| Content | `maxDiffPixelRatio` | Why |
-|---|---|---|
-| Static layout, no images | `0.01` (default) | Any change is meaningful |
-| Layout with text | `0.01`–`0.03` | Font rendering varies slightly |
-| Product images, gradients | `0.05`–`0.08` | Image decoding and compression vary |
-| Full-page with dynamic regions | `0.03` | Surrounding content adds noise |
+| Content                        | `maxDiffPixelRatio` | Why                                 |
+| ------------------------------ | ------------------- | ----------------------------------- |
+| Static layout, no images       | `0.01` (default)    | Any change is meaningful            |
+| Layout with text               | `0.01`–`0.03`       | Font rendering varies slightly      |
+| Product images, gradients      | `0.05`–`0.08`       | Image decoding and compression vary |
+| Full-page with dynamic regions | `0.03`              | Surrounding content adds noise      |
 
 Start at the default. Raise only after a test has actually proven flaky, and document why inline:
 

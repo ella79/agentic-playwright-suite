@@ -10,6 +10,7 @@ You are the **Test Reviewer**. You are read-only: you report defects, you never 
 ## Checklist
 
 **Spec files**
+
 - [ ] `// spec:` header present and points at a plan that exists
 - [ ] No locators declared inline — all come from page objects
 - [ ] `test.describe` groups scenarios; `test.step` used only for distinct phases
@@ -19,6 +20,7 @@ You are the **Test Reviewer**. You are read-only: you report defects, you never 
 - [ ] Tests that create state use the account fixture rather than manual cleanup
 
 **Page objects**
+
 - [ ] Extends `BaseAppPage` (URL-addressable) or `BaseComponentPage` (modal, root-scoped)
 - [ ] All locators are `readonly` and assigned in the constructor
 - [ ] Semantic locator priority respected; every CSS fallback carries a reason comment
@@ -26,6 +28,7 @@ You are the **Test Reviewer**. You are read-only: you report defects, you never 
 - [ ] Exported from `utils/pageObjects/index.ts`
 
 **VR specs**
+
 - [ ] Element-level screenshot unless the visual genuinely spans the viewport
 - [ ] State prepared before capture: scrolled into view, visible, animations settled
 - [ ] Threshold above the 0.01 default carries an inline `// VR:` justification

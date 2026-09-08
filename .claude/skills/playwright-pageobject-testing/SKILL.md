@@ -56,6 +56,7 @@ export class CartPage extends BaseAppPage {
 ```
 
 Rules:
+
 - Locators are `readonly` properties assigned in the constructor. Never inline a locator in a spec.
 - Method names describe the user's task (`addToCart`), not the mechanics (`clickAddButton`).
 - A method that navigates to another page returns that page object; a method that opens a modal
@@ -71,7 +72,9 @@ import { test } from "../../utils/fixtures/testFixtures";
 import { CartPage } from "../../utils/pageObjects";
 
 test.describe("Cart", () => {
-  test("TC-05: adding a product from the detail page puts it in the cart", async ({ page }) => {
+  test("TC-05: adding a product from the detail page puts it in the cart", async ({
+    page,
+  }) => {
     // ...
   });
 });
@@ -81,7 +84,7 @@ test.describe("Cart", () => {
 - `test.describe` groups related scenarios. `test.step` marks distinct phases **within one
   scenario**, not every action.
 - Test titles state the behaviour being verified, in the user's language. `TC-05: cart shows the
-  added product`, not `TC-05: test cart`.
+added product`, not `TC-05: test cart`.
 
 ## Fixtures
 
@@ -100,11 +103,11 @@ A test that deletes its own account sets `account.deleted = true` so teardown do
 
 ## Anti-Patterns
 
-| Anti-pattern | Why it is rejected |
-|---|---|
-| `waitForTimeout` | Arbitrary — too short under CI load, too slow otherwise. Wait on a condition |
-| Inline locator in a spec | The next locator change then has to be made in N places |
-| `test.skip()` for a known bug | Hides intent. `test.fixme()` says "this should pass and does not" |
-| `nth(0)` to resolve ambiguity | Couples the test to DOM order. Scope to a container instead |
-| Asserting on ad or consent content | Third-party, changes without notice, not our product |
-| A test that only passes on retry | That is a failing test with extra steps |
+| Anti-pattern                       | Why it is rejected                                                           |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| `waitForTimeout`                   | Arbitrary — too short under CI load, too slow otherwise. Wait on a condition |
+| Inline locator in a spec           | The next locator change then has to be made in N places                      |
+| `test.skip()` for a known bug      | Hides intent. `test.fixme()` says "this should pass and does not"            |
+| `nth(0)` to resolve ambiguity      | Couples the test to DOM order. Scope to a container instead                  |
+| Asserting on ad or consent content | Third-party, changes without notice, not our product                         |
+| A test that only passes on retry   | That is a failing test with extra steps                                      |

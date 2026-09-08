@@ -19,12 +19,12 @@ anonymous states render different navigation.
 
 ## When To Use
 
-| Situation | Use MCP for |
-|---|---|
-| Planning a new feature area | Walking the flow, listing states, capturing accessible names |
-| A locator does not resolve | Snapshotting the current DOM to see what the element is actually called |
-| A test fails and the error is unclear | Re-driving the exact steps and observing where reality diverges |
-| Deciding a VR threshold | Comparing repeated screenshots of the same state for natural variance |
+| Situation                             | Use MCP for                                                             |
+| ------------------------------------- | ----------------------------------------------------------------------- |
+| Planning a new feature area           | Walking the flow, listing states, capturing accessible names            |
+| A locator does not resolve            | Snapshotting the current DOM to see what the element is actually called |
+| A test fails and the error is unclear | Re-driving the exact steps and observing where reality diverges         |
+| Deciding a VR threshold               | Comparing repeated screenshots of the same state for natural variance   |
 
 ## When Not To Use
 

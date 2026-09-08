@@ -23,20 +23,24 @@ guess at selectors or flows from memory.
 # <Feature> Test Plan
 
 ## Scope
+
 What this plan covers, and explicitly what it does not.
 
 ## Preconditions
+
 Account state, cart state, entry URL.
 
 ## Test Cases
 
 ### TC-01: <behaviour being verified>
+
 - **Type:** happy path | error state
 - **Steps:** numbered, user-level, no code
 - **Expected:** observable outcome, phrased as an assertion
 - **Locator notes:** accessible names confirmed during exploration
 
 ## Out of Scope
+
 Cases deliberately left uncovered, and why.
 ```
 

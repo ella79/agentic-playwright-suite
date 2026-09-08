@@ -22,8 +22,14 @@ export default [
     rules: {
       ...tseslint.configs.recommended.rules,
       ...playwright.configs["flat/recommended"].rules,
+      // TypeScript already resolves identifiers; no-undef only produces false
+      // positives on ambient Node globals here.
+      "no-undef": "off",
       "playwright/no-conditional-in-test": "off",
-      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
     },
   },
   prettier,

@@ -13,14 +13,14 @@ yarn test:e2e
 
 ## Commands
 
-| Command | Purpose |
-|---|---|
-| `yarn test:e2e` | Run the functional E2E suite |
-| `yarn test:vr` | Run the visual regression suite |
-| `yarn test:report` | Open the last HTML report |
-| `yarn typecheck` | TypeScript check |
-| `yarn lint` | ESLint |
-| `yarn stylecheck` | Prettier check |
+| Command            | Purpose                         |
+| ------------------ | ------------------------------- |
+| `yarn test:e2e`    | Run the functional E2E suite    |
+| `yarn test:vr`     | Run the visual regression suite |
+| `yarn test:report` | Open the last HTML report       |
+| `yarn typecheck`   | TypeScript check                |
+| `yarn lint`        | ESLint                          |
+| `yarn stylecheck`  | Prettier check                  |
 
 ## Status
 

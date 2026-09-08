@@ -11,5 +11,10 @@
     "resolveJsonModule": true,
     "noEmit": true
   },
-  "include": ["tests/**/*.ts", "vr-tests/**/*.ts", "utils/**/*.ts", "playwright.config.ts"]
+  "include": [
+    "tests/**/*.ts",
+    "vr-tests/**/*.ts",
+    "utils/**/*.ts",
+    "playwright.config.ts"
+  ]
 }
