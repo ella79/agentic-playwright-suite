@@ -1,1 +1,1 @@
-{"total":1,"items":[{"uid":"2089e1c4a7affb723d6b019d29a1231a","name":"Functional E2E","statistic":{"failed":0,"broken":1,"skipped":0,"passed":4,"unknown":0,"total":5}}]}
+{"total":1,"items":[{"uid":"2089e1c4a7affb723d6b019d29a1231a","name":"Functional E2E","statistic":{"failed":0,"broken":0,"skipped":0,"passed":5,"unknown":0,"total":5}}]}
