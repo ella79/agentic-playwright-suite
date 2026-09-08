@@ -1,30 +1,26 @@
 // spec: specs/vr-test-plans/visual-regression-test-plan.md
 import { expect, test } from "../utils/fixtures/testFixtures";
-import { AccountInfoPage, HomePage, LoginPage } from "../utils/pageObjects";
 import { buildAccount } from "../utils/testData";
 
 test.describe("Visual regression - authentication", () => {
-  test("VR-14: login form", async ({ page }) => {
-    const loginPage = new LoginPage(page);
-
+  test("VR-14: login form", async ({ loginPage }) => {
     await loginPage.gotoLoginPage();
     await expect(loginPage.loginButton).toBeVisible();
 
     await expect(loginPage.loginForm).toHaveScreenshot("auth-login-form.png");
   });
 
-  test("VR-15: signup entry form", async ({ page }) => {
-    const loginPage = new LoginPage(page);
-
+  test("VR-15: signup entry form", async ({ loginPage }) => {
     await loginPage.gotoLoginPage();
     await expect(loginPage.signupButton).toBeVisible();
 
     await expect(loginPage.signupForm).toHaveScreenshot("auth-signup-form.png");
   });
 
-  test("VR-16: full registration form", async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    const accountInfoPage = new AccountInfoPage(page);
+  test("VR-16: full registration form", async ({
+    loginPage,
+    accountInfoPage,
+  }) => {
     const candidate = buildAccount();
 
     await loginPage.gotoLoginPage();
@@ -38,11 +34,9 @@ test.describe("Visual regression - authentication", () => {
   });
 
   test("VR-18: site header for a signed-in user", async ({
-    page,
     uniqueAccount,
+    homePage,
   }) => {
-    const homePage = new HomePage(page);
-
     await homePage.gotoHomePage();
     await expect(homePage.loggedInAs).toContainText(uniqueAccount.name);
 

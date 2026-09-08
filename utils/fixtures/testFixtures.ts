@@ -1,9 +1,16 @@
 import { expect, test as base } from "@playwright/test";
 import {
   AccountInfoPage,
+  CartPage,
+  CheckoutPage,
   ConfirmationPage,
+  ContactUsPage,
   HomePage,
   LoginPage,
+  OrderConfirmationPage,
+  PaymentPage,
+  ProductDetailPage,
+  ProductsPage,
 } from "../pageObjects";
 import { buildAccount, type TestAccount } from "../testData";
 import { url } from "../url";
@@ -13,7 +20,26 @@ export interface ActiveAccount extends TestAccount {
   deleted: boolean;
 }
 
-interface Fixtures {
+/**
+ * Page objects are supplied as fixtures rather than constructed in each test,
+ * which is what Playwright's own documentation recommends: a spec declares the
+ * pages it works with and nothing else.
+ */
+interface PageObjectFixtures {
+  homePage: HomePage;
+  productsPage: ProductsPage;
+  productDetailPage: ProductDetailPage;
+  loginPage: LoginPage;
+  accountInfoPage: AccountInfoPage;
+  confirmationPage: ConfirmationPage;
+  cartPage: CartPage;
+  checkoutPage: CheckoutPage;
+  paymentPage: PaymentPage;
+  orderConfirmationPage: OrderConfirmationPage;
+  contactUsPage: ContactUsPage;
+}
+
+interface Fixtures extends PageObjectFixtures {
   uniqueAccount: ActiveAccount;
 }
 
@@ -64,22 +90,35 @@ export const test = base.extend<Fixtures>({
     await use(page);
   },
 
+  homePage: async ({ page }, use) => use(new HomePage(page)),
+  productsPage: async ({ page }, use) => use(new ProductsPage(page)),
+  productDetailPage: async ({ page }, use) => use(new ProductDetailPage(page)),
+  loginPage: async ({ page }, use) => use(new LoginPage(page)),
+  accountInfoPage: async ({ page }, use) => use(new AccountInfoPage(page)),
+  confirmationPage: async ({ page }, use) => use(new ConfirmationPage(page)),
+  cartPage: async ({ page }, use) => use(new CartPage(page)),
+  checkoutPage: async ({ page }, use) => use(new CheckoutPage(page)),
+  paymentPage: async ({ page }, use) => use(new PaymentPage(page)),
+  orderConfirmationPage: async ({ page }, use) =>
+    use(new OrderConfirmationPage(page)),
+  contactUsPage: async ({ page }, use) => use(new ContactUsPage(page)),
+
   /**
    * Registers a throwaway account for the test and removes it afterwards.
    * Each test owns its own account, so parallel workers never contend and no
    * test inherits state from another.
    */
-  uniqueAccount: async ({ page }, use) => {
+  uniqueAccount: async (
+    { page, loginPage, accountInfoPage, confirmationPage, homePage },
+    use,
+  ) => {
     const account: ActiveAccount = { ...buildAccount(), deleted: false };
 
-    const loginPage = new LoginPage(page);
     await loginPage.gotoLoginPage();
     await loginPage.startSignup(account.name, account.email);
 
-    const accountInfoPage = new AccountInfoPage(page);
     await accountInfoPage.createAccount(account);
 
-    const confirmationPage = new ConfirmationPage(page);
     await confirmationPage.continueButton.waitFor({ state: "visible" });
     await confirmationPage.continue();
 
@@ -89,7 +128,6 @@ export const test = base.extend<Fixtures>({
       return;
     }
 
-    const homePage = new HomePage(page);
     await homePage.gotoHomePage();
     const stillSignedIn = await homePage.logoutLink
       .isVisible()
@@ -108,7 +146,7 @@ export const test = base.extend<Fixtures>({
     await page.goto(url.deleteAccount);
     // A silent teardown failure would leak accounts run after run with nothing
     // surfacing, so cleanup asserts its own outcome.
-    await expect(new ConfirmationPage(page).accountDeletedBanner).toBeVisible();
+    await expect(confirmationPage.accountDeletedBanner).toBeVisible();
   },
 });
 

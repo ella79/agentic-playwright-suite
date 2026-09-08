@@ -1,22 +1,18 @@
 // spec: specs/vr-test-plans/visual-regression-test-plan.md
 import { expect, test } from "../utils/fixtures/testFixtures";
-import { HomePage } from "../utils/pageObjects";
 
 test.describe("Visual regression - home", () => {
-  let homePage: HomePage;
-
-  test.beforeEach(async ({ page }) => {
-    homePage = new HomePage(page);
+  test.beforeEach(async ({ homePage }) => {
     await homePage.gotoHomePage();
   });
 
-  test("VR-01: site header for an anonymous visitor", async () => {
+  test("VR-01: site header for an anonymous visitor", async ({ homePage }) => {
     await expect(homePage.signupLoginLink).toBeVisible();
 
     await expect(homePage.header).toHaveScreenshot("home-header-anonymous.png");
   });
 
-  test("VR-02: featured products section", async () => {
+  test("VR-02: featured products section", async ({ homePage }) => {
     await homePage.featuresItemsHeading.scrollIntoViewIfNeeded();
     await expect(homePage.featuresItemsHeading).toBeVisible();
 
@@ -26,7 +22,7 @@ test.describe("Visual regression - home", () => {
     );
   });
 
-  test("VR-03: footer newsletter block", async () => {
+  test("VR-03: footer newsletter block", async ({ homePage }) => {
     await homePage.subscriptionHeading.scrollIntoViewIfNeeded();
     await expect(homePage.subscriptionEmailInput).toBeVisible();
 

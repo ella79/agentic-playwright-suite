@@ -1,23 +1,16 @@
 // spec: specs/test-plans/authentication-test-plan.md
 import { expect, test } from "../../utils/fixtures/testFixtures";
-import {
-  AccountInfoPage,
-  ConfirmationPage,
-  HomePage,
-  LoginPage,
-} from "../../utils/pageObjects";
 import { buildAccount } from "../../utils/testData";
 import { url } from "../../utils/url";
 
 test.describe("Authentication", () => {
   test("TC-01: a new visitor can register and lands in the signed-in state", async ({
-    page,
+    loginPage,
+    accountInfoPage,
+    confirmationPage,
+    homePage,
   }) => {
     const account = buildAccount();
-    const loginPage = new LoginPage(page);
-    const accountInfoPage = new AccountInfoPage(page);
-    const confirmationPage = new ConfirmationPage(page);
-    const homePage = new HomePage(page);
 
     await test.step("start signup from the login page", async () => {
       await loginPage.gotoLoginPage();
@@ -43,12 +36,10 @@ test.describe("Authentication", () => {
   });
 
   test("TC-02: a registered user can sign in with valid credentials", async ({
-    page,
     uniqueAccount,
+    homePage,
+    loginPage,
   }) => {
-    const homePage = new HomePage(page);
-    const loginPage = new LoginPage(page);
-
     await homePage.gotoHomePage();
     await homePage.logout();
 
@@ -60,9 +51,9 @@ test.describe("Authentication", () => {
 
   test("TC-03: signing in with wrong credentials is rejected", async ({
     page,
+    loginPage,
+    homePage,
   }) => {
-    const loginPage = new LoginPage(page);
-    const homePage = new HomePage(page);
     const unregistered = buildAccount();
 
     await loginPage.gotoLoginPage();
@@ -74,13 +65,11 @@ test.describe("Authentication", () => {
   });
 
   test("TC-04: signing up with an already registered email is rejected", async ({
-    page,
     uniqueAccount,
+    homePage,
+    loginPage,
+    accountInfoPage,
   }) => {
-    const homePage = new HomePage(page);
-    const loginPage = new LoginPage(page);
-    const accountInfoPage = new AccountInfoPage(page);
-
     await homePage.gotoHomePage();
     await homePage.logout();
 
@@ -91,12 +80,10 @@ test.describe("Authentication", () => {
   });
 
   test("TC-05: a signed-in user can delete their account", async ({
-    page,
     uniqueAccount,
+    homePage,
+    confirmationPage,
   }) => {
-    const homePage = new HomePage(page);
-    const confirmationPage = new ConfirmationPage(page);
-
     await homePage.gotoHomePage();
     await homePage.deleteAccount();
 
@@ -112,10 +99,9 @@ test.describe("Authentication", () => {
   test("TC-06: logging out returns the visitor to the anonymous state", async ({
     page,
     uniqueAccount,
+    homePage,
+    loginPage,
   }) => {
-    const homePage = new HomePage(page);
-    const loginPage = new LoginPage(page);
-
     await homePage.gotoHomePage();
     await expect(homePage.loggedInAs).toContainText(uniqueAccount.name);
 

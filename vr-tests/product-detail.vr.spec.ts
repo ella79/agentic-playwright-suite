@@ -1,17 +1,13 @@
 // spec: specs/vr-test-plans/visual-regression-test-plan.md
 import { expect, test } from "../utils/fixtures/testFixtures";
-import { ProductDetailPage } from "../utils/pageObjects";
 import { products } from "../utils/testData";
 
 test.describe("Visual regression - product detail", () => {
-  let productDetailPage: ProductDetailPage;
-
-  test.beforeEach(async ({ page }) => {
-    productDetailPage = new ProductDetailPage(page);
+  test.beforeEach(async ({ productDetailPage }) => {
     await productDetailPage.gotoProductDetailPage(products.blueTop.id);
   });
 
-  test("VR-08: product information panel", async () => {
+  test("VR-08: product information panel", async ({ productDetailPage }) => {
     await expect(productDetailPage.productName).toBeVisible();
 
     await expect(productDetailPage.productInformation).toHaveScreenshot(
@@ -20,7 +16,7 @@ test.describe("Visual regression - product detail", () => {
     );
   });
 
-  test("VR-09: write-a-review form", async () => {
+  test("VR-09: write-a-review form", async ({ productDetailPage }) => {
     await productDetailPage.reviewSection.scrollIntoViewIfNeeded();
     await expect(productDetailPage.reviewTextarea).toBeVisible();
 

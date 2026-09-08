@@ -20,7 +20,7 @@ was confirmed against a live accessibility snapshot first.
 | `playwright`      | `npx @playwright/mcp`                | Ad-hoc exploration outside test authoring |
 
 **Prefer `playwright-test`.** It reads `playwright.config.ts`, so it already knows this project's
-`baseURL`, the `data-qa` test id attribute, and the 1280x720 viewport — an agent resolves locators
+`baseURL`, the `data-qa` test id attribute, and the 1920x1080 viewport — an agent resolves locators
 exactly as the suite will. It also exposes tools the general server has no equivalent for:
 
 | Tool                                                                                    | Purpose                                                      |

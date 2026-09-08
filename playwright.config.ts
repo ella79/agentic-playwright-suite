@@ -40,7 +40,7 @@ export default defineConfig({
       testDir: "./tests",
       use: {
         ...devices["Desktop Chrome"],
-        viewport: { width: 1280, height: 720 },
+        viewport: { width: 1920, height: 1080 },
       },
     },
     {
@@ -53,7 +53,7 @@ export default defineConfig({
       testDir: "./seed",
       use: {
         ...devices["Desktop Chrome"],
-        viewport: { width: 1280, height: 720 },
+        viewport: { width: 1920, height: 1080 },
       },
     },
     {
@@ -61,7 +61,7 @@ export default defineConfig({
       testDir: "./vr-tests",
       use: {
         ...devices["Desktop Chrome"],
-        viewport: { width: 1280, height: 720 },
+        viewport: { width: 1920, height: 1080 },
       },
     },
   ],

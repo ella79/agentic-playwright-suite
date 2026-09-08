@@ -58,5 +58,5 @@ rather than Playwright's bare `test`.
 - Hover and focus states: cursor position and focus rings vary between runs and platforms.
 - Order confirmation: the page contains a generated order id, so its only stable region is text
   the functional suite already asserts.
-- Responsive breakpoints: the suite runs one viewport (1280x720). Adding mobile widths would double
+- Responsive breakpoints: the suite runs one viewport (1920x1080). Adding mobile widths would double
   the baseline count for a portfolio suite deliberately capped at twenty.

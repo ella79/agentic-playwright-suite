@@ -11,12 +11,9 @@
 // is not coverage — inside tests/ it would run as a twenty-first case that
 // exists only to serve the agents.
 import { expect, test } from "../utils/fixtures/testFixtures";
-import { HomePage } from "../utils/pageObjects";
 
 test.describe("Seed", () => {
-  test("storefront is reachable and rendered", async ({ page }) => {
-    const homePage = new HomePage(page);
-
+  test("storefront is reachable and rendered", async ({ homePage }) => {
     await homePage.gotoHomePage();
 
     await expect(homePage.featuresItemsHeading).toBeVisible();

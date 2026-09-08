@@ -1,11 +1,8 @@
 // spec: specs/vr-test-plans/visual-regression-test-plan.md
 import { expect, test } from "../utils/fixtures/testFixtures";
-import { ContactUsPage } from "../utils/pageObjects";
 
 test.describe("Visual regression - contact", () => {
-  test("VR-17: contact form", async ({ page }) => {
-    const contactUsPage = new ContactUsPage(page);
-
+  test("VR-17: contact form", async ({ contactUsPage }) => {
     await contactUsPage.gotoContactUsPage();
     await expect(contactUsPage.submitButton).toBeVisible();
 
