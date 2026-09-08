@@ -1,0 +1,15 @@
+## What changed
+
+<!-- One or two sentences. What a reviewer needs before reading the diff. -->
+
+## Why
+
+<!-- The reason the change exists. If it fixes a failure, name the root cause, not the symptom. -->
+
+## Checks
+
+- [ ] `yarn typecheck`, `yarn lint`, `yarn stylecheck` pass
+- [ ] Affected cases pass without retries
+- [ ] Coverage change respects the suite caps, or names the case it replaces
+- [ ] New visual baselines were generated in the CI image, not on the host
+- [ ] `specs/STATUS.md` updated if coverage changed, `specs/DECISIONS.md` if a call was made

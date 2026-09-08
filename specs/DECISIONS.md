@@ -98,3 +98,20 @@ The related fix, `waitForImagesLoaded`, addresses the same class of problem at i
 photography streams in after load, so a region containing it keeps reflowing and a capture can
 expire waiting for stability. Waiting on the images themselves is condition-based; raising the
 timeout would only have moved the deadline.
+
+## 2026-09-08 — No setup project or shared storage state, unlike the reference suites
+
+Both reference suites this structure came from run a `setup` project that authenticates once and
+shares the result through `storageState`. There it is clearly right: those applications sit behind
+an OAuth flow with several redirects and an `AWSELBAuthSessionCookie`, so paying it per test would
+dominate the run.
+
+Automation Exercise differs in a way that inverts the answer. Login is a single form POST, and no
+account exists to log into — the suite has to create one first. A shared account would mean the
+account-deletion case destroys the session every other case depends on, parallel shards competing
+over one identity, and a registration left behind on a public demo site after every run. Each test
+that needs a signed-in user therefore registers and removes its own, through the `uniqueAccount`
+fixture.
+
+The cost is roughly five seconds per authenticated case. The suite runs in about ninety seconds, and
+what it is meant to demonstrate is reliability, so the trade goes the other way here.
