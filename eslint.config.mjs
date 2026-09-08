@@ -13,6 +13,11 @@ export default [
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",
+        // Type-aware linting. Playwright's own best practices call this out:
+        // a missing await on an assertion is the classic silent failure, and
+        // no-floating-promises is the only thing that catches it statically.
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: {
@@ -23,6 +28,8 @@ export default [
       // TypeScript already resolves identifiers; no-undef only produces false
       // positives on ambient Node globals here.
       "no-undef": "off",
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/await-thenable": "error",
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_" },

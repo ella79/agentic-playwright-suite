@@ -70,14 +70,21 @@ jobs:
           path: allure-results
           retention-days: 7
 
+      # Blob is the only report format that merges correctly across shards.
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-e2e-${{ matrix.shard }}
+          path: blob-report
+          retention-days: 7
+
       - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: e2e-traces-${{ matrix.shard }}
-          path: |
-            playwright-report
-            test-results
+          path: test-results
           retention-days: 7
 
   visual-regression:
@@ -122,14 +129,20 @@ jobs:
           path: allure-results
           retention-days: 7
 
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-vr
+          path: blob-report
+          retention-days: 7
+
       - name: Upload visual diffs
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: visual-diffs
-          path: |
-            playwright-report
-            test-results
+          path: test-results
           retention-days: 7
 
   publish-dashboard:
@@ -184,6 +197,20 @@ jobs:
 
       - name: Generate Allure report
         run: yarn allure:generate
+
+      # The HTML report is published alongside Allure because it carries the
+      # traces: Allure shows what failed, the trace viewer shows why.
+      - name: Collect blob reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: blob-report-*
+          path: all-blob-reports
+          merge-multiple: true
+
+      - name: Merge sharded reports
+        run: |
+          npx playwright merge-reports --reporter html ./all-blob-reports
+          mv playwright-report allure-report/playwright-report
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

@@ -6,10 +6,21 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: [
-    ["html", { open: "never" }],
-    ["junit", { outputFile: "reports/junit/results.xml" }],
-  ],
+  // Sharded CI runs use the blob reporter, which is the only one that can be
+  // merged back into a single correct report across shards; locally the HTML
+  // report is more useful. Allure runs in both because the published dashboard
+  // is built from its results.
+  reporter: process.env.CI
+    ? [
+        ["blob"],
+        ["allure-playwright", { resultsDir: "allure-results" }],
+        ["junit", { outputFile: "reports/junit/results.xml" }],
+      ]
+    : [
+        ["html", { open: "never" }],
+        ["allure-playwright", { resultsDir: "allure-results" }],
+        ["junit", { outputFile: "reports/junit/results.xml" }],
+      ],
   use: {
     baseURL: process.env.E2E_BASE_URL || "https://automationexercise.com",
     testIdAttribute: "data-qa",
