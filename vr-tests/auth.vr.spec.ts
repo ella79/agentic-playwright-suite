@@ -38,7 +38,7 @@ test.describe("Visual regression - authentication", () => {
     );
   });
 
-  test("VR-18: site header for a signed-in user", async ({
+  test("VR-17: site header for a signed-in user", async ({
     page,
     uniqueAccount,
   }) => {

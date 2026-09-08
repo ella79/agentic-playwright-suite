@@ -3,7 +3,7 @@ import { expect, test } from "../utils/fixtures/testFixtures";
 import { ContactUsPage } from "../utils/pageObjects";
 
 test.describe("Visual regression - contact", () => {
-  test("VR-17: contact form", async ({ page }) => {
+  test("VR-18: contact form", async ({ page }) => {
     const contactUsPage = new ContactUsPage(page);
 
     await contactUsPage.gotoContactUsPage();
