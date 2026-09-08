@@ -77,6 +77,17 @@ Linting is grouped by the official `group:linters` preset rather than by hand. I
 better than the one a local rule would give: upgrading linters individually means reasoning about
 peer dependencies one package at a time.
 
+Three categories merge themselves once `ci-gate` is green: linters and formatters on non major
+updates, and weekly lock file maintenance. Renovate's automerge guidance names development
+dependencies, linters and formatters in particular, as the safest category and limits the practice
+to non major updates, and it asks for a fourteen day minimum release age on anything automerged, so
+that is set. Playwright is excluded by name: a version change moves glyph rendering, so it needs the
+baselines regenerated and the agents rebuilt before it can be believed.
+
+Automerging still cannot bypass the branch protection. Renovate opens a pull request, waits for the
+gate, and merges only if it passed. Branch level automerge, which skips the pull request entirely,
+is not possible on a repository that requires them, which this one does.
+
 Nothing else is configured. `dependencyDashboard`, weekly lock file maintenance and a concurrent
 pull request limit of ten are all already what the presets or the defaults give, so setting them
 again would only be noise that reads like configuration.
