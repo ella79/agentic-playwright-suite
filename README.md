@@ -48,6 +48,11 @@ env/docker/     Images for local and CI execution
 a label can never cross-match. Every locator is a `readonly` property; no spec reaches the DOM
 directly.
 
+**Page objects arrive as fixtures.** A spec declares the pages it works with in its signature and
+its body starts at the first meaningful action — no construction preamble, and the account fixture
+composes the same page object fixtures rather than building its own. This is what Playwright's
+documentation recommends over instantiating page objects per test.
+
 **Semantic locators, with the exceptions documented.** Priority runs `getByRole` → `getByLabel` →
 `getByPlaceholder` → `getByText` → `getByTestId`. The application ships `data-qa` attributes, which
 `testIdAttribute` maps onto `getByTestId`, so test ids here are a semantic option rather than an
