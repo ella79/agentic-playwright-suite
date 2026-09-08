@@ -1,0 +1,1 @@
+{"reportName":"Visual regression","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":20,"unknown":0,"total":20},"time":{"start":1788876529916,"stop":1788876582828,"duration":52912,"minDuration":3677,"maxDuration":9178,"sumDuration":100991}}
