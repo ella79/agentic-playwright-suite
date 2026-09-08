@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Suite health</title>
+<style>
+  :root { color-scheme: light dark; --line:#8884; --good:#1a7f37; --warn:#9a6700; --bad:#cf222e; }
+  body { font: 15px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; margin: 0 auto; padding: 2rem 1.25rem 4rem; max-width: 60rem; }
+  h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+  h2 { margin: 2.5rem 0 .5rem; font-size: 1.1rem; }
+  p.sub { margin: 0 0 1.5rem; opacity: .7; }
+  table { border-collapse: collapse; width: 100%; margin-top: .5rem; }
+  th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  thead th { font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; opacity: .65; }
+  tbody th { font-weight: 600; }
+  td.good { color: var(--good); font-weight: 600; }
+  td.warn { color: var(--warn); font-weight: 600; }
+  td.bad  { color: var(--bad);  font-weight: 600; }
+  .spark svg { width: 260px; height: 40px; }
+  .spark polyline { fill: none; stroke: currentColor; stroke-width: 1.5; opacity: .8; }
+  .none { opacity: .6; font-style: italic; }
+  nav a { margin-right: 1rem; }
+  footer { margin-top: 3rem; opacity: .7; font-size: .9rem; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: .35rem 1rem; margin: .5rem 0 0; }
+  dt { font-weight: 600; }
+  dd { margin: 0; }
+</style>
+</head>
+<body>
+<h1>Suite health</h1>
+<p class="sub">Run 14 &middot; eb50dab0 on main &middot; Tue, 08 Sep 2026 15:03:33 GMT</p>
+
+<nav>
+  <a href="../">Test results</a>
+  <a href="../functional/">Functional report</a>
+  <a href="../visual/">Visual report</a>
+  <a href="https://github.com/ella79/agentic-playwright-suite">Repository</a>
+</nav>
+
+<h2>Current run</h2>
+<table>
+  <thead><tr><th>Suite</th><th>Cases, cap</th><th>Pass rate</th><th>Flaky rate</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
+  <tbody><tr>
+      <th scope="row">functional</th>
+      <td>20 / 20</td>
+      <td class="good">100%</td>
+      <td class="good">0%</td>
+      <td>5.1s</td>
+      <td>10.2s</td>
+      <td>66.9s</td>
+    </tr><tr>
+      <th scope="row">visual</th>
+      <td>20 / 20</td>
+      <td class="good">100%</td>
+      <td class="good">0%</td>
+      <td>4.4s</td>
+      <td>9.6s</td>
+      <td>56.5s</td>
+    </tr></tbody>
+</table>
+
+<h2>Last 1 runs</h2>
+<table>
+  <thead><tr><th>Suite</th><th>Pass rate, 0 to 100</th><th>p95 duration</th></tr></thead>
+  <tbody><tr>
+      <th scope="row">functional</th>
+      <td class="spark"><span class=none>not enough runs yet</span></td>
+      <td class="spark"><span class=none>not enough runs yet</span></td>
+    </tr><tr>
+      <th scope="row">visual</th>
+      <td class="spark"><span class=none>not enough runs yet</span></td>
+      <td class="spark"><span class=none>not enough runs yet</span></td>
+    </tr></tbody>
+</table>
+
+<h2>Slowest cases in this run</h2>
+<table>
+  <thead><tr><th>Case</th><th>Suite</th><th>Duration</th></tr></thead>
+  <tbody><tr><th scope="row">TC-04: signing up with an already registered email is rejected</th><td>functional</td><td>14.8s</td></tr><tr><th scope="row">VR-18: site header for a signed-in user</th><td>visual</td><td>12.7s</td></tr><tr><th scope="row">TC-17: a signed-in user can complete an order end to end</th><td>functional</td><td>10.2s</td></tr><tr><th scope="row">TC-05: a signed-in user can delete their account</th><td>functional</td><td>10.1s</td></tr><tr><th scope="row">VR-20: card entry form</th><td>visual</td><td>9.6s</td></tr></tbody>
+</table>
+
+<h2>Repeat offenders</h2>
+<table>
+  <thead><tr><th>Case</th><th>Suite</th><th>Runs affected</th></tr></thead>
+  <tbody><tr><td colspan="3" class="none">No case failed or retried in the last 1 runs.</td></tr></tbody>
+</table>
+
+<h2>Thresholds</h2>
+<dl>
+  <dt>Pass rate</dt><dd>90% or above is healthy, 85 to 90% is acceptable during active development, below 85% means the suite has a stability problem rather than the application.</dd>
+  <dt>Flaky rate</dt><dd>Below 1% is the target. Past 5% the suite stops being believed, and a suite nobody believes is worse than no suite.</dd>
+  <dt>Duration</dt><dd>Tracked as a trend, not a fixed limit. What matters is whether it is growing faster than coverage.</dd>
+  <dt>Coverage cap</dt><dd>Twenty cases per suite. New coverage replaces an existing case rather than adding to the count.</dd>
+</dl>
+
+<footer>
+  Built from Playwright's JSON report on every run and accumulated on the published branch.
+  Case level results, traces and screenshots live in the <a href="../">Allure report</a>; this page
+  deliberately does not repeat them.
+</footer>
+</body>
+</html>
