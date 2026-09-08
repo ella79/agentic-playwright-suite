@@ -9,13 +9,24 @@ prepare-playwright  →  static-checks  →  e2e-playwright     ┐
 
 Runs on every push and pull request to `main`.
 
-| Job                        | Responsibility                                                                |
-| -------------------------- | ----------------------------------------------------------------------------- |
-| `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry     |
-| `static-checks`            | Typecheck, lint, format. Gates everything after it                            |
-| `e2e-playwright`           | The functional suite                                                          |
-| `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal |
-| `publish-dashboard`        | Merges both reports, restores trend history, deploys to GitHub Pages          |
+| Job                        | Responsibility                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry                  |
+| `static-checks`            | Typecheck, lint, format. Gates everything after it                                         |
+| `e2e-playwright`           | The functional suite                                                                       |
+| `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal              |
+| `cross-browser`            | The same twenty functional cases on WebKit and mobile Safari, skipped on pull requests     |
+| `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages |
+| `ci-gate`                  | Reads every other job's result. The only check the branch protection requires              |
+
+## Branch Protection
+
+`main` accepts no direct pushes, from anyone, and the bypass list is empty on purpose: a rule with an
+exception for its author is a rule a reviewer discounts. Every change arrives through a pull request
+that cannot merge until `ci-gate` is green, and force pushes and branch deletion are refused.
+
+The gate exists because GitHub treats a skipped job as a satisfied requirement. Naming the test jobs
+directly would have meant that a job which stopped running quietly stopped being enforced.
 
 Every job after the build runs inside the image the build produced, so browsers and dependencies are
 installed once instead of three times. The image tag carries the Playwright version and a hash of
