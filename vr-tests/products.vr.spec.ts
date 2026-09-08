@@ -1,4 +1,4 @@
-// spec: specs/vr-test-plans/visual-regression-test-plan.md
+// spec: specs/vr-test-plans/products-vr-test-plan.md
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { products, searchTerms } from "../utils/testData";
 

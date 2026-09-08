@@ -1,0 +1,38 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
+    "eslint.validate": ["typescript"],
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "files.eol": "\n",
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/playwright-report": true,
+      "**/test-results": true,
+      "**/allure-results": true,
+      "**/allure-report": true,
+      "**/*-snapshots": true
+    },
+    "files.associations": {
+      "*.vr.spec.ts": "typescript"
+    },
+    "playwright.reuseBrowser": false,
+    "playwright.showTrace": true
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-playwright.playwright",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint"
+    ]
+  }
+}

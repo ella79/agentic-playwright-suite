@@ -5,3 +5,6 @@ reports
 allure-results
 allure-report
 vr-tests/**/*-snapshots
+
+# VS Code parses this as JSONC; keeping it strict JSON avoids trailing commas.
+agentic-playwright-suite.code-workspace

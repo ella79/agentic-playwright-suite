@@ -4,12 +4,12 @@ Test plans, project state, and decision history for this suite.
 
 ## Structure
 
-| Path             | Purpose                                                                    |
-| ---------------- | -------------------------------------------------------------------------- |
-| `STATUS.md`      | Coverage tables, findings raised against the application, next steps       |
-| `DECISIONS.md`   | Append-only decision log — every scope and architecture call, with why     |
-| `test-plans/`    | Five functional plans, one per feature area, covering TC-01 to TC-20       |
-| `vr-test-plans/` | The visual plan covering VR-01 to VR-20, with each capture's justification |
+| Path             | Purpose                                                                                  |
+| ---------------- | ---------------------------------------------------------------------------------------- |
+| `STATUS.md`      | Coverage tables, findings raised against the application, next steps                     |
+| `DECISIONS.md`   | Append-only decision log — every scope and architecture call, with why                   |
+| `test-plans/`    | Five functional plans, one per feature area, covering TC-01 to TC-20                     |
+| `vr-test-plans/` | Seven visual plans, one per area, covering VR-01 to VR-20, plus their shared conventions |
 
 ## Conventions
 

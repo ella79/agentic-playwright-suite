@@ -1,4 +1,4 @@
-// spec: specs/vr-test-plans/visual-regression-test-plan.md
+// spec: specs/vr-test-plans/authentication-vr-test-plan.md
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { buildAccount } from "../utils/testData";
 
