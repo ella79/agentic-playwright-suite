@@ -311,7 +311,7 @@ ajv@^6.12.4, ajv@^6.14.0:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-allure-commandline@^2.32.0:
+allure-commandline@2.43.0:
   version "2.43.0"
   resolved "https://registry.yarnpkg.com/allure-commandline/-/allure-commandline-2.43.0.tgz#e9670a61492e949251e5132972ed846508ae85e7"
   integrity sha512-nsqccDOgi80fi9WjvBapZjlFlugodVWudotNtWx6XKiSI7NuN6oTWEkXnkxQBzNg02Yf9lZLtCFlKvjAlcpu6Q==
@@ -323,7 +323,7 @@ allure-js-commons@3.12.0:
   dependencies:
     md5 "^2.3.0"
 
-allure-playwright@^3.0.0:
+allure-playwright@3.12.0:
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/allure-playwright/-/allure-playwright-3.12.0.tgz#cea283d7f765540f524c048673fc23ac3870d920"
   integrity sha512-nAKusqO6YVisJbjSD3Ds5lfV3DsW3TZs1Hm07bntKNwDxrXRCmZMhYGfhmXBzM5G0IqLHkkZd/hR3baFvpQKOQ==
