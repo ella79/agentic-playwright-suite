@@ -3,15 +3,15 @@
 One plan per area, matching the spec files in `vr-tests/`. This file holds what applies to all of
 them, so the individual plans only carry what is specific to their area.
 
-| Plan                             | Spec file                            | Cases                 |
-| -------------------------------- | ------------------------------------ | --------------------- |
-| `home-vr-test-plan.md`           | `vr-tests/home.vr.spec.ts`           | VR-01 to VR-03        |
-| `products-vr-test-plan.md`       | `vr-tests/products.vr.spec.ts`       | VR-04 to VR-07        |
-| `product-detail-vr-test-plan.md` | `vr-tests/product-detail.vr.spec.ts` | VR-08 to VR-09        |
-| `cart-vr-test-plan.md`           | `vr-tests/cart.vr.spec.ts`           | VR-10 to VR-13        |
-| `authentication-vr-test-plan.md` | `vr-tests/auth.vr.spec.ts`           | VR-14 to VR-16, VR-18 |
-| `contact-vr-test-plan.md`        | `vr-tests/contact.vr.spec.ts`        | VR-17                 |
-| `checkout-vr-test-plan.md`       | `vr-tests/checkout.vr.spec.ts`       | VR-19 to VR-20        |
+| Plan                             | Spec file                            | Cases          |
+| -------------------------------- | ------------------------------------ | -------------- |
+| `home-vr-test-plan.md`           | `vr-tests/home.vr.spec.ts`           | VR-01 to VR-03 |
+| `products-vr-test-plan.md`       | `vr-tests/products.vr.spec.ts`       | VR-04 to VR-07 |
+| `product-detail-vr-test-plan.md` | `vr-tests/product-detail.vr.spec.ts` | VR-08 to VR-09 |
+| `cart-vr-test-plan.md`           | `vr-tests/cart.vr.spec.ts`           | VR-10 to VR-13 |
+| `authentication-vr-test-plan.md` | `vr-tests/auth.vr.spec.ts`           | VR-14 to VR-17 |
+| `contact-vr-test-plan.md`        | `vr-tests/contact.vr.spec.ts`        | VR-18          |
+| `checkout-vr-test-plan.md`       | `vr-tests/checkout.vr.spec.ts`       | VR-19 to VR-20 |
 
 ## What These Plans Cover
 

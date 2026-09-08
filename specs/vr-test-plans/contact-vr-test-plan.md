@@ -12,7 +12,7 @@ likely thing on the page to shift after a browser or CSS change.
 
 | ID    | Screenshot     | State captured                                   |
 | ----- | -------------- | ------------------------------------------------ |
-| VR-17 | `contact-form` | Contact form, empty, including the file selector |
+| VR-18 | `contact-form` | Contact form, empty, including the file selector |
 
 ## Notes
 

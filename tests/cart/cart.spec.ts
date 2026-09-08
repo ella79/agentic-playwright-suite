@@ -43,6 +43,21 @@ test.describe("Cart", () => {
     await expect(cartPage.cartRows).toHaveCount(1);
   });
 
+  test("TC-14: the quantity set before adding is the quantity in the cart", async ({
+    page,
+  }) => {
+    const productDetailPage = new ProductDetailPage(page);
+    const cartPage = new CartPage(page);
+
+    await productDetailPage.gotoProductDetailPage(products.menTshirt.id);
+    await productDetailPage.setQuantity(3);
+    const modal = await productDetailPage.addToCart();
+    await modal.viewCart();
+
+    await expect(cartPage.getRowQuantity(products.menTshirt.name)).toHaveText(
+      "3",
+    );
+  });
   test("TC-15: removing the only product empties the cart", async ({
     page,
   }) => {
@@ -75,21 +90,5 @@ test.describe("Cart", () => {
     await expect(guardModal.message).toBeVisible();
     await expect(guardModal.registerLoginLink).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`${url.cart}$`));
-  });
-
-  test("TC-14: the quantity set before adding is the quantity in the cart", async ({
-    page,
-  }) => {
-    const productDetailPage = new ProductDetailPage(page);
-    const cartPage = new CartPage(page);
-
-    await productDetailPage.gotoProductDetailPage(products.menTshirt.id);
-    await productDetailPage.setQuantity(3);
-    const modal = await productDetailPage.addToCart();
-    await modal.viewCart();
-
-    await expect(cartPage.getRowQuantity(products.menTshirt.name)).toHaveText(
-      "3",
-    );
   });
 });

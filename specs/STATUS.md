@@ -52,7 +52,7 @@ around silently.
    column is floated. VR-20 captures the container that has dimensions, with the cause recorded at
    the capture.
 3. The contact page renders the same success text twice, once for the form and once for a hidden
-   newsletter widget. TC-18 scopes to the visible one; the success state is excluded from VR-17 so
+   newsletter widget. TC-18 scopes to the visible one; the success state is excluded from VR-18 so
    the duplication is not baked into a baseline.
 4. `/delete_account` deletes on GET, with no confirmation step. The account fixture relies on it for
    teardown and asserts the outcome.

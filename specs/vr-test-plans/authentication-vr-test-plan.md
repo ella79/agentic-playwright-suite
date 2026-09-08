@@ -15,7 +15,7 @@ home plan, so this pair is what proves the header actually changes.
 | VR-14 | `auth-login-form`        | Login form, empty                                         |
 | VR-15 | `auth-signup-form`       | Signup entry form, empty                                  |
 | VR-16 | `auth-account-info-form` | Full registration form: title, dates, address, checkboxes |
-| VR-18 | `auth-header-signed-in`  | Site header showing Logout, Delete Account, and the name  |
+| VR-17 | `auth-header-signed-in`  | Site header showing Logout, Delete Account, and the name  |
 
 ## Notes
 
@@ -26,7 +26,7 @@ baseline.
 **VR-16 is the highest-value capture in this area.** It is the only form with select controls,
 radio buttons and checkboxes together, which is exactly where a CSS regression lands.
 
-**VR-18 needs a registered account**, so it requests `uniqueAccount`. The account name appears in
+**VR-17 needs a registered account**, so it requests `uniqueAccount`. The account name appears in
 the header, and the fixture generates it per run, the capture is scoped to the header, and the
 name's width varies only within the fixed-format string the generator produces.
 
