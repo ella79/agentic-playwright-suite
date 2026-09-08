@@ -27,9 +27,11 @@ export class ContactUsPage extends BaseAppPage {
     // File input has no data-qa hook and no accessible name.
     this.fileInput = page.locator('input[name="upload_file"]');
     this.submitButton = page.getByTestId("submit-button");
-    this.successMessage = page.getByText(
-      "Success! Your details have been submitted successfully.",
-    );
+    // The page carries two elements with this exact text: the contact form's
+    // status banner and a hidden one belonging to the newsletter widget.
+    this.successMessage = page
+      .locator("#contact-page")
+      .getByText("Success! Your details have been submitted successfully.");
     this.homeButton = page.getByRole("link", { name: "Home" }).last();
   }
 

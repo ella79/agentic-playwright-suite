@@ -58,7 +58,13 @@ export const products = {
   menTshirt: { id: 2, name: "Men Tshirt", price: "Rs. 400" },
 } as const;
 
+/**
+ * Search matches category names as well as product names, so a term like "top"
+ * legitimately returns items whose name does not contain it. "saree" is used
+ * because every product in that category also carries the word in its name,
+ * which keeps the assertion meaningful without asserting false behaviour.
+ */
 export const searchTerms = {
-  matching: "top",
+  matching: "saree",
   nonExistent: "zzzznotaproduct",
 } as const;

@@ -15,14 +15,14 @@ Not covered: password reset (the application does not implement one) and social 
 
 ## Test Cases
 
-| ID | Type | Scenario | Expected |
-|---|---|---|---|
-| TC-01 | happy | A new visitor registers with full account and address details | The account created banner is shown and the navigation switches to the signed-in state |
-| TC-02 | happy | A registered user signs in with valid credentials | `Logged in as <name>` appears in the navigation |
-| TC-03 | error | A user signs in with an unregistered email and wrong password | `Your email or password is incorrect!` is shown and the URL stays on `/login` |
-| TC-04 | error | A visitor starts signup with an email that already has an account | `Email Address already exist!` is shown and no account form is reached |
-| TC-05 | happy | A signed-in user deletes their account | The account deleted banner is shown and the navigation returns to the anonymous state |
-| TC-06 | happy | A signed-in user logs out | The navigation returns to the anonymous state and `/login` is served again |
+| ID    | Type  | Scenario                                                          | Expected                                                                               |
+| ----- | ----- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| TC-01 | happy | A new visitor registers with full account and address details     | The account created banner is shown and the navigation switches to the signed-in state |
+| TC-02 | happy | A registered user signs in with valid credentials                 | `Logged in as <name>` appears in the navigation                                        |
+| TC-03 | error | A user signs in with an unregistered email and wrong password     | `Your email or password is incorrect!` is shown and the URL stays on `/login`          |
+| TC-04 | error | A visitor starts signup with an email that already has an account | `Email Address already exist!` is shown and no account form is reached                 |
+| TC-05 | happy | A signed-in user deletes their account                            | The account deleted banner is shown and the navigation returns to the anonymous state  |
+| TC-06 | happy | A signed-in user logs out                                         | The navigation returns to the anonymous state and `/login` is served again             |
 
 ## Locator Notes
 

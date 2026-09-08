@@ -1,0 +1,2 @@
+Attachment used by the contact form test.
+Its contents are irrelevant; only the upload path is exercised.

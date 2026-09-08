@@ -13,11 +13,11 @@ message, so each test asserts that message rather than any internal state.
 
 ## Test Cases
 
-| ID | Type | Scenario | Expected |
-|---|---|---|---|
-| TC-18 | happy | A visitor submits the contact form with an attachment | The success message is shown after the native confirm dialog is accepted |
-| TC-19 | happy | A visitor submits a review on a product detail page | The thank-you message is shown |
-| TC-20 | happy | A visitor subscribes to the newsletter from the footer | The subscription success message is shown |
+| ID    | Type  | Scenario                                               | Expected                                                                 |
+| ----- | ----- | ------------------------------------------------------ | ------------------------------------------------------------------------ |
+| TC-18 | happy | A visitor submits the contact form with an attachment  | The success message is shown after the native confirm dialog is accepted |
+| TC-19 | happy | A visitor submits a review on a product detail page    | The thank-you message is shown                                           |
+| TC-20 | happy | A visitor subscribes to the newsletter from the footer | The subscription success message is shown                                |
 
 ## Locator Notes
 

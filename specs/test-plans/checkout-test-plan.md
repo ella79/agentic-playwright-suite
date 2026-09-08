@@ -16,8 +16,8 @@ this one exists to prove the flow holds together, not to cover each step's varia
 
 ## Test Cases
 
-| ID | Type | Scenario | Expected |
-|---|---|---|---|
+| ID    | Type  | Scenario                                            | Expected                                                                                                                                                                                |
+| ----- | ----- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | TC-17 | happy | A signed-in user checks out a cart with one product | Delivery and billing addresses reflect the registered account, the order review lists the product, and after payment the order placed confirmation with a downloadable invoice is shown |
 
 ## Steps

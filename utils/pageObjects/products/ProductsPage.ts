@@ -1,5 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 import { BaseAppPage } from "../base/BaseAppPage";
+import { AddToCartModal } from "../cart/modals/AddToCartModal";
 import { url } from "../../url";
 
 export class ProductsPage extends BaseAppPage {
@@ -43,6 +44,11 @@ export class ProductsPage extends BaseAppPage {
     return this.productCards.filter({ hasText: productName }).first();
   }
 
+  /**
+   * Subcategory links live in collapsed panels keyed by the parent category
+   * name, and the same subcategory label appears under several parents, so the
+   * panel must be scoped rather than matched globally.
+   */
   async openCategory(
     parentCategory: "Women" | "Men" | "Kids",
     subCategory: string,
@@ -51,8 +57,8 @@ export class ProductsPage extends BaseAppPage {
       .getByRole("link", { name: parentCategory })
       .click();
     await this.categorySidebar
+      .locator(`#${parentCategory}`)
       .getByRole("link", { name: subCategory })
-      .first()
       .click();
   }
 
@@ -63,22 +69,34 @@ export class ProductsPage extends BaseAppPage {
       .click();
   }
 
-  async viewProduct(productId: number): Promise<void> {
-    await this.page
+  async openProductDetail(productName: string): Promise<void> {
+    await this.getProductCard(productName)
       .getByRole("link", { name: "View Product" })
-      .nth(productId - 1)
       .click();
+  }
+
+  async productNames(): Promise<string[]> {
+    return this.productCards.locator(".productinfo p").allTextContents();
   }
 
   /**
    * The listing renders each card twice (base state plus hover overlay) with the
    * same product id, so both instances trigger the same request.
+   *
+   * Adding is an XHR: returning the confirmation modal forces callers to wait
+   * for it to land instead of navigating away mid-request.
    */
-  async addProductToCartFromListing(productId: number): Promise<void> {
+  async addProductToCartFromListing(
+    productId: number,
+  ): Promise<AddToCartModal> {
     await this.page
       .locator(`.add-to-cart[data-product-id="${productId}"]`)
       .first()
       .click();
+
+    const modal = new AddToCartModal(this.page);
+    await modal.waitForVisible();
+    return modal;
   }
 
   async productCount(): Promise<number> {

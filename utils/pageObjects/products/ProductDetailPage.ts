@@ -23,14 +23,23 @@ export class ProductDetailPage extends BaseAppPage {
     this.productInformation = page.locator(".product-information");
     this.productName = this.productInformation.getByRole("heading").first();
     this.productPrice = this.productInformation.getByText(/^Rs\. \d+/);
-    this.productCategory = this.productInformation.getByText(/^Category:/);
-    this.availability = this.productInformation.getByText(/^Availability:/);
+    // The label sits in its own <b>; scope to the paragraph to get label + value.
+    this.productCategory = this.productInformation.locator("p", {
+      hasText: "Category:",
+    });
+    this.availability = this.productInformation.locator("p", {
+      hasText: "Availability:",
+    });
     // Number input with no label and no data-qa hook.
     this.quantityInput = page.locator("#quantity");
     this.addToCartButton = page.getByRole("button", { name: "Add to cart" });
     this.reviewSection = page.locator("#reviews");
     this.reviewNameInput = page.getByPlaceholder("Your Name");
-    this.reviewEmailInput = page.getByPlaceholder("Email Address");
+    // Exact match: the footer's "Your email address" field would otherwise
+    // match this placeholder as a substring.
+    this.reviewEmailInput = page.getByPlaceholder("Email Address", {
+      exact: true,
+    });
     this.reviewTextarea = page.getByPlaceholder("Add Review Here!");
     this.reviewSubmitButton = page.getByRole("button", { name: "Submit" });
     this.reviewSuccessMessage = page.getByText("Thank you for your review.");

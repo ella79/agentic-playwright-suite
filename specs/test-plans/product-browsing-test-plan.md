@@ -12,13 +12,13 @@ full catalog.
 
 ## Test Cases
 
-| ID | Type | Scenario | Expected |
-|---|---|---|---|
-| TC-07 | happy | A visitor opens the catalog and views a product | The catalog renders product cards and the detail page shows name, price, availability |
-| TC-08 | happy | A visitor searches for a term matching several products | The searched products heading appears and every returned card matches the term |
-| TC-09 | error | A visitor searches for a term with no matches | The searched products heading appears with zero cards — the catalog is not silently returned |
-| TC-10 | happy | A visitor filters by a category | The heading names the category and at least one product is listed |
-| TC-11 | happy | A visitor filters by a brand | The heading names the brand and at least one product is listed |
+| ID    | Type  | Scenario                                                | Expected                                                                                     |
+| ----- | ----- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| TC-07 | happy | A visitor opens the catalog and views a product         | The catalog renders product cards and the detail page shows name, price, availability        |
+| TC-08 | happy | A visitor searches for a term matching several products | The searched products heading appears and every returned card matches the term               |
+| TC-09 | error | A visitor searches for a term with no matches           | The searched products heading appears with zero cards — the catalog is not silently returned |
+| TC-10 | happy | A visitor filters by a category                         | The heading names the category and at least one product is listed                            |
+| TC-11 | happy | A visitor filters by a brand                            | The heading names the brand and at least one product is listed                               |
 
 ## Locator Notes
 
