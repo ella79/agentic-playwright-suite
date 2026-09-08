@@ -2,12 +2,14 @@
   {
     "name": "Visual difference",
     "messageRegex": ".*Screenshot comparison failed.*",
-    "matchedStatuses": ["failed"]
+    "matchedStatuses": ["failed"],
+    "description": "A screenshot no longer matches its baseline. Either the interface changed or the baseline is stale."
   },
   {
     "name": "Missing baseline",
     "messageRegex": ".*snapshot doesn't exist.*",
-    "matchedStatuses": ["failed"]
+    "matchedStatuses": ["failed"],
+    "description": "No committed baseline for this capture on this platform. The visual job fails rather than writing one and reporting success."
   },
   {
     "name": "Application defect",
@@ -24,11 +26,13 @@
   {
     "name": "Timed out waiting for state",
     "messageRegex": ".*(Timeout .* exceeded|Test timeout of).*",
-    "matchedStatuses": ["failed", "broken"]
+    "matchedStatuses": ["failed", "broken"],
+    "description": "The application never reached the state the case was waiting for, within the timeout."
   },
   {
     "name": "Assertion failed",
     "messageRegex": ".*expect.*",
-    "matchedStatuses": ["failed"]
+    "matchedStatuses": ["failed"],
+    "description": "An assertion about the application's behaviour did not hold. The most interesting category of the six."
   }
 ]
