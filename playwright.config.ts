@@ -17,8 +17,11 @@ const allureReporter: ReporterDescription = [
     resultsDir: "allure-results",
     environmentInfo: {
       base_url: BASE_URL,
-      browser: "Chromium",
-      viewport: "1920x1080",
+      // What actually ran. The cross browser job overrides these, because a
+      // report that says Chromium while it holds WebKit results is worse than
+      // one that says nothing.
+      browser: process.env.E2E_BROWSERS || "Chromium",
+      viewport: process.env.E2E_VIEWPORT || "1920x1080",
       node: process.version,
       os: `${process.platform} ${process.arch}`,
       ci: process.env.CI ? "GitHub Actions" : "local",

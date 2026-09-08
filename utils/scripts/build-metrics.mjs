@@ -34,12 +34,18 @@ const WINDOW = 30;
 const CAPS = { functional: 20, visual: 20 };
 
 const args = process.argv.slice(2);
-const options = { suites: [], history: undefined, out: "metrics" };
+const options = {
+  suites: [],
+  history: undefined,
+  out: "metrics",
+  categories: undefined,
+};
 for (let i = 0; i < args.length; i += 2) {
   const [flag, value] = [args[i], args[i + 1]];
   if (flag === "--suite") options.suites.push(value);
   if (flag === "--history") options.history = value;
   if (flag === "--out") options.out = value;
+  if (flag === "--categories") options.categories = value;
 }
 
 const percentile = (values, p) => {
@@ -187,6 +193,20 @@ function sparkline(values, { width = 260, height = 40, min, max }) {
   return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img"><polyline points="${points}" /></svg>`;
 }
 
+/**
+ * Allure's own Categories tab only lists failures, so it reads as empty while
+ * the suite is green. The taxonomy is worth showing regardless: it says what
+ * this suite expects to go wrong and how it will be named when it does.
+ */
+let categories = [];
+if (options.categories) {
+  try {
+    categories = JSON.parse(await readFile(options.categories, "utf-8"));
+  } catch {
+    categories = [];
+  }
+}
+
 const seconds = (ms) => `${round(ms / 1000, 1)}s`;
 const escape = (text) =>
   String(text).replace(
@@ -287,6 +307,7 @@ const html = `<!doctype html>
   <a href="../">Test results</a>
   <a href="../functional/">Functional report</a>
   <a href="../visual/">Visual report</a>
+  <a href="../cross-browser/">Cross browser</a>
   <a href="https://github.com/ella79/agentic-playwright-suite">Repository</a>
 </nav>
 
@@ -312,6 +333,22 @@ const html = `<!doctype html>
 <table>
   <thead><tr><th>Case</th><th>Suite</th><th>Runs affected</th></tr></thead>
   <tbody>${offenderRows}</tbody>
+</table>
+
+<h2>How a failure gets classified</h2>
+<p class="sub">Applied automatically to any failure in the report. Empty while everything passes, which is the point.</p>
+<table>
+  <thead><tr><th>Category</th><th>Matches</th></tr></thead>
+  <tbody>${
+    categories.length
+      ? categories
+          .map(
+            (c) =>
+              `<tr><th scope="row">${escape(c.name)}</th><td>${escape(c.description ?? (c.matchedStatuses ?? []).join(", "))}</td></tr>`,
+          )
+          .join("")
+      : '<tr><td colspan="2" class="none">No categories file was provided.</td></tr>'
+  }</tbody>
 </table>
 
 <h2>Thresholds</h2>

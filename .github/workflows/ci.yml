@@ -289,6 +289,9 @@ jobs:
         run: ln -s /workspace/node_modules node_modules
 
       - name: Run the suite on WebKit and mobile Safari
+        env:
+          E2E_BROWSERS: WebKit and mobile Safari
+          E2E_VIEWPORT: 1920x1080 desktop and iPhone 15
         run: yarn test:cross-browser
 
       - name: Upload Allure results
