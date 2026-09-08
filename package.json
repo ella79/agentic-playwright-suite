@@ -1,0 +1,41 @@
+{
+  "name": "agentic-playwright-suite",
+  "version": "1.0.0",
+  "description": "Playwright + TypeScript E2E and visual regression suite for Automation Exercise, built with an agentic Claude Code workflow",
+  "private": true,
+  "scripts": {
+    "stylecheck": "prettier --check .",
+    "stylecheck:ci": "yarn stylecheck",
+    "stylefix": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "typecheck:ci": "yarn typecheck",
+    "lint": "eslint .",
+    "lint:ci": "yarn lint",
+    "lint:fix": "eslint . --fix",
+    "test:e2e": "playwright test --project=chromium",
+    "test:e2e:headed": "playwright test --project=chromium --headed",
+    "test:e2e:ui": "playwright test --project=chromium --ui",
+    "test:e2e:debug": "PWDEBUG=1 playwright test --project=chromium --debug",
+    "test:e2e:list": "playwright test --project=chromium --list",
+    "test:vr": "playwright test --project=visual",
+    "test:vr:update": "playwright test --project=visual --update-snapshots",
+    "test:vr:headed": "playwright test --project=visual --headed",
+    "test:report": "playwright show-report",
+    "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
+    "allure:open": "allure open ./allure-report",
+    "playwright:install": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0",
+    "@types/node": "^22.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "allure-commandline": "^2.32.0",
+    "allure-playwright": "^3.0.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-playwright": "^2.1.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2"
+  }
+}
