@@ -43,6 +43,10 @@ export default defineConfig({
         ["blob"],
         allureReporter,
         ["junit", { outputFile: "reports/junit/results.xml" }],
+        // The metrics page is built from this. It is the only reporter that
+        // states flaky as a first class outcome, which is the number the page
+        // exists to track.
+        ["json", { outputFile: "reports/results.json" }],
       ]
     : [
         ["html", { open: "never" }],

@@ -159,6 +159,16 @@ jobs:
           path: blob-report
           retention-days: 7
 
+      # Playwright's JSON report is the only one that states flaky as an
+      # outcome, so it is what the suite health page is built from.
+      - name: Upload JSON report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: results-json-e2e
+          path: reports/results.json
+          retention-days: 7
+
       - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v7
@@ -215,6 +225,14 @@ jobs:
         with:
           name: blob-report-vr
           path: blob-report
+          retention-days: 7
+
+      - name: Upload JSON report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: results-json-vr
+          path: reports/results.json
           retention-days: 7
 
       - name: Upload visual diffs
@@ -304,6 +322,12 @@ jobs:
           if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
             git fetch origin gh-pages --depth=1
             git worktree add gh-pages-tmp origin/gh-pages
+            if [ -f gh-pages-tmp/metrics/history.json ]; then
+              mkdir -p previous-metrics
+              cp gh-pages-tmp/metrics/history.json previous-metrics/history.json
+              echo "Restored suite health history"
+            fi
+
             for suite in combined functional visual; do
               case $suite in
                 combined) source=gh-pages-tmp/history ;;
@@ -325,6 +349,22 @@ jobs:
           npx allure generate results/combined --clean -o allure-report
           npx allure generate results/functional --clean -o allure-report/functional
           npx allure generate results/visual --clean -o allure-report/visual
+
+      - name: Collect JSON reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: results-json-*
+          path: json-reports
+
+      # The suite health page is a different question from the Allure report:
+      # not what this run found, but whether the suite is trustworthy and which
+      # way it is moving. It deliberately repeats none of Allure's case level
+      # detail.
+      - name: Build the suite health page
+        env:
+          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          node utils/scripts/build-metrics.mjs             --suite functional=json-reports/results-json-e2e/results.json             --suite visual=json-reports/results-json-vr/results.json             --history previous-metrics/history.json             --out allure-report/metrics
 
       # The HTML report is published alongside Allure because it carries the
       # traces: Allure shows what failed, the trace viewer shows why.
