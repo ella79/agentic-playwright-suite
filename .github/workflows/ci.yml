@@ -94,11 +94,19 @@ jobs:
       - name: TypeScript
         run: yarn typecheck:ci
 
-      # continue-on-error so the findings still reach code scanning when the
-      # run fails. The gate is restored by the last step: a lint failure still
-      # fails the job.
+      # Two runs on purpose. The SARIF formatter writes to a file, so a run
+      # that only produces SARIF fails with an empty log and leaves whoever
+      # opens it no idea which rule fired. The readable run is the gate; the
+      # SARIF run feeds code scanning. Both use continue-on-error so the
+      # findings still reach the Security tab when the code is failing, and the
+      # gate is restored by the last step in this job.
       - name: ESLint
         id: eslint
+        continue-on-error: true
+        run: yarn lint:ci
+
+      - name: ESLint report for code scanning
+        if: always()
         continue-on-error: true
         run: yarn lint:sarif
 
