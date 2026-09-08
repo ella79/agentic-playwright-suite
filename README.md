@@ -129,7 +129,7 @@ and viewport without being told them twice, and it exposes the generation tools
 [`@playwright/mcp`](https://github.com/microsoft/playwright-mcp) stays registered for exploration
 outside test authoring.
 
-`seed/seed.spec.ts` is the template generated tests start from. Playwright puts it in `tests/` by
+`specs/seed.spec.ts` is the template generated tests start from. Playwright puts it in `tests/` by
 default; here it sits outside, because inside a suite capped at twenty cases a bootstrap template
 would run as a twenty-first case that asserts nothing.
 

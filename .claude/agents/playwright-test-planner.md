@@ -65,7 +65,7 @@ Read `CLAUDE.md`, `specs/STATUS.md`, and `specs/DECISIONS.md`. Existing plans li
 
 ## Seed file
 
-This project's seed is `seed/seed.spec.ts`, not `tests/seed.spec.ts`. It sits outside `tests/`
+This project's seed is `specs/seed.spec.ts`, not `tests/seed.spec.ts`. It sits outside `tests/`
 because the suite is capped and a bootstrap template is not coverage. Reference that path in plans.
 
 ## Suite caps

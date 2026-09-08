@@ -75,9 +75,13 @@ plain `npx` invocation so the repository is not host-specific.
 
 `init-agents` creates `tests/seed.spec.ts` as the template generated tests start from. Left there it
 would run as a twenty-first functional case that asserts nothing, breaking the cap for something
-that is tooling rather than coverage. It moved to `seed/seed.spec.ts` and was rewritten to
+that is tooling rather than coverage. It moved to `specs/seed.spec.ts` and was rewritten to
 demonstrate this project's setup — the shared fixture and a page object — so tests generated from it
 inherit the right shape instead of raw locators.
+
+It sits beside the plans it bootstraps rather than in a directory of its own, matched by name so the
+rest of `specs/` stays Markdown. A whole top-level folder for one file is structure that has to be
+explained every time someone opens the repository.
 
 ## 2026-09-08 — No baseline taller than the viewport
 

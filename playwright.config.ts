@@ -76,9 +76,11 @@ export default defineConfig({
       // generated tests start from rather than coverage: inside the functional
       // project it would run as a twenty-first case. The planner still needs to
       // execute it to prove the environment initialises, so it needs a project
-      // to run under. Invoke with --project=seed.
+      // to run under. It sits in specs/ beside the plans it bootstraps, matched
+      // by name so the rest of that directory stays Markdown.
       name: "seed",
-      testDir: "./seed",
+      testDir: "./specs",
+      testMatch: /seed\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1920, height: 1080 },

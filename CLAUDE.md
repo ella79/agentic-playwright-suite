@@ -29,9 +29,8 @@ Base URL defaults to `https://automationexercise.com`. Override with `E2E_BASE_U
 
 ```
 tests/               Functional E2E spec files (*.spec.ts), one directory per feature area
-seed/                Environment seed used as the template for generated tests
 vr-tests/            Visual regression spec files (*.vr.spec.ts) + baseline snapshots
-specs/               Test plans (Markdown) + STATUS.md + DECISIONS.md
+specs/               Test plans (Markdown) + STATUS.md + DECISIONS.md + seed.spec.ts
 utils/
   pageObjects/        Page object classes — BaseAppPage (pages) / BaseComponentPage (modals)
   fixtures/           Custom Playwright fixtures (account lifecycle)

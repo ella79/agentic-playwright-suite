@@ -23,7 +23,7 @@
   },
   "include": [
     "tests/**/*.ts",
-    "seed/**/*.ts",
+    "specs/**/*.ts",
     "vr-tests/**/*.ts",
     "utils/**/*.ts",
     "playwright.config.ts"
