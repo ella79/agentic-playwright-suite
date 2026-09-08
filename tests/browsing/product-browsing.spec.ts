@@ -42,6 +42,19 @@ test.describe("Product browsing", () => {
     }
   });
 
+  test("TC-09: a search with no matches returns an empty result set", async ({
+    page,
+  }) => {
+    const productsPage = new ProductsPage(page);
+
+    await productsPage.gotoProductsPage();
+    await productsPage.searchFor(searchTerms.nonExistent);
+
+    await expect(productsPage.searchedProductsHeading).toBeVisible();
+    // The catalog must not be silently returned when nothing matches.
+    await expect(productsPage.productCards).toHaveCount(0);
+  });
+
   test("TC-10: filtering by category lists that category's products", async ({
     page,
   }) => {

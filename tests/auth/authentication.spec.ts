@@ -58,6 +58,38 @@ test.describe("Authentication", () => {
     await expect(homePage.logoutLink).toBeVisible();
   });
 
+  test("TC-03: signing in with wrong credentials is rejected", async ({
+    page,
+  }) => {
+    const loginPage = new LoginPage(page);
+    const homePage = new HomePage(page);
+    const unregistered = buildAccount();
+
+    await loginPage.gotoLoginPage();
+    await loginPage.login(unregistered.email, "DefinitelyWrong123!");
+
+    await expect(loginPage.loginErrorMessage).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`${url.login}$`));
+    await expect(homePage.loggedInAs).toBeHidden();
+  });
+
+  test("TC-04: signing up with an already registered email is rejected", async ({
+    page,
+    uniqueAccount,
+  }) => {
+    const homePage = new HomePage(page);
+    const loginPage = new LoginPage(page);
+    const accountInfoPage = new AccountInfoPage(page);
+
+    await homePage.gotoHomePage();
+    await homePage.logout();
+
+    await loginPage.startSignup(uniqueAccount.name, uniqueAccount.email);
+
+    await expect(loginPage.signupErrorMessage).toBeVisible();
+    await expect(accountInfoPage.enterAccountInfoHeading).toBeHidden();
+  });
+
   test("TC-05: a signed-in user can delete their account", async ({
     page,
     uniqueAccount,
