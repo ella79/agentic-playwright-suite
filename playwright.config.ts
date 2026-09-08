@@ -75,6 +75,26 @@ export default defineConfig({
         viewport: { width: 1920, height: 1080 },
       },
     },
+    // Cross browser coverage runs the same twenty functional cases on the two
+    // engines Chromium cannot speak for. WebKit is the only way to reach
+    // Safari, which is the default browser on every iOS device, and the mobile
+    // project exercises the layout a phone actually gets. They are separate
+    // projects rather than extra cases: the coverage is the same, the surface
+    // is not. The visual suite stays on Chromium alone, because three engines
+    // would mean sixty baselines for a human to review.
+    {
+      name: "webkit",
+      testDir: "./tests",
+      use: {
+        ...devices["Desktop Safari"],
+        viewport: { width: 1920, height: 1080 },
+      },
+    },
+    {
+      name: "mobile-safari",
+      testDir: "./tests",
+      use: { ...devices["iPhone 15"] },
+    },
     {
       // The agent seed. It has its own project because it is the template
       // generated tests start from rather than coverage: inside the functional

@@ -13,8 +13,9 @@ MCP, and published from a containerised CI pipeline.
 | [Functional](https://ella79.github.io/agentic-playwright-suite/functional/) and [visual](https://ella79.github.io/agentic-playwright-suite/visual/) | Each suite with its own trend                                                   |
 | [Trace viewer](https://ella79.github.io/agentic-playwright-suite/playwright-report/)                                                                | Every step of every case, replayable                                            |
 
-**20 functional cases and 20 visual cases, both capped.** Chromium, one viewport, Linux baselines
-generated in the same image CI runs. New coverage replaces an existing case rather than growing the
+**20 functional cases and 20 visual cases, both capped.** The functional cases also run on WebKit
+and on a phone viewport, so the same coverage is proven on the engine behind Safari and on the
+layout a phone gets. Visual baselines stay Chromium on Linux, generated in the same image CI runs. New coverage replaces an existing case rather than growing the
 suite, because twenty cases that can each be justified demonstrate more than two hundred nobody can
 explain.
 

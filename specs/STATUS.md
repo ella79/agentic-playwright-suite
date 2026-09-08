@@ -19,6 +19,11 @@ Updated: 2026-09-08 · Source of truth for results:
 
 Cap: 20. Full. New coverage replaces an existing case rather than growing the suite.
 
+The same twenty cases run on WebKit and on mobile Safari on every merge, published separately so the
+canonical dashboard stays one run of one engine. Both passed on the first attempt with no change to
+any locator, which is the argument for the locator policy: roles and `data-qa` attributes do not
+depend on the engine or the viewport.
+
 ## Visual Regression Coverage
 
 | #   | Feature Plan                     | Visual Test                 | Test Cases | Implemented | Passed | Failed | Flaky | Skipped | Fixme |

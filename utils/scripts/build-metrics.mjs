@@ -27,6 +27,12 @@ const FLAKY_RATE_ACCEPTABLE = 5;
 /** How many runs the trends and the offender tables look back over. */
 const WINDOW = 30;
 
+/**
+ * Suites with a deliberate ceiling on case count. Cross browser has none: it is
+ * the same twenty cases on other engines, so a cap there would be meaningless.
+ */
+const CAPS = { functional: 20, visual: 20 };
+
 const args = process.argv.slice(2);
 const options = { suites: [], history: undefined, out: "metrics" };
 for (let i = 0; i < args.length; i += 2) {
@@ -199,7 +205,7 @@ const suiteRows = suites
     );
     return `<tr>
       <th scope="row">${escape(s.name)}</th>
-      <td>${s.total} / 20</td>
+      <td>${CAPS[s.name] ? `${s.total} / ${CAPS[s.name]}` : s.total}</td>
       <td class="${pass}">${s.passRate}%</td>
       <td class="${flake}">${s.flakyRate}%</td>
       <td>${seconds(s.p50)}</td>
@@ -313,7 +319,7 @@ const html = `<!doctype html>
   <dt>Pass rate</dt><dd>${PASS_RATE_GOOD}% or above is healthy, ${PASS_RATE_ACCEPTABLE} to ${PASS_RATE_GOOD}% is acceptable during active development, below ${PASS_RATE_ACCEPTABLE}% means the suite has a stability problem rather than the application.</dd>
   <dt>Flaky rate</dt><dd>Below ${FLAKY_RATE_GOOD}% is the target. Past ${FLAKY_RATE_ACCEPTABLE}% the suite stops being believed, and a suite nobody believes is worse than no suite.</dd>
   <dt>Duration</dt><dd>Tracked as a trend, not a fixed limit. What matters is whether it is growing faster than coverage.</dd>
-  <dt>Coverage cap</dt><dd>Twenty cases per suite. New coverage replaces an existing case rather than adding to the count.</dd>
+  <dt>Coverage cap</dt><dd>Twenty cases for the functional suite and twenty for the visual one. New coverage replaces an existing case rather than adding to the count. Cross browser has no cap of its own: it runs the same functional cases on WebKit and on a phone viewport.</dd>
 </dl>
 
 <footer>
