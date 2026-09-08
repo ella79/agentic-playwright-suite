@@ -1,11 +1,15 @@
 # Agentic Playwright Suite
 
+[![CI](https://github.com/ella79/agentic-playwright-suite/actions/workflows/ci.yml/badge.svg)](https://github.com/ella79/agentic-playwright-suite/actions/workflows/ci.yml)
+
 End-to-end and visual regression tests for [Automation Exercise](https://automationexercise.com),
 written with Playwright and TypeScript, driven by a Claude Code agent workflow, and gated by a
 GitHub Actions pipeline that publishes its own results.
 
-- **Live dashboard:** https://ella79.github.io/agentic-playwright-suite/ (Allure, with pass-rate
-  trend across runs)
+- **Live dashboard:** https://ella79.github.io/agentic-playwright-suite/ — Allure, with pass-rate
+  trend across runs
+- **Trace viewer:** https://ella79.github.io/agentic-playwright-suite/playwright-report/ — published
+  beside it, because Allure answers what failed and a trace answers why
 - **Scope:** 20 functional cases, 20 visual cases, one browser, one viewport
 - **Target:** a public demo storefront, so every run hits a real network, real third-party ads, and
   a real database
