@@ -246,11 +246,27 @@ jobs:
   # The same twenty cases on the engines Chromium cannot speak for. It runs on
   # merge rather than on every pull request: WebKit and a phone viewport catch
   # rendering and layout problems, which is not the feedback a review needs
-  # within seconds, and the two engines together cost about three minutes.
+  # within seconds.
+  #
+  # It waits for the other two test jobs rather than running beside them. When
+  # it ran in parallel the target, a shared public demo host, was taking six
+  # concurrent browsers instead of four, and the two heaviest cases hit the
+  # sixty second test timeout while the same cases passed on WebKit in the same
+  # run. The suite was the cause of its own flakiness, which is the one thing
+  # the flaky policy in the README refuses to tolerate. Three minutes of wall
+  # clock is the price, and it is cheaper than a retry that hides it.
   cross-browser:
     name: cross-browser
-    needs: [prepare-playwright-image, static-checks]
-    if: github.event_name != 'pull_request'
+    needs:
+      [
+        prepare-playwright-image,
+        static-checks,
+        e2e-playwright,
+        visual-regression,
+      ]
+    if: >-
+      !cancelled() && github.event_name != 'pull_request' &&
+      needs.static-checks.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:

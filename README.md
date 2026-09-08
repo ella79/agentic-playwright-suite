@@ -45,6 +45,11 @@ The full command list is in [`docs/architecture.md`](docs/architecture.md).
 Every job runs inside an image built by the first job, so browsers and dependencies install once
 rather than three times, and a local run uses that same image.
 
+The cross browser job waits for the other two rather than running beside them. The target is a
+shared public host, and six concurrent browsers against it made the two heaviest cases time out
+while the same cases passed elsewhere in the same run. Three minutes of wall clock is the cost of
+not being the cause of your own flakiness.
+
 ## When a test goes flaky
 
 A flaky test is a defect in the suite, not weather. The policy, in order:
