@@ -295,6 +295,8 @@ jobs:
           write_meta results/functional "Functional E2E" "functional/"
           write_meta results/visual "Visual regression" "visual/"
 
+          node utils/scripts/group-allure-packages.mjs             results/combined results/functional results/visual
+
       # Trend graphs only exist if the previous report's history is carried
       # forward, so each report restores its own from the published site.
       - name: Restore trend history
