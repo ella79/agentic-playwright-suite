@@ -1,0 +1,62 @@
+name: Update VR baselines
+
+# Visual baselines are platform-specific. A screenshot generated on a developer
+# machine renders text differently from the CI runner and would never match, so
+# the authoritative baselines are generated here, on the same platform that
+# compares them, and committed from here.
+#
+# Run this deliberately, after verifying a visual change was intended.
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why the baselines are being regenerated"
+        required: true
+        type: string
+
+jobs:
+  update-baselines:
+    name: Regenerate and commit baselines
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Install Chromium
+        run: yarn playwright:install
+
+      - name: Regenerate baselines
+        run: yarn test:vr:update
+
+      - name: Commit baselines
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add vr-tests
+          if git diff --staged --quiet; then
+            echo "Baselines already current, nothing to commit"
+            exit 0
+          fi
+          git diff --staged --stat
+          git commit -m "test: regenerate visual baselines
+
+          ${{ inputs.reason }}"
+          git push
+
+      - name: Upload the regenerated set for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regenerated-baselines
+          path: vr-tests/**/*-snapshots/**
+          retention-days: 14

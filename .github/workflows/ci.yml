@@ -1,0 +1,196 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  static-checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      - name: TypeScript
+        run: yarn typecheck:ci
+
+      - name: ESLint
+        run: yarn lint:ci
+
+      - name: Prettier
+        run: yarn stylecheck:ci
+
+  e2e-tests:
+    name: E2E (shard ${{ matrix.shard }}/2)
+    needs: static-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Install Chromium
+        run: yarn playwright:install
+
+      - name: Run functional suite
+        run: yarn test:e2e --shard=${{ matrix.shard }}/2
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-e2e-${{ matrix.shard }}
+          path: allure-results
+          retention-days: 7
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-traces-${{ matrix.shard }}
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+  visual-regression:
+    name: Visual regression
+    needs: static-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Install Chromium
+        run: yarn playwright:install
+
+      # Baselines are committed from this same platform by the
+      # update-vr-baselines workflow. Without them Playwright would write new
+      # ones and report success, so their absence is treated as a failure
+      # rather than silently self-seeding a green run.
+      - name: Verify Linux baselines exist
+        run: |
+          count=$(find vr-tests -name '*-linux.png' | wc -l)
+          echo "Found $count Linux baselines"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::No Linux baselines committed. Run the update-vr-baselines workflow first."
+            exit 1
+          fi
+
+      - name: Run visual suite
+        run: yarn test:vr
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-vr
+          path: allure-results
+          retention-days: 7
+
+      - name: Upload visual diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-diffs
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+  publish-dashboard:
+    name: Publish dashboard
+    needs: [e2e-tests, visual-regression]
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Collect results from every test job
+        uses: actions/download-artifact@v4
+        with:
+          pattern: allure-results-*
+          path: downloaded-results
+          merge-multiple: true
+
+      - name: Stage results
+        run: |
+          mkdir -p allure-results
+          cp -r downloaded-results/. allure-results/ 2>/dev/null || true
+          ls -la allure-results | head
+
+      # Trend graphs only exist if the previous report's history is carried
+      # forward, so it is restored from the published site before generating.
+      - name: Restore trend history
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages --depth=1
+            git worktree add gh-pages-tmp origin/gh-pages
+            if [ -d gh-pages-tmp/history ]; then
+              cp -r gh-pages-tmp/history allure-results/history
+              echo "Restored history from the published dashboard"
+            fi
+          else
+            echo "No gh-pages branch yet: this run seeds the history"
+          fi
+
+      - name: Generate Allure report
+        run: yarn allure:generate
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-report
+          publish_branch: gh-pages
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "docs: publish test dashboard for ${{ github.sha }}"

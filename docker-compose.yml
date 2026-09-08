@@ -1,0 +1,32 @@
+services:
+  # Functional suite in the same image CI uses.
+  e2e:
+    build:
+      context: .
+      dockerfile: env/docker/e2e-playwright-local.Dockerfile
+    volumes:
+      - .:/workspace
+      - /workspace/node_modules
+    command: yarn test:e2e
+
+  # Visual suite against the committed Linux baselines.
+  vr:
+    build:
+      context: .
+      dockerfile: env/docker/e2e-playwright-local.Dockerfile
+    volumes:
+      - .:/workspace
+      - /workspace/node_modules
+    command: yarn test:vr
+
+  # Regenerates Linux baselines on any host. This is the only supported way to
+  # update them locally: baselines produced outside this image belong to a
+  # different rendering platform and are gitignored for that reason.
+  vr-update:
+    build:
+      context: .
+      dockerfile: env/docker/e2e-playwright-local.Dockerfile
+    volumes:
+      - .:/workspace
+      - /workspace/node_modules
+    command: yarn test:vr:update
