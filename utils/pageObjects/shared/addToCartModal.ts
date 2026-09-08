@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
-import { BaseComponentPage } from "../../base/BaseComponentPage";
-import { url } from "../../../url";
+import { BaseComponentPage } from "../baseComponentPage";
+import { url } from "../../url";
 
 export class AddToCartModal extends BaseComponentPage {
   readonly heading: Locator;

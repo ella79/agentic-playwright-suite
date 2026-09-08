@@ -1,5 +1,5 @@
 import { type Locator, type Page } from "@playwright/test";
-import { BaseAppPage } from "../base/BaseAppPage";
+import { BaseAppPage } from "../baseAppPage";
 
 /**
  * Account created and account deleted share one layout: a banner plus a

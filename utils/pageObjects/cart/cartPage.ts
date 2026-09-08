@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
-import { BaseAppPage } from "../base/BaseAppPage";
-import { CheckoutGuardModal } from "./modals/CheckoutGuardModal";
+import { BaseAppPage } from "../baseAppPage";
+import { CheckoutGuardModal } from "../shared/checkoutGuardModal";
 import { url } from "../../url";
 
 export class CartPage extends BaseAppPage {

@@ -1,5 +1,5 @@
 import { type Locator, type Page } from "@playwright/test";
-import { BaseComponentPage } from "../../base/BaseComponentPage";
+import { BaseComponentPage } from "../baseComponentPage";
 
 /**
  * Shown when an anonymous visitor tries to check out: the application requires

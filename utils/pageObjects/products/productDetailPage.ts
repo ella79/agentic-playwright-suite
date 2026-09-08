@@ -1,6 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
-import { BaseAppPage } from "../base/BaseAppPage";
-import { AddToCartModal } from "../cart/modals/AddToCartModal";
+import { BaseAppPage } from "../baseAppPage";
+import { AddToCartModal } from "../shared/addToCartModal";
 import { url } from "../../url";
 
 export class ProductDetailPage extends BaseAppPage {

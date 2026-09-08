@@ -1,5 +1,5 @@
 import { type Locator, type Page } from "@playwright/test";
-import { BaseAppPage } from "../base/BaseAppPage";
+import { BaseAppPage } from "../baseAppPage";
 import { url } from "../../url";
 
 export class ContactUsPage extends BaseAppPage {
