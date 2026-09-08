@@ -45,10 +45,12 @@ The full command list is in [`docs/architecture.md`](docs/architecture.md).
 Every job runs inside an image built by the first job, so browsers and dependencies install once
 rather than three times, and a local run uses that same image.
 
-The cross browser job waits for the other two rather than running beside them. The target is a
-shared public host, and six concurrent browsers against it made the two heaviest cases time out
-while the same cases passed elsewhere in the same run. Three minutes of wall clock is the cost of
-not being the cause of your own flakiness.
+The test jobs run in parallel with a concurrency budget rather than an unbounded one. The target is
+a shared public host: at six concurrent browsers the two heaviest cases timed out while the same
+checkout passed on WebKit in the same run, so the suite had become the cause of its own flakiness.
+Four is the level that held across every run before that, and it is now spent deliberately, one
+worker each for the functional and visual jobs and two for cross browser, which carries twice the
+cases. What the target sees is the number that matters, not how it is divided between jobs.
 
 ## When a test goes flaky
 

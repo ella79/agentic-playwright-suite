@@ -139,7 +139,7 @@ jobs:
         run: ln -s /workspace/node_modules node_modules
 
       - name: Run functional suite
-        run: yarn test:e2e
+        run: yarn test:e2e --workers=1
 
       - name: Upload Allure results
         if: always()
@@ -209,7 +209,7 @@ jobs:
           fi
 
       - name: Run visual suite
-        run: yarn test:vr
+        run: yarn test:vr --workers=1
 
       - name: Upload Allure results
         if: always()
@@ -248,25 +248,19 @@ jobs:
   # rendering and layout problems, which is not the feedback a review needs
   # within seconds.
   #
-  # It waits for the other two test jobs rather than running beside them. When
-  # it ran in parallel the target, a shared public demo host, was taking six
-  # concurrent browsers instead of four, and the two heaviest cases hit the
-  # sixty second test timeout while the same cases passed on WebKit in the same
-  # run. The suite was the cause of its own flakiness, which is the one thing
-  # the flaky policy in the README refuses to tolerate. Three minutes of wall
-  # clock is the price, and it is cheaper than a retry that hides it.
+  # It runs beside the other test jobs, and the concurrency is what keeps that
+  # honest. The target is a shared public demo host. At six concurrent browsers
+  # the two heaviest cases hit the sixty second test timeout, while the same
+  # checkout passed on WebKit in that same run: the suite had become the cause
+  # of its own flakiness. Four browsers is the level that held across every run
+  # before that, so the budget is spent deliberately: one worker each for the
+  # functional and visual jobs, two here because this job carries forty cases
+  # and would otherwise become the critical path. The load on the target is the
+  # number that matters, not how it is spread across jobs.
   cross-browser:
     name: cross-browser
-    needs:
-      [
-        prepare-playwright-image,
-        static-checks,
-        e2e-playwright,
-        visual-regression,
-      ]
-    if: >-
-      !cancelled() && github.event_name != 'pull_request' &&
-      needs.static-checks.result == 'success'
+    needs: [prepare-playwright-image, static-checks]
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
