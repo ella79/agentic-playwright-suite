@@ -12,9 +12,12 @@
 // exists only to serve the agents. It sits beside the plans it bootstraps
 // instead, matched by name so the rest of specs/ stays Markdown.
 import { expect, test } from "../utils/fixtures/testFixtures";
+import { HomePage } from "../utils/pageObjects";
 
 test.describe("Seed", () => {
-  test("storefront is reachable and rendered", async ({ homePage }) => {
+  test("storefront is reachable and rendered", async ({ page }) => {
+    const homePage = new HomePage(page);
+
     await homePage.gotoHomePage();
 
     await expect(homePage.featuresItemsHeading).toBeVisible();

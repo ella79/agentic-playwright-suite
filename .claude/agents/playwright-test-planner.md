@@ -60,7 +60,7 @@ These override the generic guidance above wherever they conflict.
 
 ## Before planning
 
-Read `CLAUDE.md`, `specs/STATUS.md`, and `specs/DECISIONS.md`. Existing plans live in
+Read `CLAUDE.md` and `specs/STATUS.md`. Existing plans live in
 `specs/test-plans/`; visual plans in `specs/vr-test-plans/`.
 
 ## Seed file

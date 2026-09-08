@@ -1,6 +1,11 @@
 // spec: specs/test-plans/engagement-test-plan.md
 import path from "path";
 import { expect, test } from "../../utils/fixtures/testFixtures";
+import {
+  ContactUsPage,
+  HomePage,
+  ProductDetailPage,
+} from "../../utils/pageObjects";
 import { buildAccount, products } from "../../utils/testData";
 
 const ATTACHMENT = path.resolve(
@@ -10,8 +15,10 @@ const ATTACHMENT = path.resolve(
 
 test.describe("Engagement", () => {
   test("TC-18: the contact form accepts a message with an attachment", async ({
-    contactUsPage,
+    page,
   }) => {
+    const contactUsPage = new ContactUsPage(page);
+
     const visitor = buildAccount();
 
     await contactUsPage.gotoContactUsPage();
@@ -31,8 +38,10 @@ test.describe("Engagement", () => {
   });
 
   test("TC-19: a product review can be submitted from the detail page", async ({
-    productDetailPage,
+    page,
   }) => {
+    const productDetailPage = new ProductDetailPage(page);
+
     const reviewer = buildAccount();
 
     await productDetailPage.gotoProductDetailPage(products.blueTop.id);
@@ -48,8 +57,10 @@ test.describe("Engagement", () => {
   });
 
   test("TC-20: a visitor can subscribe to the newsletter from the footer", async ({
-    homePage,
+    page,
   }) => {
+    const homePage = new HomePage(page);
+
     const subscriber = buildAccount();
 
     await homePage.gotoHomePage();

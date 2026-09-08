@@ -1,12 +1,15 @@
 // spec: specs/test-plans/product-browsing-test-plan.md
 import { expect, test } from "../../utils/fixtures/testFixtures";
+import { ProductDetailPage, ProductsPage } from "../../utils/pageObjects";
 import { products, searchTerms } from "../../utils/testData";
 
 test.describe("Product browsing", () => {
   test("TC-07: the catalog lists products and one opens its detail page", async ({
-    productsPage,
-    productDetailPage,
+    page,
   }) => {
+    const productsPage = new ProductsPage(page);
+    const productDetailPage = new ProductDetailPage(page);
+
     await productsPage.gotoProductsPage();
     await expect(productsPage.allProductsHeading).toBeVisible();
     await expect(productsPage.productCards.first()).toBeVisible();
@@ -23,8 +26,10 @@ test.describe("Product browsing", () => {
   });
 
   test("TC-08: search returns only products matching the term", async ({
-    productsPage,
+    page,
   }) => {
+    const productsPage = new ProductsPage(page);
+
     await productsPage.gotoProductsPage();
     await productsPage.searchFor(searchTerms.matching);
 
@@ -38,8 +43,10 @@ test.describe("Product browsing", () => {
   });
 
   test("TC-09: a search with no matches returns an empty result set", async ({
-    productsPage,
+    page,
   }) => {
+    const productsPage = new ProductsPage(page);
+
     await productsPage.gotoProductsPage();
     await productsPage.searchFor(searchTerms.nonExistent);
 
@@ -49,8 +56,10 @@ test.describe("Product browsing", () => {
   });
 
   test("TC-10: filtering by category lists that category's products", async ({
-    productsPage,
+    page,
   }) => {
+    const productsPage = new ProductsPage(page);
+
     await productsPage.gotoProductsPage();
     await productsPage.openCategory("Women", "Tops");
 
@@ -61,8 +70,10 @@ test.describe("Product browsing", () => {
   });
 
   test("TC-11: filtering by brand lists that brand's products", async ({
-    productsPage,
+    page,
   }) => {
+    const productsPage = new ProductsPage(page);
+
     await productsPage.gotoProductsPage();
     await productsPage.openBrand("Polo");
 

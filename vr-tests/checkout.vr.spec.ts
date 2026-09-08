@@ -1,20 +1,29 @@
 // spec: specs/vr-test-plans/checkout-vr-test-plan.md
 import { expect, test } from "../utils/fixtures/testFixtures";
+import {
+  CartPage,
+  CheckoutPage,
+  PaymentPage,
+  ProductDetailPage,
+} from "../utils/pageObjects";
 import { products } from "../utils/testData";
 
 test.describe("Visual regression - checkout", () => {
   // uniqueAccount is requested for its side effect: both captures are only
   // reachable once an account exists and is signed in.
-  test.beforeEach(
-    async ({ uniqueAccount: _uniqueAccount, productDetailPage, cartPage }) => {
-      await productDetailPage.gotoProductDetailPage(products.blueTop.id);
-      const modal = await productDetailPage.addToCart();
-      await modal.viewCart();
-      await cartPage.proceedToCheckout();
-    },
-  );
+  test.beforeEach(async ({ page, uniqueAccount: _uniqueAccount }) => {
+    const productDetailPage = new ProductDetailPage(page);
+    const cartPage = new CartPage(page);
 
-  test("VR-19: delivery address block", async ({ checkoutPage }) => {
+    await productDetailPage.gotoProductDetailPage(products.blueTop.id);
+    const modal = await productDetailPage.addToCart();
+    await modal.viewCart();
+    await cartPage.proceedToCheckout();
+  });
+
+  test("VR-19: delivery address block", async ({ page }) => {
+    const checkoutPage = new CheckoutPage(page);
+
     await expect(checkoutPage.addressDetailsHeading).toBeVisible();
 
     await expect(checkoutPage.deliveryAddress).toHaveScreenshot(
@@ -25,7 +34,10 @@ test.describe("Visual regression - checkout", () => {
     );
   });
 
-  test("VR-20: card entry form", async ({ checkoutPage, paymentPage }) => {
+  test("VR-20: card entry form", async ({ page }) => {
+    const checkoutPage = new CheckoutPage(page);
+    const paymentPage = new PaymentPage(page);
+
     await checkoutPage.placeOrder();
     await expect(paymentPage.payButton).toBeVisible();
 

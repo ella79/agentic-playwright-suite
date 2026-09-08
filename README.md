@@ -39,7 +39,7 @@ yarn test:e2e
 ```
 tests/          20 functional cases, one directory per feature area
 vr-tests/       20 visual cases plus their committed baselines
-specs/          Test plans, STATUS.md, DECISIONS.md
+specs/          Test plans and the test status report
 utils/
   pageObjects/  BaseAppPage (pages) and BaseComponentPage (modals)
   fixtures/     Account lifecycle and third-party request blocking
@@ -73,7 +73,7 @@ would make visual comparison meaningless.
 
 ## Decisions Worth Defending
 
-The full log is in [`specs/DECISIONS.md`](specs/DECISIONS.md). Three that a reviewer would question:
+The ones a reviewer would question, with the reasoning rather than only the outcome:
 
 **No shared authenticated storage state.** The usual optimization is to log in once and reuse the
 session. It is the right call when login is an expensive OAuth redirect; here it is a two-field
@@ -90,6 +90,28 @@ produced on Windows will not match a Linux runner. `yarn docker:vr:update` regen
 the same image CI runs, so a developer on any host produces the authoritative set. Baselines written
 directly on Windows or macOS are gitignored, and the visual job fails outright rather than seeding
 its own.
+
+**No baseline taller than the viewport.** Two captures originally targeted the element holding the
+whole catalog, which measures 13,347 pixels. They failed intermittently under load, timing out on
+the stability check rather than on any visual difference. Raising the timeout would have hidden the
+more important half: nobody scans thirteen thousand pixels for the four that changed, so those cases
+could only ever be rubber-stamped. Both now anchor the section heading to the top of the viewport
+and capture the viewport — 412 KB instead of 2.8 MB, and reviewable.
+
+**The planner, generator and healer are generated, not written.** `npx playwright init-agents
+--loop=claude` produces definitions version-matched to the installed Playwright, carrying the exact
+tool names and call protocol of its authoring MCP server; a hand-written equivalent drifts the
+moment Playwright updates. What they lack is knowledge of this repository — the official generator's
+own example writes `page.click(...)` directly — so each gains a project rules section that overrides
+that. The manager, companion and reviewer stay hand-written, because the official set has no
+equivalent and coverage strategy is exactly where a repository's own standards live.
+
+**Two MCP servers, for two jobs.** `playwright-test` reads `playwright.config.ts`, so an agent
+exploring the site inherits the project's base URL, `data-qa` test id attribute and viewport instead
+of being told them twice, and it exposes generation tools a general browser server does not have.
+`@playwright/mcp` stays registered for exploration outside test authoring. Verifying that the second
+one actually starts caught a real error in the first configuration: `--browser chromium` is not a
+valid value, so the server would have failed on launch while the config looked plausible.
 
 ## The Agent Workflow
 

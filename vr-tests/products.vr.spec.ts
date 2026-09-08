@@ -1,16 +1,21 @@
 // spec: specs/vr-test-plans/products-vr-test-plan.md
 import { expect, test } from "../utils/fixtures/testFixtures";
+import { ProductsPage } from "../utils/pageObjects";
 import { products, searchTerms } from "../utils/testData";
 
 test.describe("Visual regression - products", () => {
-  test.beforeEach(async ({ productsPage }) => {
+  test.beforeEach(async ({ page }) => {
+    const productsPage = new ProductsPage(page);
+
     await productsPage.gotoProductsPage();
     await expect(productsPage.allProductsHeading).toBeVisible();
   });
 
   // Same reason as VR-02: the grid holds the whole catalog and is far taller
   // than any reviewable image.
-  test("VR-04: catalog grid", async ({ page, productsPage }) => {
+  test("VR-04: catalog grid", async ({ page }) => {
+    const productsPage = new ProductsPage(page);
+
     await expect(productsPage.productCards.first()).toBeVisible();
     await productsPage.scrollToTop(productsPage.allProductsHeading);
     await productsPage.waitForImagesLoaded(productsPage.productGrid);
@@ -21,7 +26,9 @@ test.describe("Visual regression - products", () => {
     );
   });
 
-  test("VR-05: single product card at rest", async ({ productsPage }) => {
+  test("VR-05: single product card at rest", async ({ page }) => {
+    const productsPage = new ProductsPage(page);
+
     const card = productsPage.getProductCard(products.blueTop.name);
     await card.scrollIntoViewIfNeeded();
     await expect(card).toBeVisible();
@@ -32,7 +39,9 @@ test.describe("Visual regression - products", () => {
     });
   });
 
-  test("VR-06: category accordion", async ({ productsPage }) => {
+  test("VR-06: category accordion", async ({ page }) => {
+    const productsPage = new ProductsPage(page);
+
     await expect(productsPage.categorySidebar).toBeVisible();
 
     await expect(productsPage.categorySidebar).toHaveScreenshot(
@@ -41,8 +50,10 @@ test.describe("Visual regression - products", () => {
   });
 
   test("VR-07: catalog area after a search with no matches", async ({
-    productsPage,
+    page,
   }) => {
+    const productsPage = new ProductsPage(page);
+
     await productsPage.searchFor(searchTerms.nonExistent);
     await expect(productsPage.searchedProductsHeading).toBeVisible();
     await expect(productsPage.productCards).toHaveCount(0);

@@ -48,10 +48,10 @@ A portfolio suite that sprawls stops demonstrating judgment.
 
 ## Session Protocol
 
-1. Read `specs/STATUS.md` and `specs/DECISIONS.md` before doing anything.
+1. Read `specs/STATUS.md` before doing anything: it is the coverage baseline.
 2. Open with a status line: what is covered, what is open, what comes next.
 3. Update `specs/STATUS.md` after every delegated result.
-4. Append to `specs/DECISIONS.md` for any scope or architecture decision — that file is append-only.
+4. Record any scope or architecture decision in the README's decisions section, with the reasoning, not just the outcome.
 5. Report final results as a table: file, test count, pass/fail.
 
 ## Quality Gates

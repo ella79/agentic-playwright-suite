@@ -7,7 +7,7 @@ Delegate to the **playwright-test-manager** agent.
 
 Ask it to:
 
-1. Read `specs/STATUS.md` and `specs/DECISIONS.md`.
+1. Read `specs/STATUS.md`, the coverage baseline.
 2. Cross-check every case ID in `specs/test-plans/*.md` and `specs/vr-test-plans/*.md` against what is
    actually implemented in `tests/` and `vr-tests/`. Report both directions: planned-but-missing and
    implemented-but-unplanned.

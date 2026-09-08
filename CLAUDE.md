@@ -30,7 +30,7 @@ Base URL defaults to `https://automationexercise.com`. Override with `E2E_BASE_U
 ```
 tests/               Functional E2E spec files (*.spec.ts), one directory per feature area
 vr-tests/            Visual regression spec files (*.vr.spec.ts) + baseline snapshots
-specs/               Test plans (Markdown) + STATUS.md + DECISIONS.md + seed.spec.ts
+specs/               Test plans (Markdown) + STATUS.md + seed.spec.ts
 utils/
   pageObjects/        Page object classes — BaseAppPage (pages) / BaseComponentPage (modals)
   fixtures/           Custom Playwright fixtures (account lifecycle)
@@ -52,12 +52,12 @@ Quick rules:
 - **Grouping** — `test.describe()` per scenario group; `test.step()` for distinct phases of one scenario
 - **Known failures** — `test.fixme()` only, never `test.skip()`
 - **No hard waits** — no `waitForTimeout` in test code; use condition-based waiting
-- **Account lifecycle** — tests needing a logged-in user use the `uniqueAccount` fixture (signs up a throwaway account, cleans it up after) rather than a shared seed account — see `specs/DECISIONS.md` for why
+- **Account lifecycle** — tests needing a logged-in user use the `uniqueAccount` fixture (signs up a throwaway account, cleans it up after) rather than a shared seed account — see the README for why
 
 ## Persistent State
 
 - `specs/STATUS.md` — current coverage, open questions, next steps. Read at the start of any session.
-- `specs/DECISIONS.md` — append-only log of scope/architecture decisions and why they were made.
+- Architecture decisions and their reasoning live in the README, under "Decisions Worth Defending".
 
 ## Agent System
 
