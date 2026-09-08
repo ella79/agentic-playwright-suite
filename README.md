@@ -1,23 +1,37 @@
 # Agentic Playwright Suite
 
+End to end and visual regression tests for [Automation Exercise](https://automationexercise.com),
+written in Playwright and TypeScript.
+
+The suite is authored and maintained through a Claude Code agent workflow that drives the browser
+over Playwright MCP. It runs in a containerised GitHub Actions pipeline and publishes its own
+results as a live dashboard.
+
+| Resource                                    | Link                                                                         |
+| ------------------------------------------- | ---------------------------------------------------------------------------- |
+| Test dashboard (Allure, with trend history) | https://ella79.github.io/agentic-playwright-suite/                           |
+| Trace viewer (merged Playwright report)     | https://ella79.github.io/agentic-playwright-suite/playwright-report/         |
+| Pipeline                                    | [GitHub Actions](https://github.com/ella79/agentic-playwright-suite/actions) |
+
 [![CI](https://github.com/ella79/agentic-playwright-suite/actions/workflows/ci.yml/badge.svg)](https://github.com/ella79/agentic-playwright-suite/actions/workflows/ci.yml)
 
-End-to-end and visual regression tests for [Automation Exercise](https://automationexercise.com),
-written with Playwright and TypeScript, driven by a Claude Code agent workflow, and gated by a
-GitHub Actions pipeline that publishes its own results.
+## Scope
 
-- **Live dashboard:** https://ella79.github.io/agentic-playwright-suite/ — Allure, with pass-rate
-  trend across runs
-- **Trace viewer:** https://ella79.github.io/agentic-playwright-suite/playwright-report/ — published
-  beside it, because Allure answers what failed and a trace answers why
-- **Scope:** 20 functional cases, 20 visual cases, one browser, one viewport
-- **Target:** a public demo storefront, so every run hits a real network, real third-party ads, and
-  a real database
+Twenty functional cases and twenty visual cases, one browser, one viewport. Both counts are capped.
+New coverage replaces an existing case rather than growing the suite, because twenty cases that can
+each be justified demonstrate more than two hundred nobody can explain.
 
-The suite is deliberately small. Twenty well-argued cases with a green pipeline say more about
-judgment than two hundred that nobody can explain.
+The target is a public demo storefront, so every run crosses a real network and hits a real
+database, with third party advertising on the page. That is deliberate: the failures it produces
+are the failures a real pipeline produces.
 
-## Quick Start
+## Prerequisites
+
+- Node.js 20 or later
+- Yarn
+- Docker Desktop, only if you intend to work on visual regression
+
+## Common Commands
 
 ```bash
 yarn install
@@ -25,229 +39,246 @@ yarn playwright:install:chromium
 yarn test:e2e
 ```
 
-| Command                                            | Purpose                                          |
-| -------------------------------------------------- | ------------------------------------------------ |
-| `yarn test:e2e`                                    | Functional suite                                 |
-| `yarn test:vr`                                     | Visual suite against committed baselines         |
-| `yarn docker:vr`                                   | Visual suite in the same Linux image CI uses     |
-| `yarn docker:vr:update`                            | Regenerate baselines with CI-identical rendering |
-| `yarn test:e2e:report`                             | Open the last HTML report                        |
-| `yarn typecheck` / `yarn lint` / `yarn stylecheck` | The three static gates CI runs first             |
+| Command                             | Purpose                                                 |
+| ----------------------------------- | ------------------------------------------------------- |
+| `yarn test:e2e`                     | Run the functional suite                                |
+| `yarn test:e2e:headed`              | Run it with a visible browser                           |
+| `yarn test:e2e:ui`                  | Open the Playwright UI runner                           |
+| `yarn test:vr`                      | Run the visual suite against the committed baselines    |
+| `yarn docker:vr`                    | Run the visual suite in the same Linux image CI uses    |
+| `yarn docker:vr:update`             | Regenerate baselines with rendering identical to CI     |
+| `yarn test:seed`                    | Run the environment seed the agents generate tests from |
+| `yarn test:e2e:report`              | Open the last HTML report                               |
+| `yarn typecheck`                    | TypeScript, no emit                                     |
+| `yarn lint` / `yarn lint:fix`       | ESLint                                                  |
+| `yarn stylecheck` / `yarn stylefix` | Prettier                                                |
+
+## Environment Variables
+
+None are required. The suite runs against the public demo site with no credentials, because every
+test that needs an account registers its own and deletes it afterwards.
+
+| Variable       | Effect                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------- |
+| `E2E_BASE_URL` | Point the suite at a different host. Defaults to `https://automationexercise.com`       |
+| `CI`           | Set by the pipeline. Switches reporters to blob, enables one retry, caps workers at two |
+
+## Repository Structure
+
+```
+tests/                                 Functional specs, one directory per feature area
+├── auth/authentication.spec.ts        TC-01 to TC-06
+├── browsing/product-browsing.spec.ts  TC-07 to TC-11
+├── cart/cart.spec.ts                  TC-12 to TC-16
+├── checkout/checkout.spec.ts          TC-17
+└── engagement/engagement.spec.ts      TC-18 to TC-20
+
+vr-tests/                              Visual specs and their committed baselines
+├── *.vr.spec.ts                       VR-01 to VR-20
+└── *.vr.spec.ts-snapshots/            Chromium on Linux, 1920x1080
+
+specs/
+├── STATUS.md                          Test status report: coverage, findings, open decisions
+├── seed.spec.ts                       Environment seed the agents start generated tests from
+├── test-plans/                        One plan per functional area
+└── vr-test-plans/                     One plan per visual area, plus shared conventions
+
+utils/
+├── pageObjects/
+│   ├── baseAppPage.ts                 Base for URL addressable pages
+│   ├── baseComponentPage.ts           Base for modals, root scoped
+│   ├── shared/                        Modals reached from more than one page
+│   ├── auth/ cart/ checkout/ ...      One directory per area
+│   └── index.ts                       Barrel export
+├── fixtures/
+│   ├── testFixtures.ts                Account lifecycle, third party blocking, report labels
+│   └── allureLabels.ts                Labels applied to every result
+├── testData.ts                        Generated accounts, fixed products, card details
+└── url.ts                             Route constants and patterns
+
+.claude/                               Agents, skills, slash commands
+env/docker/                            Execution images for CI and local use
+.github/workflows/                     Pipeline definitions
+```
 
 ## Architecture
 
+**Two page object bases.** `BaseAppPage` owns navigation and the shared chrome. `BaseComponentPage`
+takes a root locator and resolves every child inside it, so two modals sharing a label can never
+cross match. Every locator is a `readonly` property and no spec reaches the DOM directly.
+
+**Semantic locators, with the exceptions documented.** Priority runs `getByRole`, `getByLabel`,
+`getByPlaceholder`, `getByText`, `getByTestId`. The application ships `data-qa` attributes and
+`testIdAttribute` maps onto them, so a test id here is a semantic option rather than an escape
+hatch. Where a control genuinely has no accessible name, such as an icon only button, the CSS
+fallback carries an inline comment saying why.
+
+**Fixtures own lifecycle, not construction.** Specs construct their own page objects. What is a
+fixture is the account: it registers a throwaway user, yields it, and removes it afterwards while
+asserting the removal actually happened. No shared account, no shared storage state, nothing for
+parallel workers to contend over.
+
+**Third party noise is blocked rather than tolerated.** Advertising, analytics and consent
+management hosts are aborted at the route level. None of it is the product under test, and all of it
+injects layout shifts that would make visual comparison meaningless.
+
+## Coverage
+
+Current results and the per area breakdown live in [`specs/STATUS.md`](specs/STATUS.md).
+
+| Suite                 | Cases | Cap | Areas                                                                   |
+| --------------------- | ----- | --- | ----------------------------------------------------------------------- |
+| Functional (`tests/`) | 20    | 20  | Authentication, product browsing, cart, checkout, engagement            |
+| Visual (`vr-tests/`)  | 20    | 20  | Home, products, product detail, cart, authentication, contact, checkout |
+
+Every spec begins with a `// spec:` header pointing at the plan that justifies it, so a failing case
+leads back to the reasoning rather than to a stack trace alone.
+
+## Visual Regression
+
+Baselines are Chromium on Linux at 1920x1080. Screenshots differ between platforms, so a baseline
+produced on Windows or macOS will never match a runner. Regenerate them in the image CI uses:
+
+```bash
+yarn docker:vr:update
 ```
-tests/          20 functional cases, one directory per feature area
-vr-tests/       20 visual cases plus their committed baselines
-specs/          Test plans and the test status report
-utils/
-  pageObjects/  BaseAppPage (pages) and BaseComponentPage (modals)
-  fixtures/     Account lifecycle and third-party request blocking
-.claude/        Agents, skills, and slash commands
-env/docker/     Images for local and CI execution
+
+Baselines written directly on a host are gitignored, and the visual job fails outright when none are
+committed rather than writing its own and reporting success.
+
+## CI/CD
+
+```
+   build                 check                  end2end
+
+prepare-playwright  →  static-checks  →  e2e-playwright     ┐
+      image                           →  visual-regression  ┴→  publish-dashboard
 ```
 
-**Two page object bases, not one.** `BaseAppPage` owns navigation and shared chrome.
-`BaseComponentPage` takes a root locator and resolves every child inside it, so two modals sharing
-a label can never cross-match. Every locator is a `readonly` property; no spec reaches the DOM
-directly.
+Runs on every push and pull request to `main`.
 
-**Page objects arrive as fixtures.** A spec declares the pages it works with in its signature and
-its body starts at the first meaningful action — no construction preamble, and the account fixture
-composes the same page object fixtures rather than building its own. This is what Playwright's
-documentation recommends over instantiating page objects per test.
+| Job                        | Responsibility                                                                |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry     |
+| `static-checks`            | Typecheck, lint, format. Gates everything after it                            |
+| `e2e-playwright`           | The functional suite                                                          |
+| `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal |
+| `publish-dashboard`        | Merges both reports, restores trend history, deploys to GitHub Pages          |
 
-**Semantic locators, with the exceptions documented.** Priority runs `getByRole` → `getByLabel` →
-`getByPlaceholder` → `getByText` → `getByTestId`. The application ships `data-qa` attributes, which
-`testIdAttribute` maps onto `getByTestId`, so test ids here are a semantic option rather than an
-escape hatch. Where a control genuinely has no accessible name — icon-only buttons, layout
-wrappers — the CSS fallback carries an inline comment saying why.
+Every job after the build runs inside the image the build produced, so browsers and dependencies are
+installed once instead of three times. The image tag carries the Playwright version and a hash of
+`package.json` plus `yarn.lock`, so a dependency change produces a new tag and no job can run against
+an image whose `node_modules` no longer match the lockfile.
 
-**Every test owns its data.** Tests needing a signed-in user take a `uniqueAccount` fixture that
-registers a throwaway account and deletes it afterwards, asserting the deletion actually happened.
-No shared seed account, no shared storage state, nothing to contend over between parallel workers.
+Traces, screenshots and visual diffs upload as artifacts on failure.
 
-**Third-party noise is blocked, not tolerated.** Ad, analytics, and consent-management hosts are
-aborted at the route level. They are not the product under test, and they inject layout shifts that
-would make visual comparison meaningless.
+## The Published Report
 
-## Decisions Worth Defending
+Playwright project names match the CI job names, so a merged report labels every result
+`e2e-playwright` or `visual-regression` instead of leaving forty rows to be told apart by path.
 
-The ones a reviewer would question, with the reasoning rather than only the outcome:
+Allure results are labelled by an automatic fixture rather than by hand, because a label applied
+only where someone remembered is one the report cannot rely on. Each result carries:
 
-**No shared authenticated storage state.** The usual optimization is to log in once and reuse the
-session. It is the right call when login is an expensive OAuth redirect; here it is a two-field
-POST. Reusing one account would mean the account-deletion test destroys the session every other
-test depends on, and parallel shards racing over one identity. Isolation is worth more than the
-second it saves.
+| Label                      | Effect in the report                                                                     |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| `parentSuite`              | Splits the dashboard into Functional E2E and Visual regression under every status filter |
+| `suite`                    | Breaks each of those down by area                                                        |
+| `epic`, `feature`, `story` | Populates the Behaviours tab                                                             |
+| `severity`                 | Critical only where a failure means a user cannot buy or cannot reach their account      |
+| `link`                     | The plan that justifies the case, read from its own `// spec:` header, plus its source   |
+
+`categories.json` classifies failures, since a screenshot diff, a host 5xx and a real assertion
+failure are three different conversations. `environmentInfo` records the base URL, browser,
+viewport, commit and branch behind a run. `executor.json` links the published report back to the
+pipeline run that produced it.
+
+## The Agent Workflow
+
+`.claude/` holds six agents, three skills, two MCP server registrations and the slash commands that
+connect them. They were used to build and audit this suite, not written as decoration.
+
+Planner, generator and healer are generated rather than hand written. `npx playwright init-agents
+--loop=claude` produces definitions matched to the installed Playwright version, carrying the exact
+tool names and call protocol of its authoring MCP server. Each then gains a project rules section,
+because the official definitions know nothing about this codebase: the generator's own example
+writes `page.click(...)` directly, which this repository does not allow. Manager, companion and
+reviewer are hand written, since the official set has no equivalent.
+
+| Agent                       | Responsibility                                   | Source        |
+| --------------------------- | ------------------------------------------------ | ------------- |
+| `playwright-test-manager`   | Strategy, coverage gaps, the caps, quality gates | hand written  |
+| `playwright-test-companion` | Full plan, implement, review, validate cycles    | hand written  |
+| `playwright-test-planner`   | Live exploration, then a written plan            | `init-agents` |
+| `playwright-test-generator` | One case at a time, from an existing plan        | `init-agents` |
+| `playwright-test-reviewer`  | Read only convention audit                       | hand written  |
+| `playwright-test-healer`    | Root cause diagnosis of failures                 | `init-agents` |
+
+| Command             | Effect                                                                      |
+| ------------------- | --------------------------------------------------------------------------- |
+| `/coverage`         | The manager audits plans against implementations and proposes the next move |
+| `/plan <area>`      | The planner explores the live site and writes a plan                        |
+| `/implement <case>` | The generator implements exactly that case                                  |
+| `/review [files]`   | The reviewer audits against the checklist                                   |
+| `/heal <case>`      | The healer diagnoses before touching anything                               |
+| `/cycle <area>`     | The companion runs the whole loop                                           |
+
+Two MCP servers are registered in `.mcp.json`. `playwright-test`
+(`npx playwright run-test-mcp-server`) is the authoring server the generated agents use. It reads
+`playwright.config.ts`, so an agent inherits the base URL, the `data-qa` test id attribute and the
+viewport instead of being told them twice, and it exposes generation tools that a general browser
+server does not have. [`@playwright/mcp`](https://github.com/microsoft/playwright-mcp) stays
+registered for exploration outside test authoring.
+
+The skills are enforced rather than suggested. Four rules from
+`.claude/skills/playwright-pageobject-testing/SKILL.md`, namely no hard waits, no skipped tests, no
+forced clicks and every test must assert, are configured as ESLint errors scoped to spec files. A
+violation fails `static-checks` before any test runs, because a standard that lives only in prose is
+a standard that erodes.
+
+## Decisions
+
+The ones a reviewer would question, with the reasoning rather than only the outcome.
+
+**No shared authenticated storage state.** The usual optimisation is to log in once and reuse the
+session. That is right when login is an expensive OAuth redirect. Here it is a two field POST
+against an account the suite has to create in the first place. Sharing one account would mean the
+deletion test destroys the session every other test depends on, and parallel workers competing over
+one identity. Isolation is worth more than the second it saves.
+
+**Page objects are not fixtures.** Playwright's documentation shows a page object as one possible
+fixture example, but its page object guide instantiates directly, and a fixture earns its place when
+it owns setup and teardown rather than when it wraps an empty constructor. Specs construct what they
+use. The account, which has a real lifecycle, stays a fixture.
 
 **No custom screenshot runtime.** A wrapper enforcing named capture strategies pays for itself
-across hundreds of visual tests. Across twenty it is indirection with no payer. Native
+across hundreds of visual tests. Across twenty it is indirection with nobody to pay for it. Native
 `toHaveScreenshot()` with documented thresholds does the same work in less code.
-
-**Baselines are generated in a container, never on the host.** Screenshots are platform-specific: one
-produced on Windows will not match a Linux runner. `yarn docker:vr:update` regenerates them inside
-the same image CI runs, so a developer on any host produces the authoritative set. Baselines written
-directly on Windows or macOS are gitignored, and the visual job fails outright rather than seeding
-its own.
 
 **No baseline taller than the viewport.** Two captures originally targeted the element holding the
 whole catalog, which measures 13,347 pixels. They failed intermittently under load, timing out on
 the stability check rather than on any visual difference. Raising the timeout would have hidden the
 more important half: nobody scans thirteen thousand pixels for the four that changed, so those cases
-could only ever be rubber-stamped. Both now anchor the section heading to the top of the viewport
-and capture the viewport — 412 KB instead of 2.8 MB, and reviewable.
+could only ever be rubber stamped. Both now anchor the section heading to the top of the viewport
+and capture the viewport, at 412 KB instead of 2.8 MB.
 
-**The planner, generator and healer are generated, not written.** `npx playwright init-agents
---loop=claude` produces definitions version-matched to the installed Playwright, carrying the exact
-tool names and call protocol of its authoring MCP server; a hand-written equivalent drifts the
-moment Playwright updates. What they lack is knowledge of this repository — the official generator's
-own example writes `page.click(...)` directly — so each gains a project rules section that overrides
-that. The manager, companion and reviewer stay hand-written, because the official set has no
-equivalent and coverage strategy is exactly where a repository's own standards live.
-
-**Two MCP servers, for two jobs.** `playwright-test` reads `playwright.config.ts`, so an agent
-exploring the site inherits the project's base URL, `data-qa` test id attribute and viewport instead
-of being told them twice, and it exposes generation tools a general browser server does not have.
-`@playwright/mcp` stays registered for exploration outside test authoring. Verifying that the second
-one actually starts caught a real error in the first configuration: `--browser chromium` is not a
-valid value, so the server would have failed on launch while the config looked plausible.
-
-## The Agent Workflow
-
-`.claude/` holds six agents, three skills, two MCP server registrations, and the slash commands that
-connect them. They are not documentation — they were used to build and audit this suite.
-
-Planner, generator, and healer are **generated**, not hand-written: `npx playwright init-agents
---loop=claude` produces definitions version-matched to the installed Playwright, carrying the exact
-tool names and call protocol of its test MCP server. Each then gains a "Project rules for this
-repository" section, because the official definitions know nothing about this codebase — the
-generator's own example writes `page.click(...)` directly, which this repository does not allow.
-Manager, companion, and reviewer are hand-written; the official set has no equivalent.
-
-| Agent                       | Owns                                                   |
-| --------------------------- | ------------------------------------------------------ |
-| `playwright-test-manager`   | Strategy, coverage gaps, the suite caps, quality gates |
-| `playwright-test-companion` | Full plan → implement → review → validate cycles       |
-| `playwright-test-planner`   | Live exploration through MCP, then a written plan      |
-| `playwright-test-generator` | One case at a time, from an existing plan              |
-| `playwright-test-reviewer`  | Read-only convention audit                             |
-| `playwright-test-healer`    | Root-cause diagnosis of failures                       |
-
-| Command             | Effect                                                                  |
-| ------------------- | ----------------------------------------------------------------------- |
-| `/coverage`         | Manager audits plans against implementations and proposes the next move |
-| `/plan <area>`      | Planner explores the live site through MCP and writes a plan            |
-| `/implement <case>` | Generator implements exactly that case                                  |
-| `/review [files]`   | Reviewer audits against the checklist                                   |
-| `/heal <case>`      | Healer diagnoses before touching anything                               |
-| `/cycle <area>`     | Companion runs the whole loop                                           |
-
-Two MCP servers are registered in `.mcp.json`. `playwright-test`
-(`npx playwright run-test-mcp-server`) is the authoring server the official agents use: it reads
-`playwright.config.ts`, so an agent inherits this project's `baseURL`, `data-qa` test id attribute,
-and viewport without being told them twice, and it exposes the generation tools
-(`planner_save_plan`, `generator_write_test`) that a general browser server does not have.
-[`@playwright/mcp`](https://github.com/microsoft/playwright-mcp) stays registered for exploration
-outside test authoring.
-
-`specs/seed.spec.ts` is the template generated tests start from. Playwright puts it in `tests/` by
-default; here it sits outside, because inside a suite capped at twenty cases a bootstrap template
-would run as a twenty-first case that asserts nothing.
-
-**The skills are enforced, not suggested.** Four rules from
-`.claude/skills/playwright-pageobject-testing/SKILL.md` — no hard waits, no skipped tests, no forced
-clicks, every test must assert — are configured as ESLint errors scoped to spec files. A violation
-fails `static-checks` before any test runs. A standard that only lives in prose is a standard that
-erodes.
-
-### What the agents actually found
-
-Both of these were live in the suite and would have shipped:
-
-- The reviewer caught that a visual case masked the exact element it was capturing. The delivery
-  address screenshot was a rectangle of mask boxes — it would have passed against a blank address
-  block. The case asserted nothing.
-- The healer traced a visual case that could never pass to a defect in the application: the payment
-  form wraps fields in Bootstrap 4 `.form-row` markup while the site ships Bootstrap 3 CSS. With no
-  clearfix rule, every row and the `<form>` itself collapse to zero height. The page only looks
-  correct because the parent grid column is floated. The fix targets that column, with the cause
-  recorded in the page object.
-
-## CI/CD
-
-```
-   build              check                    end2end
-
-prepare-        ──▶ static-checks ──┬──▶ e2e-playwright ────┐
-playwright-image                    │                       ├──▶ publish-dashboard
-                                    └──▶ visual-regression ─┘
-```
-
-Runs on every push and pull request to `main`.
-
-- `prepare-playwright-image` — builds the execution image from
-  [`env/docker/e2e-playwright.Dockerfile`](env/docker/e2e-playwright.Dockerfile) and pushes it to
-  the GitHub Container Registry. Every job after it runs **inside** that image, so browsers and
-  dependencies are installed once rather than three times. The tag carries the Playwright version
-  and a hash of `package.json` plus `yarn.lock`, so a dependency change produces a new tag and no
-  job can run against an image whose `node_modules` no longer match the lockfile.
-- `static-checks` — typecheck, lint, format. Gates everything else.
-- `e2e-playwright` — the functional suite.
-- `visual-regression` — separate job, so a screenshot diff never hides functional signal. It fails
-  fast if no Linux baselines are committed, because with no baseline Playwright writes one and
-  reports success: the job would go green while comparing nothing.
-- `publish-dashboard` — merges the reports from both test jobs, restores the previous run's trend
-  history from the published site, and deploys the Allure report to GitHub Pages. Runs on `main`
-  only.
-
-The image is the point of the `build` stage: it is what makes the container the tests run in
-identical to the one `yarn docker:vr` uses locally, which is the only reason a visual baseline
-generated on a laptop can be trusted against a runner.
-
-Traces, screenshots, and visual diffs upload as artifacts on failure.
-
-### The published report
-
-Playwright's project names match the CI job names, so a merged report labels every result as
-`e2e-playwright` or `visual-regression` rather than leaving forty rows to be told apart by path.
-
-The Allure side is labelled by an automatic fixture rather than by hand, since a label applied only
-where someone remembered is one the report cannot rely on. Each result carries:
-
-- `parentSuite`, splitting the dashboard into **Functional E2E** and **Visual regression**, each
-  broken down by area, under every status filter
-- `epic` / `feature` / `story`, which is what populates the Behaviours tab
-- `severity`, critical only where a failure means a user cannot buy or cannot reach their account
-- a link to the plan that justifies the case, read from its own `// spec:` header so it cannot go
-  stale, and a link to the source
-
-`categories.json` classifies failures, because a screenshot diff, a host 5xx and a real assertion
-failure are three different conversations and an unclassified report makes them look like one.
-`environment.properties` records the base URL, browser, viewport, commit and branch behind a run,
-and `executor.json` links the published report back to the pipeline run that produced it.
+**Two MCP servers, for two jobs.** Verifying that the second one actually starts caught a real error
+in the first configuration: `--browser chromium` is not a valid value, so the server would have
+failed on launch while the configuration looked plausible.
 
 ## What Broke While Building This
 
 Kept because the failures are more informative than the passes.
 
-| Symptom                                    | Actual cause                                                                                                                                   |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cart empty after adding from the listing   | Adding is an XHR; navigating straight to the cart cancelled it. The page object now returns the confirmation modal so callers must wait for it |
-| Review form filled the wrong field         | `getByPlaceholder` matches substrings, so "Email Address" also matched the footer's "Your email address"                                       |
-| Contact success assertion hit two elements | The page renders the same success text twice, once for the form and once for a hidden newsletter widget                                        |
-| Search test failed on a correct result     | Search matches category names, not just product names. The test was wrong, not the site                                                        |
-| Payment form screenshot never captured     | Zero-height form: Bootstrap 4 markup, Bootstrap 3 CSS                                                                                          |
+| Symptom                                     | Actual cause                                                                                                                                                                                                        |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cart empty after adding from the listing    | Adding is an XHR and navigating straight to the cart cancelled it. The page object now returns the confirmation modal, so callers have to wait for it                                                               |
+| Review form filled the wrong field          | `getByPlaceholder` matches substrings, so "Email Address" also matched the footer's "Your email address"                                                                                                            |
+| Five tests failing only under parallel load | The cart's controls are anchors without `href`, driven by the site's own JavaScript. A click landing before the handler binds is a silent no operation: Playwright reports success and the application does nothing |
+| A visual case that could never pass         | The payment form ships Bootstrap 4 row markup against Bootstrap 3 CSS, so every row collapses to zero height. A defect in the application, recorded rather than worked around                                       |
+| A visual case that asserted nothing         | The delivery address capture masked the element it was capturing. It would have passed against a blank block                                                                                                        |
 
-Product-side observations are logged in [`specs/STATUS.md`](specs/STATUS.md) rather than worked
-around silently.
+## Findings Raised Against the Application
 
-## Not Covered, On Purpose
-
-- Payment rejection: the application accepts any card, so a declined-payment test would assert
-  behaviour that does not exist.
-- Client-side validation: the forms defer to native browser handling, which would test the browser.
-- Cross-browser and mobile viewports: one browser and one viewport keep the baseline set reviewable.
-  Adding a second viewport doubles it.
-- API coverage: the application exposes endpoints worth testing, but they belong in their own suite
-  rather than bolted onto a UI one.
+Product observations rather than test defects, listed in [`specs/STATUS.md`](specs/STATUS.md) with
+how each one is covered or deliberately excluded.

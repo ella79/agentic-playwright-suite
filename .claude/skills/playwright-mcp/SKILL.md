@@ -20,7 +20,7 @@ was confirmed against a live accessibility snapshot first.
 | `playwright`      | `npx @playwright/mcp`                | Ad-hoc exploration outside test authoring |
 
 **Prefer `playwright-test`.** It reads `playwright.config.ts`, so it already knows this project's
-`baseURL`, the `data-qa` test id attribute, and the 1920x1080 viewport — an agent resolves locators
+`baseURL`, the `data-qa` test id attribute and the 1920x1080 viewport, so an agent resolves locators
 exactly as the suite will. It also exposes tools the general server has no equivalent for:
 
 | Tool                                                                                    | Purpose                                                      |
@@ -48,7 +48,7 @@ repository" section each one ends with.
 ## Method
 
 1. `planner_setup_page` (or `generator_setup_page`) once, before anything else.
-2. `browser_snapshot` — the accessibility tree is the source of truth for locators. The `role` and
+2. `browser_snapshot`: the accessibility tree is the source of truth for locators. The `role` and
    the accessible `name` are what `getByRole` will match.
 3. Interact to reach each state the plan needs; snapshot again at every state worth asserting on.
 4. Use the `browser_verify_*` tools for checks, so verifications survive into the generated test as
@@ -71,7 +71,7 @@ repository" section each one ends with.
   so `getByRole("button", { name: "Consent" })` resolves it, while `document.querySelector` from an
   evaluate call will not. Do not conclude the button is missing.
 - Third-party ad iframes inject after load and shift layout. The test fixture aborts those hosts, so
-  a suite run and an MCP session can render differently — check which one you are looking at.
+  a suite run and an MCP session can render differently. Check which one you are looking at.
 - `/delete_account` deletes immediately on GET. Do not navigate there while exploring with an
   account you still need.
 - Search matches category names as well as product names.

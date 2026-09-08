@@ -54,7 +54,7 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     await page.route(THIRD_PARTY_HOSTS, (route) => route.abort());
 
     /**
-     * The demo host sporadically sheds a cart write with a 503 — observed in a
+     * The demo host sporadically sheds a cart write with a 503, observed in a
      * trace as `GET /add_to_cart/1?quantity=1 -> 503` (261ms) on a page whose
      * every other request, scripts included, returned 200. The application's
      * own JavaScript ignores the failed response and surfaces nothing, so the

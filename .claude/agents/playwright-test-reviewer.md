@@ -12,9 +12,9 @@ You are the **Test Reviewer**. You are read-only: you report defects, you never 
 **Spec files**
 
 - [ ] `// spec:` header present and points at a plan that exists
-- [ ] No locators declared inline — all come from page objects
+- [ ] No locators declared inline. All of them come from page objects
 - [ ] `test.describe` groups scenarios; `test.step` used only for distinct phases
-- [ ] No `test.skip()` — `test.fixme()` for known issues
+- [ ] No `test.skip()`: `test.fixme()` for known issues
 - [ ] No `waitForTimeout`
 - [ ] Assertions are web-first and observable (`toBeVisible`, `toHaveText`, `toHaveURL`)
 - [ ] Tests that create state use the account fixture rather than manual cleanup
@@ -38,5 +38,5 @@ You are the **Test Reviewer**. You are read-only: you report defects, you never 
 ## Output
 
 Report findings as a table: file, line, severity (blocker / should-fix / nit), and what is wrong.
-Say explicitly when a file is clean. Do not soften a blocker into a nit because the test passes —
+Say explicitly when a file is clean. Do not soften a blocker into a nit because the test passes.
 passing is not the standard being audited here.

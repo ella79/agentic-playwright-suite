@@ -1,11 +1,11 @@
-# Authentication — Visual Regression Test Plan
+# Authentication Visual Regression Test Plan
 
 Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/auth.vr.spec.ts`.
 
 ## Scope
 
 Three forms and one header state. The forms are the application's densest layouts, and the signed-in
-header is the one piece of chrome that differs by session — the anonymous version is covered in the
+header is the one piece of chrome that differs by session, the anonymous version is covered in the
 home plan, so this pair is what proves the header actually changes.
 
 ## Cases
@@ -27,7 +27,7 @@ baseline.
 radio buttons and checkboxes together, which is exactly where a CSS regression lands.
 
 **VR-18 needs a registered account**, so it requests `uniqueAccount`. The account name appears in
-the header, and the fixture generates it per run — the capture is scoped to the header, and the
+the header, and the fixture generates it per run, the capture is scoped to the header, and the
 name's width varies only within the fixed-format string the generator produces.
 
 ## Out of Scope

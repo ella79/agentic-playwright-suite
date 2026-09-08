@@ -1,6 +1,6 @@
 ---
 name: playwright-visual-regression
-description: Create and maintain visual regression tests — what to screenshot, how to stabilize state first, threshold selection, masking third-party noise, and baseline management. Use when adding VR coverage or diagnosing a flaky screenshot.
+description: Create and maintain visual regression tests, what to screenshot, how to stabilize state first, threshold selection, masking third-party noise, and baseline management. Use when adding VR coverage or diagnosing a flaky screenshot.
 ---
 
 # Visual Regression Skill
@@ -24,7 +24,7 @@ cries wolf gets ignored, which is worse than having none.
 | Screenshot | `<area>-<state>.png` | `cart-with-single-item.png` |
 
 Playwright appends the platform suffix (`-chromium-linux.png`) itself. Baselines are generated on
-Linux to match CI — a baseline captured on Windows or macOS will not match and must not be
+Linux to match CI. A baseline captured on Windows or macOS will not match and must not be
 committed.
 
 ## What To Screenshot
@@ -62,7 +62,7 @@ await expect(productsPage.firstProductCard).toHaveScreenshot(
 ```
 
 1. Navigate.
-2. Wait for the target to be **visible** — never screenshot on hope.
+2. Wait for the target to be **visible**: never screenshot on hope.
 3. Scroll into view if the element lazy-loads.
 4. Reach the target state through the page object.
 5. Capture.
@@ -75,7 +75,7 @@ Prefer element-level captures. They isolate the component from page chrome and, 
 application, from ad iframes that inject at unpredictable offsets.
 
 ```typescript
-// Preferred — scoped to the component
+// Preferred, scoped to the component
 await expect(cartPage.cartTable).toHaveScreenshot("cart-with-single-item.png");
 
 // Only when the visual genuinely spans the viewport (modal over the page)
@@ -121,7 +121,7 @@ yarn test:vr            # run against committed baselines
 yarn test:vr:update     # regenerate after an intentional UI change
 ```
 
-- Baselines are committed — they are the reference the suite is judged against.
+- Baselines are committed. They are the reference the suite is judged against.
 - Update them only when the visual change is intentional **and verified**: look at the diff image in
   the HTML report before regenerating.
 - After regenerating, review `git diff --stat`. Only the files you expected should have changed. A
@@ -131,7 +131,7 @@ yarn test:vr:update     # regenerate after an intentional UI change
 ## Size Rule
 
 No baseline may be taller than the viewport. A capture a reviewer cannot scan in one screen is not a
-regression check — a diff in it gets approved without being read, which is worse than no test.
+regression check. A diff in it gets approved without being read, which is worse than no test.
 
 The application's `.features_items` grid is 13,347 pixels tall and demonstrates both failure modes:
 the baseline is unreviewable, and the capture expires on the stability check under parallel load

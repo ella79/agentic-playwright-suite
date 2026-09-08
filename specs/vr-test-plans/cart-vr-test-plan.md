@@ -1,11 +1,11 @@
-# Cart — Visual Regression Test Plan
+# Cart Visual Regression Test Plan
 
 Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/cart.vr.spec.ts`.
 
 ## Scope
 
 The cart has the widest set of visually distinct states in the application, and two of them are
-modals — the highest-value visual targets in any suite, because a modal's positioning and overlay
+modals, the highest-value visual targets in any suite, because a modal's positioning and overlay
 break in ways functional assertions never notice. A test can click a button inside a modal that has
 rendered halfway off-screen and still pass.
 

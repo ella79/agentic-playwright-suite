@@ -1,6 +1,6 @@
 ---
 name: playwright-pageobject-testing
-description: Coding standard for tests and page objects in this repository — locator priority, page object structure, fixtures, assertions, and the anti-patterns that get a change rejected. Use before writing or reviewing any test code.
+description: Coding standard for tests and page objects in this repository, locator priority, page object structure, fixtures, assertions, and the anti-patterns that get a change rejected. Use before writing or reviewing any test code.
 ---
 
 # Page Object Testing Skill
@@ -12,15 +12,15 @@ someone who has never opened this repo before.
 
 ## Locator Priority
 
-1. `getByRole(role, { name })` — the default. Matches what a user and a screen reader see.
-2. `getByLabel` — form controls with a real label.
-3. `getByPlaceholder` — form controls with only a placeholder (common in this app).
-4. `getByText` — non-interactive content, and elements the app renders as `<a>` without `href`
+1. `getByRole(role, { name })`: the default. Matches what a user and a screen reader see.
+2. `getByLabel`: form controls with a real label.
+3. `getByPlaceholder`: form controls with only a placeholder (common in this app).
+4. `getByText`: non-interactive content, and elements the app renders as `<a>` without `href`
    (those have no link role, so `getByRole("link")` will not find them).
-5. `getByTestId` — the `data-qa` attribute, mapped via `testIdAttribute` in the config. Automation
+5. `getByTestId`: the `data-qa` attribute, mapped via `testIdAttribute` in the config. Automation
    Exercise ships `data-qa` on most form controls, so this is a first-class option here, not a
    fallback.
-6. CSS — last resort, and only with an inline comment explaining why nothing above works.
+6. CSS as a last resort, and only with an inline comment explaining why nothing above works.
 
 ```typescript
 // No accessible name: icon-only control with no aria-label
@@ -31,9 +31,9 @@ readonly removeItemButton: Locator = row.locator(".cart_quantity_delete");
 
 Two bases:
 
-- **`BaseAppPage`** — a URL-addressable page. Owns navigation (`goto…Page()`) and shared chrome
+- **`BaseAppPage`**: a URL-addressable page. Owns navigation (`goto…Page()`) and shared chrome
   (header, consent banner).
-- **`BaseComponentPage`** — a modal or dialog. Scoped to a `root` locator; every child locator is
+- **`BaseComponentPage`**: a modal or dialog. Scoped to a `root` locator; every child locator is
   resolved inside that root so two open dialogs can never cross-match.
 
 ```typescript
@@ -80,7 +80,7 @@ test.describe("Cart", () => {
 });
 ```
 
-- The `// spec:` header is mandatory — it is how coverage is traced back to a plan.
+- The `// spec:` header is mandatory. It is how coverage is traced back to a plan.
 - `test.describe` groups related scenarios. `test.step` marks distinct phases **within one
   scenario**, not every action.
 - Test titles state the behaviour being verified, in the user's language. `TC-05: cart shows the
@@ -103,11 +103,11 @@ A test that deletes its own account sets `account.deleted = true` so teardown do
 
 ## Anti-Patterns
 
-| Anti-pattern                       | Why it is rejected                                                           |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| `waitForTimeout`                   | Arbitrary — too short under CI load, too slow otherwise. Wait on a condition |
-| Inline locator in a spec           | The next locator change then has to be made in N places                      |
-| `test.skip()` for a known bug      | Hides intent. `test.fixme()` says "this should pass and does not"            |
-| `nth(0)` to resolve ambiguity      | Couples the test to DOM order. Scope to a container instead                  |
-| Asserting on ad or consent content | Third-party, changes without notice, not our product                         |
-| A test that only passes on retry   | That is a failing test with extra steps                                      |
+| Anti-pattern                       | Why it is rejected                                                          |
+| ---------------------------------- | --------------------------------------------------------------------------- |
+| `waitForTimeout`                   | Arbitrary, too short under CI load, too slow otherwise. Wait on a condition |
+| Inline locator in a spec           | The next locator change then has to be made in N places                     |
+| `test.skip()` for a known bug      | Hides intent. `test.fixme()` says "this should pass and does not"           |
+| `nth(0)` to resolve ambiguity      | Couples the test to DOM order. Scope to a container instead                 |
+| Asserting on ad or consent content | Third-party, changes without notice, not our product                        |
+| A test that only passes on retry   | That is a failing test with extra steps                                     |

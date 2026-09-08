@@ -5,9 +5,9 @@ E2E and visual regression test suite for [Automation Exercise](https://automatio
 ## Tech Stack
 
 - **Node.js 20+** + **Yarn**
-- **TypeScript 5** — strict mode
-- **Playwright** — Chromium only, fully parallel runs
-- **Allure** — reporting, published to GitHub Pages with trend history
+- **TypeScript 5**: strict mode
+- **Playwright**: Chromium only, fully parallel runs
+- **Allure**: reporting, published to GitHub Pages with trend history
 
 ## Commands
 
@@ -32,7 +32,7 @@ tests/               Functional E2E spec files (*.spec.ts), one directory per fe
 vr-tests/            Visual regression spec files (*.vr.spec.ts) + baseline snapshots
 specs/               Test plans (Markdown) + STATUS.md + seed.spec.ts
 utils/
-  pageObjects/        Page object classes — BaseAppPage (pages) / BaseComponentPage (modals)
+  pageObjects/        Page object classes, BaseAppPage (pages) / BaseComponentPage (modals)
   fixtures/           Custom Playwright fixtures (account lifecycle)
   testData.ts         Unique data generators
   url.ts              URL constants
@@ -46,42 +46,42 @@ Full coding standards: `.claude/skills/playwright-pageobject-testing/SKILL.md`
 
 Quick rules:
 
-- **Locators** — semantic only: `getByRole`, `getByLabel`, `getByText`, `getByTestId` (`data-qa` attribute); CSS as last resort, documented inline when used
-- **Page objects** — `BaseAppPage` for URL-addressable pages, `BaseComponentPage` for modals (root-scoped); task-oriented method names; `readonly` locators
-- **Spec header** — every spec file starts with `// spec: specs/test-plans/<plan>.md`
-- **Grouping** — `test.describe()` per scenario group; `test.step()` for distinct phases of one scenario
-- **Known failures** — `test.fixme()` only, never `test.skip()`
-- **No hard waits** — no `waitForTimeout` in test code; use condition-based waiting
-- **Account lifecycle** — tests needing a logged-in user use the `uniqueAccount` fixture (signs up a throwaway account, cleans it up after) rather than a shared seed account — see the README for why
+- **Locators**: semantic only: `getByRole`, `getByLabel`, `getByText`, `getByTestId` (`data-qa` attribute); CSS as last resort, documented inline when used
+- **Page objects**: `BaseAppPage` for URL-addressable pages, `BaseComponentPage` for modals (root-scoped); task-oriented method names; `readonly` locators
+- **Spec header**: every spec file starts with `// spec: specs/test-plans/<plan>.md`
+- **Grouping**: `test.describe()` per scenario group; `test.step()` for distinct phases of one scenario
+- **Known failures**: `test.fixme()` only, never `test.skip()`
+- **No hard waits**: no `waitForTimeout` in test code; use condition-based waiting
+- **Account lifecycle**: tests needing a logged-in user use the `uniqueAccount` fixture (signs up a throwaway account, cleans it up after) rather than a shared seed account, see the README for why
 
 ## Persistent State
 
-- `specs/STATUS.md` — current coverage, open questions, next steps. Read at the start of any session.
+- `specs/STATUS.md`: current coverage, open questions, next steps. Read at the start of any session.
 - Architecture decisions and their reasoning live in the README, under "Decisions Worth Defending".
 
 ## Agent System
 
 This project uses a Playwright QA agent hierarchy in `.claude/agents/`. Start with **playwright-test-manager** or **playwright-test-companion** for any new session or coverage question.
 
-| Agent                       | Role                                                                             | Source                        |
-| --------------------------- | -------------------------------------------------------------------------------- | ----------------------------- |
-| `playwright-test-manager`   | Senior QA authority — strategy, coverage gaps, quality gates, session continuity | hand-written                  |
-| `playwright-test-companion` | Orchestrator — drives full plan→implement→review→validate cycles                 | hand-written                  |
-| `playwright-test-planner`   | Explores the live app and writes test plans to `specs/`                          | `init-agents` + project rules |
-| `playwright-test-generator` | Implements individual test cases from a plan                                     | `init-agents` + project rules |
-| `playwright-test-reviewer`  | Read-only auditor — checks code against conventions                              | hand-written                  |
-| `playwright-test-healer`    | Debugs and fixes failing tests                                                   | `init-agents` + project rules |
+| Agent                       | Role                                                                            | Source                        |
+| --------------------------- | ------------------------------------------------------------------------------- | ----------------------------- |
+| `playwright-test-manager`   | Senior QA authority, strategy, coverage gaps, quality gates, session continuity | hand-written                  |
+| `playwright-test-companion` | Orchestrator, drives full plan→implement→review→validate cycles                 | hand-written                  |
+| `playwright-test-planner`   | Explores the live app and writes test plans to `specs/`                         | `init-agents` + project rules |
+| `playwright-test-generator` | Implements individual test cases from a plan                                    | `init-agents` + project rules |
+| `playwright-test-reviewer`  | Read-only auditor, checks code against conventions                              | hand-written                  |
+| `playwright-test-healer`    | Debugs and fixes failing tests                                                  | `init-agents` + project rules |
 
 Regenerate the three generated agents after a Playwright upgrade with `npx playwright init-agents --loop=claude`, then re-append the "Project rules for this repository" section each one ends with.
 
 Slash commands in `.claude/commands/` invoke them: `/coverage`, `/plan`, `/implement`, `/review`, `/heal`, `/cycle`.
 
-Browser access goes through the MCP servers in `.mcp.json` — `playwright-test` for authoring (it reads `playwright.config.ts`, so agents inherit `baseURL`, the `data-qa` test id attribute, and the viewport), `playwright` for ad-hoc exploration. See `.claude/skills/playwright-mcp/SKILL.md`.
+Browser access goes through the MCP servers in `.mcp.json`: `playwright-test` for authoring (it reads `playwright.config.ts`, so agents inherit `baseURL`, the `data-qa` test id attribute, and the viewport), `playwright` for ad-hoc exploration. See `.claude/skills/playwright-mcp/SKILL.md`.
 
 ## CI/CD
 
 GitHub Actions (`.github/workflows/ci.yml`), five jobs in three stages:
 
-1. **build** — `prepare-playwright-image`: builds `env/docker/e2e-playwright.Dockerfile` and pushes it to ghcr.io. Every later job runs inside that image, so dependencies and browsers install once. The tag hashes `package.json` + `yarn.lock`, so a dependency change forces a rebuild.
-2. **check** — `static-checks`: typecheck, lint, format check. Gates everything after it.
-3. **end2end** — `e2e-playwright` and `visual-regression` in parallel, then `publish-dashboard` merges both reports, restores Allure trend history from the published site, and deploys to GitHub Pages (push to `main` only).
+1. **build**: `prepare-playwright-image`: builds `env/docker/e2e-playwright.Dockerfile` and pushes it to ghcr.io. Every later job runs inside that image, so dependencies and browsers install once. The tag hashes `package.json` + `yarn.lock`, so a dependency change forces a rebuild.
+2. **check**: `static-checks`: typecheck, lint, format check. Gates everything after it.
+3. **end2end**: `e2e-playwright` and `visual-regression` in parallel, then `publish-dashboard` merges both reports, restores Allure trend history from the published site, and deploys to GitHub Pages (push to `main` only).

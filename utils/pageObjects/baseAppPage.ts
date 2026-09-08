@@ -60,7 +60,7 @@ export abstract class BaseAppPage {
    * Product photography streams in after load, so a region containing it keeps
    * reflowing as each image arrives. A screenshot assertion waits for its
    * target to be stable, and under parallel load the images can still be
-   * arriving when that wait expires — the capture then fails on stability
+   * arriving when that wait expires, the capture then fails on stability
    * rather than on any visual difference. Waiting for the images themselves
    * fixes the cause; raising the screenshot timeout would only move the
    * deadline. Images that fail to load settle through their error event, so a

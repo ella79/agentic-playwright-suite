@@ -24,7 +24,7 @@ message, so each test asserts that message rather than any internal state.
 - Contact form fields expose `data-qa`; the file input does not and is matched by its `name`.
 - Submitting the contact form raises a **native confirm dialog** before the request is sent. The
   page object registers a one-shot dialog handler; without it the test hangs on the click.
-- The review form fields are matched by placeholder — unlike the login page, these placeholders are
+- The review form fields are matched by placeholder, unlike the login page, these placeholders are
   unique on the product detail page.
 - The newsletter submit control is icon-only.
 

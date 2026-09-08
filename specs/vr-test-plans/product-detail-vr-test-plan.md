@@ -1,4 +1,4 @@
-# Product Detail — Visual Regression Test Plan
+# Product Detail Visual Regression Test Plan
 
 Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/product-detail.vr.spec.ts`.
 
@@ -22,7 +22,7 @@ Both captures use a fixed product so the content is stable between runs.
 **VR-08 waits for its image to decode** before capturing, and uses the `0.05` threshold, because the
 product photograph is served with varying compression.
 
-**VR-09 stays at the default threshold** — it is text and inputs, so any difference is real.
+**VR-09 stays at the default threshold**: it is text and inputs, so any difference is real.
 
 ## Out of Scope
 

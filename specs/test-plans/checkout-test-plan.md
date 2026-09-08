@@ -5,7 +5,7 @@
 The full purchase journey for a registered user: cart review, address confirmation, order comment,
 payment, and order confirmation.
 
-This is the suite's one long end-to-end scenario. Every other test is deliberately narrower —
+This is the suite's one long end-to-end scenario. Every other test is deliberately narrower ,
 this one exists to prove the flow holds together, not to cover each step's variations.
 
 ## Preconditions

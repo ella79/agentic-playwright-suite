@@ -23,15 +23,15 @@ its state belongs in `tests/`, not here.
 
 Baselines are Chromium on Linux at 1920x1080, generated in the same image CI runs
 (`yarn docker:vr:update`) and committed from there. Text renders differently on Windows and macOS,
-so a baseline produced on either would never match — locally generated ones are gitignored rather
+so a baseline produced on either would never match, locally generated ones are gitignored rather
 than committed, and the visual job fails outright if no Linux baseline is present rather than
 quietly writing one and reporting success.
 
 ## Size Rule
 
 No baseline may be taller than the viewport. A diff in an image nobody can scan gets approved
-without being read, which is worse than having no test. Where a region is genuinely larger — the
-catalog grid is over thirteen thousand pixels tall — the plan anchors its heading to the top of the
+without being read, which is worse than having no test. Where a region is genuinely larger, the
+catalog grid is over thirteen thousand pixels tall, the plan anchors its heading to the top of the
 viewport and captures the viewport instead.
 
 ## Thresholds

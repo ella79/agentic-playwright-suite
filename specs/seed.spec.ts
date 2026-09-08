@@ -8,7 +8,7 @@
 //
 // It lives outside tests/ on purpose. Playwright's default is tests/seed.spec.ts,
 // but this suite is capped at twenty functional cases and a bootstrap template
-// is not coverage — inside tests/ it would run as a twenty-first case that
+// is not coverage, inside tests/ it would run as a twenty-first case that
 // exists only to serve the agents. It sits beside the plans it bootstraps
 // instead, matched by name so the rest of specs/ stays Markdown.
 import { expect, test } from "../utils/fixtures/testFixtures";

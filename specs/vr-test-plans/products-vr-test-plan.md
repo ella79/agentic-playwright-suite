@@ -1,4 +1,4 @@
-# Products — Visual Regression Test Plan
+# Products Visual Regression Test Plan
 
 Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/products.vr.spec.ts`.
 
@@ -7,7 +7,7 @@ Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/products.vr.s
 The catalog page is where a styling regression is most likely to be noticed by a user, and it holds
 three distinct things worth separate baselines: the grid, the single card that composes it, and the
 filter sidebar. The no-results state is included because an empty state is the layout most likely to
-break unnoticed — nothing renders there in normal use.
+break unnoticed, nothing renders there in normal use.
 
 ## Cases
 
