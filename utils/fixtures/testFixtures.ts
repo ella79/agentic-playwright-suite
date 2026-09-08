@@ -42,7 +42,6 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
   allureLabels: [
     // The empty pattern is Playwright's own signature for a fixture that
     // depends on nothing; naming a dependency here would force it to be built.
-    // eslint-disable-next-line no-empty-pattern
     async ({}, use, testInfo) => {
       await applyAllureLabels(testInfo);
       await use();

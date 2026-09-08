@@ -28,6 +28,11 @@ export default [
       // TypeScript already resolves identifiers; no-undef only produces false
       // positives on ambient Node globals here.
       "no-undef": "off",
+      // A fixture that depends on nothing is written with an empty
+      // destructuring pattern, which is Playwright's own signature for it.
+      // The rule ships an option for exactly this shape, so the standard is
+      // stated once in the config instead of suppressed at each call site.
+      "no-empty-pattern": ["error", { allowObjectPatternsAsParameters: true }],
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/await-thenable": "error",
       "@typescript-eslint/no-unused-vars": [
