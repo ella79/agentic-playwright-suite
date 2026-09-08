@@ -4,6 +4,7 @@ import { BaseAppPage } from "../base/BaseAppPage";
 export class CheckoutPage extends BaseAppPage {
   readonly addressDetailsHeading: Locator;
   readonly deliveryAddress: Locator;
+  readonly deliveryAddressValues: Locator;
   readonly orderRows: Locator;
   readonly commentTextarea: Locator;
   readonly placeOrderLink: Locator;
@@ -14,6 +15,12 @@ export class CheckoutPage extends BaseAppPage {
       name: "Address Details",
     });
     this.deliveryAddress = page.locator("#address_delivery");
+    // Every line except the block heading holds data generated per run. Masking
+    // these keeps the heading and layout under comparison instead of blanking
+    // the whole block, which would make the capture assert nothing.
+    this.deliveryAddressValues = this.deliveryAddress.locator(
+      "li:not(.address_title)",
+    );
     this.orderRows = page.locator("#cart_info tbody tr");
     // Textarea with neither a label nor a placeholder.
     this.commentTextarea = page.locator('textarea[name="message"]');

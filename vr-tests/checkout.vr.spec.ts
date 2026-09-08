@@ -19,14 +19,15 @@ test.describe("Visual regression - checkout", () => {
     await cartPage.proceedToCheckout();
   });
 
-  test("VR-19: delivery and billing address blocks", async ({ page }) => {
+  test("VR-19: delivery address block", async ({ page }) => {
     const checkoutPage = new CheckoutPage(page);
     await expect(checkoutPage.addressDetailsHeading).toBeVisible();
 
-    await expect(page.locator("#address_delivery")).toHaveScreenshot(
+    await expect(checkoutPage.deliveryAddress).toHaveScreenshot(
       "checkout-address-details.png",
-      // VR: the block renders the registered account's generated details.
-      { mask: [checkoutPage.deliveryAddress.locator("li")] },
+      // VR: only the generated values are masked, so the heading and the
+      // block's structure stay under comparison.
+      { mask: [checkoutPage.deliveryAddressValues] },
     );
   });
 
@@ -37,6 +38,8 @@ test.describe("Visual regression - checkout", () => {
     await checkoutPage.placeOrder();
     await expect(paymentPage.payButton).toBeVisible();
 
-    await expect(paymentPage.paymentForm).toHaveScreenshot("payment-form.png");
+    await expect(paymentPage.paymentForm).toHaveScreenshot(
+      "checkout-payment-form.png",
+    );
   });
 });

@@ -37,9 +37,9 @@ and would never match, so locally generated baselines are gitignored rather than
 | VR-15 | `auth-signup-form`           | Signup entry form                                |
 | VR-16 | `auth-account-info-form`     | Full registration form                           |
 | VR-17 | `contact-form`               | Contact form                                     |
-| VR-18 | `header-signed-in`           | Site header for a signed-in user                 |
-| VR-19 | `checkout-address-details`   | Delivery and billing address blocks              |
-| VR-20 | `payment-form`               | Card entry form                                  |
+| VR-18 | `auth-header-signed-in`      | Site header for a signed-in user                 |
+| VR-19 | `checkout-address-details`   | Delivery address block                           |
+| VR-20 | `checkout-payment-form`      | Card entry form                                  |
 
 ## Thresholds
 
