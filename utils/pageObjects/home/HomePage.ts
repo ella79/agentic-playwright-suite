@@ -35,6 +35,7 @@ export class HomePage extends BaseAppPage {
   }
 
   async subscribeToNewsletter(email: string): Promise<void> {
+    await this.subscriptionHeading.scrollIntoViewIfNeeded();
     await this.subscriptionEmailInput.fill(email);
     await this.subscriptionSubmitButton.click();
   }

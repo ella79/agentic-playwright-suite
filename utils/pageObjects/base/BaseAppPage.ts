@@ -8,8 +8,7 @@ const consentHandled = new WeakSet<Page>();
 
 export abstract class BaseAppPage {
   readonly page: Page;
-  readonly homeLink: Locator;
-  readonly productsLink: Locator;
+  readonly header: Locator;
   readonly cartLink: Locator;
   readonly signupLoginLink: Locator;
   readonly contactUsLink: Locator;
@@ -20,8 +19,7 @@ export abstract class BaseAppPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.homeLink = page.getByRole("link", { name: "Home", exact: true });
-    this.productsLink = page.getByRole("link", { name: "Products" });
+    this.header = page.locator("#header");
     this.cartLink = page.getByRole("link", { name: "Cart", exact: true });
     this.signupLoginLink = page.getByRole("link", { name: "Signup / Login" });
     this.contactUsLink = page.getByRole("link", { name: "Contact us" });
@@ -54,18 +52,6 @@ export abstract class BaseAppPage {
     }
 
     consentHandled.add(this.page);
-  }
-
-  async openCart(): Promise<void> {
-    await this.cartLink.click();
-  }
-
-  async openSignupLogin(): Promise<void> {
-    await this.signupLoginLink.click();
-  }
-
-  async openContactUs(): Promise<void> {
-    await this.contactUsLink.click();
   }
 
   async logout(): Promise<void> {

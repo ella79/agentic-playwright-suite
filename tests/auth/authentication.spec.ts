@@ -38,7 +38,7 @@ test.describe("Authentication", () => {
     });
 
     // Registered outside the fixture, so this test owns the cleanup.
-    await page.goto(url.deleteAccount);
+    await homePage.deleteAccount();
     await expect(confirmationPage.accountDeletedBanner).toBeVisible();
   });
 

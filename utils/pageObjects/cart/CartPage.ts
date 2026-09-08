@@ -4,18 +4,18 @@ import { CheckoutGuardModal } from "./modals/CheckoutGuardModal";
 import { url } from "../../url";
 
 export class CartPage extends BaseAppPage {
+  readonly cartItemsSection: Locator;
   readonly cartTable: Locator;
   readonly cartRows: Locator;
   readonly emptyCartMessage: Locator;
-  readonly emptyCartLink: Locator;
   readonly proceedToCheckoutButton: Locator;
 
   constructor(page: Page) {
     super(page);
+    this.cartItemsSection = page.locator("#cart_items");
     this.cartTable = page.locator("#cart_info");
     this.cartRows = page.locator("#cart_info tbody tr");
     this.emptyCartMessage = page.getByText("Cart is empty!");
-    this.emptyCartLink = page.getByRole("link", { name: "here" });
     // Rendered as an anchor without href, so it carries no link role.
     this.proceedToCheckoutButton = page.getByText("Proceed To Checkout");
   }
@@ -53,9 +53,5 @@ export class CartPage extends BaseAppPage {
     const modal = new CheckoutGuardModal(this.page);
     await modal.waitForVisible();
     return modal;
-  }
-
-  async itemCount(): Promise<number> {
-    return this.cartRows.count();
   }
 }

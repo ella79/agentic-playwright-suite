@@ -1,0 +1,21 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["playwright"],
+  "permissions": {
+    "allow": [
+      "Bash(yarn test:e2e)",
+      "Bash(yarn test:vr)",
+      "Bash(yarn test:vr:update)",
+      "Bash(yarn typecheck)",
+      "Bash(yarn lint)",
+      "Bash(yarn stylecheck)",
+      "Bash(npx playwright test:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_take_screenshot"
+    ]
+  }
+}

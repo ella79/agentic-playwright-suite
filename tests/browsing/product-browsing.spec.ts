@@ -12,7 +12,7 @@ test.describe("Product browsing", () => {
 
     await productsPage.gotoProductsPage();
     await expect(productsPage.allProductsHeading).toBeVisible();
-    expect(await productsPage.productCount()).toBeGreaterThan(0);
+    await expect(productsPage.productCards.first()).toBeVisible();
 
     await productsPage.openProductDetail(products.blueTop.name);
 
@@ -64,9 +64,9 @@ test.describe("Product browsing", () => {
     await productsPage.openCategory("Women", "Tops");
 
     await expect(
-      page.getByRole("heading", { name: /women\s*-\s*tops products/i }),
+      productsPage.getCategoryResultsHeading("Women", "Tops"),
     ).toBeVisible();
-    expect(await productsPage.productCount()).toBeGreaterThan(0);
+    await expect(productsPage.productCards.first()).toBeVisible();
   });
 
   test("TC-11: filtering by brand lists that brand's products", async ({
@@ -77,9 +77,7 @@ test.describe("Product browsing", () => {
     await productsPage.gotoProductsPage();
     await productsPage.openBrand("Polo");
 
-    await expect(
-      page.getByRole("heading", { name: /brand\s*-\s*polo products/i }),
-    ).toBeVisible();
-    expect(await productsPage.productCount()).toBeGreaterThan(0);
+    await expect(productsPage.getBrandResultsHeading("Polo")).toBeVisible();
+    await expect(productsPage.productCards.first()).toBeVisible();
   });
 });

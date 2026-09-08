@@ -5,9 +5,11 @@
       "args": [
         "-y",
         "@playwright/mcp@latest",
-        "--browser",
-        "chromium",
-        "--isolated"
+        "--isolated",
+        "--test-id-attribute",
+        "data-qa",
+        "--viewport-size",
+        "1280,720"
       ]
     }
   }

@@ -7,5 +7,10 @@ allure-results/
 allure-report/
 .auth/
 *.log
+
+# Baselines must match the CI rendering platform. Locally generated ones are
+# for iteration only and are never the reference.
+vr-tests/**/*-win32.png
+vr-tests/**/*-darwin.png
 .env
 .DS_Store

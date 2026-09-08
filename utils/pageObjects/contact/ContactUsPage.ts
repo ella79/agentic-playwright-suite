@@ -12,14 +12,15 @@ export class ContactUsPage extends BaseAppPage {
   readonly fileInput: Locator;
   readonly submitButton: Locator;
   readonly successMessage: Locator;
-  readonly homeButton: Locator;
 
   constructor(page: Page) {
     super(page);
     this.getInTouchHeading = page.getByRole("heading", {
       name: "Get In Touch",
     });
-    this.contactForm = page.locator(".contact-form");
+    // The .contact-form class wraps two blocks; the form element itself is
+    // the one that carries the fields.
+    this.contactForm = page.locator("#contact-us-form");
     this.nameInput = page.getByTestId("name");
     this.emailInput = page.getByTestId("email");
     this.subjectInput = page.getByTestId("subject");
@@ -32,7 +33,6 @@ export class ContactUsPage extends BaseAppPage {
     this.successMessage = page
       .locator("#contact-page")
       .getByText("Success! Your details have been submitted successfully.");
-    this.homeButton = page.getByRole("link", { name: "Home" }).last();
   }
 
   async gotoContactUsPage(): Promise<void> {

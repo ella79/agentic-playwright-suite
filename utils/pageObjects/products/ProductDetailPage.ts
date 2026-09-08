@@ -7,7 +7,6 @@ export class ProductDetailPage extends BaseAppPage {
   readonly productInformation: Locator;
   readonly productName: Locator;
   readonly productPrice: Locator;
-  readonly productCategory: Locator;
   readonly availability: Locator;
   readonly quantityInput: Locator;
   readonly addToCartButton: Locator;
@@ -24,16 +23,14 @@ export class ProductDetailPage extends BaseAppPage {
     this.productName = this.productInformation.getByRole("heading").first();
     this.productPrice = this.productInformation.getByText(/^Rs\. \d+/);
     // The label sits in its own <b>; scope to the paragraph to get label + value.
-    this.productCategory = this.productInformation.locator("p", {
-      hasText: "Category:",
-    });
     this.availability = this.productInformation.locator("p", {
       hasText: "Availability:",
     });
     // Number input with no label and no data-qa hook.
     this.quantityInput = page.locator("#quantity");
     this.addToCartButton = page.getByRole("button", { name: "Add to cart" });
-    this.reviewSection = page.locator("#reviews");
+    // #reviews is a zero-height tab wrapper; the form inside it is what renders.
+    this.reviewSection = page.locator("#review-form");
     this.reviewNameInput = page.getByPlaceholder("Your Name");
     // Exact match: the footer's "Your email address" field would otherwise
     // match this placeholder as a substring.

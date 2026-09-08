@@ -40,7 +40,7 @@ test.describe("Cart", () => {
     await modal.viewCart();
 
     await expect(cartPage.getRow(products.menTshirt.name)).toBeVisible();
-    expect(await cartPage.itemCount()).toBe(1);
+    await expect(cartPage.cartRows).toHaveCount(1);
   });
 
   test("TC-15: removing the only product empties the cart", async ({

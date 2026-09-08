@@ -8,9 +8,7 @@ import { type TestAccount } from "../../testData";
  */
 export class AccountInfoPage extends BaseAppPage {
   readonly enterAccountInfoHeading: Locator;
-  readonly addressInfoHeading: Locator;
   readonly accountForm: Locator;
-  readonly titleMrRadio: Locator;
   readonly titleMrsRadio: Locator;
   readonly nameInput: Locator;
   readonly emailInput: Locator;
@@ -34,10 +32,8 @@ export class AccountInfoPage extends BaseAppPage {
   constructor(page: Page) {
     super(page);
     this.enterAccountInfoHeading = page.getByText("Enter Account Information");
-    this.addressInfoHeading = page.getByText("Address Information");
     this.accountForm = page.locator('form[action="/signup"]');
     // Radios carry values but no accessible names in this markup.
-    this.titleMrRadio = page.locator("#id_gender1");
     this.titleMrsRadio = page.locator("#id_gender2");
     this.nameInput = page.getByTestId("name");
     this.emailInput = page.getByTestId("email");

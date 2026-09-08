@@ -25,13 +25,4 @@ export class CheckoutGuardModal extends BaseComponentPage {
       name: "Continue On Cart",
     });
   }
-
-  async registerOrLogin(): Promise<void> {
-    await this.registerLoginLink.click();
-  }
-
-  async continueOnCart(): Promise<void> {
-    await this.continueOnCartButton.click();
-    await this.waitForHidden();
-  }
 }

@@ -20,9 +20,4 @@ export class AddToCartModal extends BaseComponentPage {
   async viewCart(): Promise<void> {
     await this.viewCartLink.click();
   }
-
-  async continueShopping(): Promise<void> {
-    await this.continueShoppingButton.click();
-    await this.waitForHidden();
-  }
 }

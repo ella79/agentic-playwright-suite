@@ -1,4 +1,4 @@
-import { test as base } from "@playwright/test";
+import { expect, test as base } from "@playwright/test";
 import {
   AccountInfoPage,
   ConfirmationPage,
@@ -67,6 +67,9 @@ export const test = base.extend<Fixtures>({
     }
 
     await page.goto(url.deleteAccount);
+    // A silent teardown failure would leak accounts run after run with nothing
+    // surfacing, so cleanup asserts its own outcome.
+    await expect(new ConfirmationPage(page).accountDeletedBanner).toBeVisible();
   },
 });
 

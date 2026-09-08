@@ -61,7 +61,6 @@ test.describe("Engagement", () => {
     const subscriber = buildAccount();
 
     await homePage.gotoHomePage();
-    await homePage.subscriptionHeading.scrollIntoViewIfNeeded();
     await homePage.subscribeToNewsletter(subscriber.email);
 
     await expect(homePage.subscriptionSuccessMessage).toBeVisible();

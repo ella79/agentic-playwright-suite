@@ -31,6 +31,21 @@ export class ProductsPage extends BaseAppPage {
     this.brandsSidebar = page.locator(".brands_products");
   }
 
+  getCategoryResultsHeading(
+    parentCategory: string,
+    subCategory: string,
+  ): Locator {
+    return this.page.getByRole("heading", {
+      name: new RegExp(`${parentCategory}\\s*-\\s*${subCategory} products`, "i"),
+    });
+  }
+
+  getBrandResultsHeading(brandName: string): Locator {
+    return this.page.getByRole("heading", {
+      name: new RegExp(`brand\\s*-\\s*${brandName} products`, "i"),
+    });
+  }
+
   async gotoProductsPage(): Promise<void> {
     await this.goto(url.products);
   }
@@ -97,9 +112,5 @@ export class ProductsPage extends BaseAppPage {
     const modal = new AddToCartModal(this.page);
     await modal.waitForVisible();
     return modal;
-  }
-
-  async productCount(): Promise<number> {
-    return this.productCards.count();
   }
 }
