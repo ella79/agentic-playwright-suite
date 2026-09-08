@@ -32,7 +32,7 @@ export default [
   {
     // Spec files only. Page objects legitimately use APIs that are
     // anti-patterns inside a test, such as scoping with first().
-    files: ["tests/**/*.ts", "vr-tests/**/*.ts"],
+    files: ["tests/**/*.ts", "vr-tests/**/*.ts", "seed/**/*.ts"],
     plugins: { playwright },
     rules: {
       ...playwright.configs["flat/recommended"].rules,

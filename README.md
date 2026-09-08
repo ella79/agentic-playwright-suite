@@ -82,8 +82,15 @@ separate manual workflow regenerates the authoritative set on the platform that 
 
 ## The Agent Workflow
 
-`.claude/` holds six agents, three skills, an MCP server configuration, and the slash commands that
+`.claude/` holds six agents, three skills, two MCP server registrations, and the slash commands that
 connect them. They are not documentation — they were used to build and audit this suite.
+
+Planner, generator, and healer are **generated**, not hand-written: `npx playwright init-agents
+--loop=claude` produces definitions version-matched to the installed Playwright, carrying the exact
+tool names and call protocol of its test MCP server. Each then gains a "Project rules for this
+repository" section, because the official definitions know nothing about this codebase — the
+generator's own example writes `page.click(...)` directly, which this repository does not allow.
+Manager, companion, and reviewer are hand-written; the official set has no equivalent.
 
 | Agent                       | Owns                                                   |
 | --------------------------- | ------------------------------------------------------ |
@@ -103,10 +110,17 @@ connect them. They are not documentation — they were used to build and audit t
 | `/heal <case>`      | Healer diagnoses before touching anything                               |
 | `/cycle <area>`     | Companion runs the whole loop                                           |
 
-Browser access goes through the official
-[Playwright MCP server](https://github.com/microsoft/playwright-mcp), configured in `.mcp.json` with
-`--test-id-attribute data-qa` so an agent exploring the site resolves test ids exactly as the suite
-does.
+Two MCP servers are registered in `.mcp.json`. `playwright-test`
+(`npx playwright run-test-mcp-server`) is the authoring server the official agents use: it reads
+`playwright.config.ts`, so an agent inherits this project's `baseURL`, `data-qa` test id attribute,
+and viewport without being told them twice, and it exposes the generation tools
+(`planner_save_plan`, `generator_write_test`) that a general browser server does not have.
+[`@playwright/mcp`](https://github.com/microsoft/playwright-mcp) stays registered for exploration
+outside test authoring.
+
+`seed/seed.spec.ts` is the template generated tests start from. Playwright puts it in `tests/` by
+default; here it sits outside, because inside a suite capped at twenty cases a bootstrap template
+would run as a twenty-first case that asserts nothing.
 
 **The skills are enforced, not suggested.** Four rules from
 `.claude/skills/playwright-pageobject-testing/SKILL.md` — no hard waits, no skipped tests, no forced

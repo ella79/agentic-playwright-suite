@@ -1,6 +1,6 @@
 {
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["playwright"],
+  "enabledMcpjsonServers": ["playwright-test", "playwright"],
   "permissions": {
     "allow": [
       "Bash(yarn test:e2e)",
@@ -10,12 +10,19 @@
       "Bash(yarn lint)",
       "Bash(yarn stylecheck)",
       "Bash(npx playwright test:*)",
+      "mcp__playwright-test__browser_navigate",
+      "mcp__playwright-test__browser_snapshot",
+      "mcp__playwright-test__browser_click",
+      "mcp__playwright-test__browser_type",
+      "mcp__playwright-test__browser_evaluate",
+      "mcp__playwright-test__planner_setup_page",
+      "mcp__playwright-test__planner_save_plan",
+      "mcp__playwright-test__generator_setup_page",
+      "mcp__playwright-test__generator_read_log",
+      "mcp__playwright-test__generator_write_test",
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_snapshot",
-      "mcp__playwright__browser_click",
-      "mcp__playwright__browser_type",
-      "mcp__playwright__browser_evaluate",
-      "mcp__playwright__browser_take_screenshot"
+      "mcp__playwright__browser_evaluate"
     ]
   }
 }

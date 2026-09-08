@@ -17,6 +17,7 @@
     "test:e2e:ui": "playwright test --project=chromium --ui",
     "test:e2e:debug": "PWDEBUG=1 playwright test --project=chromium --debug",
     "test:e2e:list": "playwright test --project=chromium --list",
+    "test:seed": "playwright test --project=seed",
     "test:vr": "playwright test --project=visual",
     "test:vr:update": "playwright test --project=visual --update-snapshots",
     "test:vr:headed": "playwright test --project=visual --headed",

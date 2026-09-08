@@ -33,6 +33,19 @@ export default defineConfig({
       },
     },
     {
+      // The agent seed. It has its own project because it is the template
+      // generated tests start from rather than coverage: inside the functional
+      // project it would run as a twenty-first case. The planner still needs to
+      // execute it to prove the environment initialises, so it needs a project
+      // to run under. Invoke with --project=seed.
+      name: "seed",
+      testDir: "./seed",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 720 },
+      },
+    },
+    {
       name: "visual",
       testDir: "./vr-tests",
       use: {

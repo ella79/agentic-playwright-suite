@@ -1,7 +1,7 @@
 ---
 description: Diagnose and repair a failing test
 argument-hint: <case id or spec file>
-allowed-tools: Task, Read, Edit, Grep, Glob, Bash, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_evaluate
+allowed-tools: Task, Read, Edit, Grep, Glob, Bash, mcp__playwright-test__browser_navigate, mcp__playwright-test__browser_snapshot, mcp__playwright-test__browser_click, mcp__playwright-test__browser_evaluate
 ---
 
 Delegate to the **playwright-test-healer** agent.

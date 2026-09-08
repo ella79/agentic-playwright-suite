@@ -29,6 +29,7 @@ Base URL defaults to `https://automationexercise.com`. Override with `E2E_BASE_U
 
 ```
 tests/               Functional E2E spec files (*.spec.ts), one directory per feature area
+seed/                Environment seed used as the template for generated tests
 vr-tests/            Visual regression spec files (*.vr.spec.ts) + baseline snapshots
 specs/               Test plans (Markdown) + STATUS.md + DECISIONS.md
 utils/
@@ -63,16 +64,20 @@ Quick rules:
 
 This project uses a Playwright QA agent hierarchy in `.claude/agents/`. Start with **playwright-test-manager** or **playwright-test-companion** for any new session or coverage question.
 
-| Agent                       | Role                                                                                       |
-| --------------------------- | ------------------------------------------------------------------------------------------ |
-| `playwright-test-manager`   | Senior QA authority — strategy, coverage gaps, quality gates, session continuity           |
-| `playwright-test-companion` | Orchestrator — drives full plan→implement→review→validate cycles, delegates to specialists |
-| `playwright-test-planner`   | Explores the live app via Playwright MCP and writes test plans to `specs/`                 |
-| `playwright-test-generator` | Implements individual test cases from a plan                                               |
-| `playwright-test-reviewer`  | Read-only auditor — checks code against conventions                                        |
-| `playwright-test-healer`    | Debugs and fixes failing tests using MCP inspection                                        |
+| Agent                       | Role                                                                             | Source                        |
+| --------------------------- | -------------------------------------------------------------------------------- | ----------------------------- |
+| `playwright-test-manager`   | Senior QA authority — strategy, coverage gaps, quality gates, session continuity | hand-written                  |
+| `playwright-test-companion` | Orchestrator — drives full plan→implement→review→validate cycles                 | hand-written                  |
+| `playwright-test-planner`   | Explores the live app and writes test plans to `specs/`                          | `init-agents` + project rules |
+| `playwright-test-generator` | Implements individual test cases from a plan                                     | `init-agents` + project rules |
+| `playwright-test-reviewer`  | Read-only auditor — checks code against conventions                              | hand-written                  |
+| `playwright-test-healer`    | Debugs and fixes failing tests                                                   | `init-agents` + project rules |
 
-Browser exploration during planning/healing goes through the Playwright MCP server (`.mcp.json`), not a CLI tool — see `.claude/skills/playwright-mcp/SKILL.md`.
+Regenerate the three generated agents after a Playwright upgrade with `npx playwright init-agents --loop=claude`, then re-append the "Project rules for this repository" section each one ends with.
+
+Slash commands in `.claude/commands/` invoke them: `/coverage`, `/plan`, `/implement`, `/review`, `/heal`, `/cycle`.
+
+Browser access goes through the MCP servers in `.mcp.json` — `playwright-test` for authoring (it reads `playwright.config.ts`, so agents inherit `baseURL`, the `data-qa` test id attribute, and the viewport), `playwright` for ad-hoc exploration. See `.claude/skills/playwright-mcp/SKILL.md`.
 
 ## CI/CD
 
