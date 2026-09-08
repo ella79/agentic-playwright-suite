@@ -172,6 +172,11 @@ an image whose `node_modules` no longer match the lockfile.
 
 Traces, screenshots and visual diffs upload as artifacts on failure.
 
+ESLint findings are exported as SARIF and uploaded to GitHub code scanning, which annotates them on
+the pull request line by line. A red job says something is wrong; an annotation says which line.
+Suppressed rules carry their suppression into the SARIF, so an intentional inline disable does not
+surface as an open alert.
+
 ## The Published Report
 
 Playwright project names match the CI job names, so a merged report labels every result

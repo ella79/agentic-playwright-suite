@@ -74,6 +74,10 @@ jobs:
     permissions:
       contents: read
       packages: read
+      # Lint findings are uploaded to code scanning, which annotates them on the
+      # pull request diff. A red job says something is wrong; an annotation says
+      # which line.
+      security-events: write
     container:
       image: ${{ needs.prepare-playwright-image.outputs.image }}
       credentials:
@@ -90,11 +94,29 @@ jobs:
       - name: TypeScript
         run: yarn typecheck:ci
 
+      # continue-on-error so the findings still reach code scanning when the
+      # run fails. The gate is restored by the last step: a lint failure still
+      # fails the job.
       - name: ESLint
-        run: yarn lint:ci
+        id: eslint
+        continue-on-error: true
+        run: yarn lint:sarif
+
+      - name: Upload lint findings to code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/eslint.sarif
+          category: eslint
 
       - name: Prettier
         run: yarn stylecheck:ci
+
+      - name: Fail if ESLint reported problems
+        if: steps.eslint.outcome == 'failure'
+        run: |
+          echo "::error::ESLint reported problems. See the Security tab or the annotations on this pull request."
+          exit 1
 
   # Stage: end2end
   e2e-playwright:

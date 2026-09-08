@@ -12,6 +12,7 @@
     "typecheck:ci": "yarn typecheck",
     "lint": "eslint .",
     "lint:ci": "yarn lint",
+    "lint:sarif": "eslint . --format @microsoft/eslint-formatter-sarif --output-file reports/eslint.sarif",
     "lint:fix": "eslint . --fix",
     "test:e2e": "playwright test --project=e2e-playwright",
     "test:e2e:headed": "playwright test --project=e2e-playwright --headed",
@@ -31,6 +32,7 @@
     "playwright:install:chromium": "playwright install --with-deps chromium"
   },
   "devDependencies": {
+    "@microsoft/eslint-formatter-sarif": "^3.1.0",
     "@playwright/test": "1.63.0",
     "@types/node": "^22.10.0",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
