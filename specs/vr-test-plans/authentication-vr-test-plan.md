@@ -12,10 +12,10 @@ home plan, so this pair is what proves the header actually changes.
 
 | ID    | Screenshot               | State captured                                            |
 | ----- | ------------------------ | --------------------------------------------------------- |
-| VR-14 | `auth-login-form`        | Login form, empty                                         |
-| VR-15 | `auth-signup-form`       | Signup entry form, empty                                  |
-| VR-16 | `auth-account-info-form` | Full registration form: title, dates, address, checkboxes |
-| VR-17 | `auth-header-signed-in`  | Site header showing Logout, Delete Account, and the name  |
+| VR-14 | `authentication-login-form`        | Login form, empty                                         |
+| VR-15 | `authentication-signup-form`       | Signup entry form, empty                                  |
+| VR-16 | `authentication-account-info-form` | Full registration form: title, dates, address, checkboxes |
+| VR-17 | `authentication-header-signed-in`  | Site header showing Logout, Delete Account, and the name  |
 
 ## Notes
 

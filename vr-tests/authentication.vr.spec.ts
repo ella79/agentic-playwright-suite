@@ -8,14 +8,14 @@ test.describe("Visual regression - authentication", () => {
     await loginPage.gotoLoginPage();
     await expect(loginPage.loginButton).toBeVisible();
 
-    await expect(loginPage.loginForm).toHaveScreenshot("auth-login-form.png");
+    await expect(loginPage.loginForm).toHaveScreenshot("authentication-login-form.png");
   });
 
   test("VR-15: signup entry form", async ({ loginPage }) => {
     await loginPage.gotoLoginPage();
     await expect(loginPage.signupButton).toBeVisible();
 
-    await expect(loginPage.signupForm).toHaveScreenshot("auth-signup-form.png");
+    await expect(loginPage.signupForm).toHaveScreenshot("authentication-signup-form.png");
   });
 
   test("VR-16: full registration form", async ({
@@ -30,7 +30,7 @@ test.describe("Visual regression - authentication", () => {
 
     // Captured before submission, so no account is created.
     await expect(accountInfoPage.accountForm).toHaveScreenshot(
-      "auth-account-info-form.png",
+      "authentication-account-info-form.png",
     );
   });
 
@@ -42,7 +42,7 @@ test.describe("Visual regression - authentication", () => {
     await expect(homePage.loggedInAs).toContainText(uniqueAccount.name);
 
     await expect(homePage.header).toHaveScreenshot(
-      "auth-header-signed-in.png",
+      "authentication-header-signed-in.png",
       {
         mask: [homePage.loggedInAs], // the account name differs per run
       },
