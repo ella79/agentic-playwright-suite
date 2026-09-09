@@ -469,7 +469,7 @@ jobs:
           node env/contract/verify-contract.mjs \
             --contract env/contract/allure-report.contract.json \
             --base ./allure-report \
-            --expect-version 1
+            --expect-version 2
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
