@@ -66,6 +66,23 @@ failure are three different conversations. `environmentInfo` records the base UR
 viewport, commit and branch behind a run. `executor.json` links the published report back to the
 pipeline run that produced it.
 
+### The report is verified before it is published
+
+The portfolio at [ella79.github.io/portfolio](https://ella79.github.io/portfolio/) reads this
+report. It publishes a contract, `contract/allure-report.contract.json` in
+[ella79/portfolio](https://github.com/ella79/portfolio), naming exactly which documents and fields
+it depends on. Everything the contract does not name is free to change here without warning.
+
+`publish-dashboard` runs that contract against the freshly generated report before deploying. A
+report that no longer fits fails the job, and the previously published dashboard stays up: a stale
+report the page can read beats a fresh one that breaks it, and the failed run is the notification.
+
+Both the contract and its checker are vendored into `env/contract/` rather than downloaded at run
+time. A pipeline that fetches and executes a script from a URL is not a pattern worth demonstrating,
+and a vendored copy shows up in the diff where a reviewer can see it. The check is pinned with
+`--expect-version`, so refreshing the copy without reading what changed fails loudly instead of
+verifying against expectations nobody reviewed.
+
 ## Dependency Updates
 
 [`renovate.json`](../renovate.json) extends `config:best-practices`, which is what Renovate's own

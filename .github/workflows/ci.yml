@@ -489,6 +489,25 @@ jobs:
           npx playwright merge-reports --reporter html ./all-blob-reports
           mv playwright-report allure-report/playwright-report
 
+      # The portfolio page reads this report. It publishes a contract naming
+      # exactly which documents and fields it depends on, so a change that
+      # would break it fails here rather than reaching the live site. A failed
+      # run leaves the previous dashboard up, which is the outcome we want: a
+      # stale report the page can read beats a fresh one it cannot.
+      #
+      # Both files are vendored rather than fetched at run time. A pipeline
+      # that downloads and executes a script from a URL is not a pattern worth
+      # demonstrating, even when the URL belongs to the same owner, and a
+      # vendored copy is visible in the diff. --expect-version is what makes a
+      # careless refresh loud: a copy that no longer says version 1 fails
+      # instead of quietly verifying against expectations nobody reviewed.
+      - name: Verify the report against the consumer contract
+        run: |
+          node env/contract/verify-contract.mjs \
+            --contract env/contract/allure-report.contract.json \
+            --base ./allure-report \
+            --expect-version 1
+
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

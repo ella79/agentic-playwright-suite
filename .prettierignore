@@ -8,3 +8,6 @@ vr-tests/**/*-snapshots
 
 # VS Code parses this as JSONC; keeping it strict JSON avoids trailing commas.
 agentic-playwright-suite.code-workspace
+
+# Vendored from ella79/portfolio, kept byte for byte as reviewed upstream.
+env/contract
