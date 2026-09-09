@@ -49,8 +49,8 @@ surface as an open alert.
 
 ## The Published Report
 
-Playwright project names match the CI job names, so a merged report labels every result
-`e2e-chromium` or `visual-regression` instead of leaving forty rows to be told apart by path.
+Playwright project names match the CI job names, so a reader moves from a box in the pipeline graph
+to a branch in the report without a lookup table.
 
 Allure results are labelled by an automatic fixture rather than by hand, because a label applied
 only where someone remembered is one the report cannot rely on. Each result carries:
@@ -58,15 +58,16 @@ only where someone remembered is one the report cannot rely on. Each result carr
 | Label                      | Effect in the report                                                                     |
 | -------------------------- | ---------------------------------------------------------------------------------------- |
 | `parentSuite`              | Splits the dashboard into Functional E2E and Visual regression under every status filter |
-| `suite`                    | Breaks each of those down by area                                                        |
+| `suite`                    | The engine under Functional E2E, the area under Visual regression                        |
+| `subSuite`                 | The area, under the engine it ran on                                                     |
 | `epic`, `feature`, `story` | Populates the Behaviours tab                                                             |
 | `severity`                 | Critical only where a failure means a user cannot buy or cannot reach their account      |
 | `link`                     | The plan that justifies the case, read from its own `// spec:` header, plus its source   |
 
-Three reports are published rather than one. Allure plots status over time for whatever it was
-given, so a combined report can only ever draw a single line for both suites. The functional and
-visual reports each keep their own history, which is what makes one trend readable next to the
-other.
+Three reports are published, not one per engine. The root report holds all sixty results, forty
+distinct cases with the functional twenty counted once per engine. `functional/` and `visual/` exist
+because Allure draws a single trend line per report, so a combined one could never show a visual
+trend next to a functional one.
 
 `categories.json` classifies failures, since a screenshot diff, a host 5xx and a real assertion
 failure are three different conversations. `environmentInfo` records the base URL, browser,
