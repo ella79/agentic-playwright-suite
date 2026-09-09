@@ -1,1 +1,0 @@
-[{"values":["https://automationexercise.com"],"name":"base_url"},{"values":["WebKit and mobile Safari"],"name":"browser"},{"values":["1920x1080 desktop and iPhone 15"],"name":"viewport"},{"values":["v24.20.0"],"name":"node"},{"values":["linux x64"],"name":"os"},{"values":["GitHub Actions"],"name":"ci"},{"values":["174feb67"],"name":"commit"},{"values":["main"],"name":"branch"}]
