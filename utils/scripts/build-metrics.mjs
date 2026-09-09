@@ -225,7 +225,7 @@ function donut(rows, { size = 190, thickness = 34 } = {}) {
       const circle = `<circle class="slice" cx="${size / 2}" cy="${size / 2}" r="${round(radius, 2)}"
         stroke="${SLICE_COLOURS[i % SLICE_COLOURS.length]}" stroke-width="${thickness}"
         stroke-dasharray="${round(length, 2)} ${round(circumference - length, 2)}"
-        stroke-dashoffset="${round(-offset, 2)}"><title>${escape(r.label)}: ${r.value}</title></circle>`;
+        stroke-dashoffset="${round(-offset, 2)}"><title>${escape(r.title ?? `${r.label}: ${r.value}`)}</title></circle>`;
       offset += length;
       return circle;
     })
@@ -234,7 +234,7 @@ function donut(rows, { size = 190, thickness = 34 } = {}) {
   const legend = rows
     .map(
       (r, i) =>
-        `<li><span class="swatch" style="background:${SLICE_COLOURS[i % SLICE_COLOURS.length]}"></span>
+        `<li title="${escape(r.title ?? `${r.label}: ${r.value}`)}"><span class="swatch" style="background:${SLICE_COLOURS[i % SLICE_COLOURS.length]}"></span>
          ${escape(r.label)} <b>${r.value}</b> <span class="none">${Math.round((r.value / total) * 100)}%</span></li>`,
     )
     .join("");
@@ -445,7 +445,23 @@ const html = `<!doctype html>
 </nav>
 
 <h2>Current run</h2>
-${donut(suites.map((s) => ({ label: label(s.name), value: s.total })))}
+${donut(
+  // A slice is a suite on an engine, so hovering it should say how that suite
+  // came out on that engine. It used to repeat the case count printed beside
+  // it in the legend, which is the one thing already on screen.
+  suites.map((s) => ({
+    label: label(s.name),
+    value: s.total,
+    title: `${label(s.name)}: ${[
+      `${s.passed} passed`,
+      s.failed ? `${s.failed} failed` : "",
+      s.skipped ? `${s.skipped} skipped` : "",
+      s.flaky ? `${s.flaky} flaky` : "",
+    ]
+      .filter(Boolean)
+      .join(", ")} of ${s.total}`,
+  })),
+)}
 <table>
   <thead><tr><th>Suite</th><th>Cases, cap</th><th>Pass rate</th><th>Flaky rate</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
   <tbody>${suiteRows}</tbody>
