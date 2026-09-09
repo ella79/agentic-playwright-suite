@@ -14,9 +14,9 @@ Runs on every push and pull request to `main`.
 | -------------------------- | ------------------------------------------------------------------------------------------ |
 | `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry                  |
 | `static-checks`            | Typecheck, lint, format. Gates everything after it                                         |
-| `e2e-chromium`             | The functional suite on Chromium                                                           |
+| `e2e-chromium`             | The functional suite on Chromium, one entry of the `e2e` matrix                            |
 | `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal              |
-| `e2e-webkit`               | The same twenty functional cases replayed on WebKit, skipped on pull requests              |
+| `e2e-webkit`               | The same cases on WebKit, the second `e2e` entry, present on merge only                    |
 | `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages |
 | `ci-gate`                  | Reads every other job's result. The only check the branch protection requires              |
 
@@ -28,6 +28,12 @@ that cannot merge until `ci-gate` is green, and force pushes and branch deletion
 
 The gate exists because GitHub treats a skipped job as a satisfied requirement. Naming the test jobs
 directly would have meant that a job which stopped running quietly stopped being enforced.
+
+The two functional boxes come from one job with a matrix over the Playwright project, which is the
+shape GitHub offers for this and the one Playwright's CI guidance uses: each entry gets its own
+runner, so the engines run in parallel instead of trebling one job's wall clock. The matrix list is
+built from the event rather than guarded with `if`, so on a pull request the WebKit entry does not
+exist at all rather than existing and being skipped.
 
 Every job after the build runs inside the image the build produced, so browsers and dependencies are
 installed once instead of three times. The image tag carries the Playwright version and a hash of

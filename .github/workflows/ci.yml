@@ -127,14 +127,35 @@ jobs:
           exit 1
 
   # Stage: end2end
-  e2e-chromium:
-    name: e2e-chromium
+  #
+  # One definition, one job per engine. The matrix is what GitHub Actions offers
+  # for this and what Playwright's CI guidance uses: each entry gets its own
+  # runner, so the engines run in parallel rather than trebling the wall clock
+  # of a single job.
+  #
+  # WebKit only appears on merge. Rendering differences are not the feedback a
+  # review needs within seconds, and dropping it from pull requests cuts each
+  # one to half the executions. The list is built from the event rather than
+  # guarded with `if`, because a matrix entry that exists and is skipped still
+  # shows as a box in the graph and still has to be reasoned about.
+  #
+  # `include` is deliberately not used to carry the engine label. An include
+  # entry that matches nothing in the base list does not vanish, it adds a
+  # combination, so on a pull request it would put WebKit back.
+  e2e:
+    name: ${{ matrix.project }}
     needs: [prepare-playwright-image, static-checks]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
       packages: read
+    strategy:
+      # One engine failing is a result about that engine, not a reason to throw
+      # away what the other already produced.
+      fail-fast: false
+      matrix:
+        project: ${{ github.event_name == 'pull_request' && fromJSON('["e2e-chromium"]') || fromJSON('["e2e-chromium","e2e-webkit"]') }}
     container:
       image: ${{ needs.prepare-playwright-image.outputs.image }}
       credentials:
@@ -143,27 +164,38 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The image installed dependencies at /workspace; the checkout lands
+      # elsewhere, so the job points at them rather than installing again.
       - name: Link dependencies from the image
         run: ln -s /workspace/node_modules node_modules
 
-      - name: Run functional suite
-        run: npm run test:e2e -- --workers=1
+      # One worker per engine. The budget is a precaution rather than a measured
+      # limit: one run failed with six browser instances against the shared demo
+      # host, while later runs passed with roughly twelve from several pull
+      # requests at once. The host's capacity is variable rather than a clean
+      # threshold, and keeping the budget removes the suite as a suspect when
+      # something does time out.
+      - name: Run the functional suite
+        env:
+          E2E_BROWSERS: ${{ matrix.project == 'e2e-webkit' && 'WebKit' || 'Chromium' }}
+          E2E_VIEWPORT: 1920x1080
+        run: npx playwright test --project=${{ matrix.project }} --workers=1
 
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: allure-results-chromium
+          name: allure-results-${{ matrix.project }}
           path: allure-results
           retention-days: 7
 
       # Blob is the format merge-reports consumes, so the published HTML report
-      # can hold both this job's run and the visual one's.
+      # carries the traces for every engine, not only the canonical one.
       - name: Upload blob report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: blob-report-chromium
+          name: blob-report-${{ matrix.project }}
           path: blob-report
           retention-days: 7
 
@@ -173,7 +205,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: results-json-chromium
+          name: results-json-${{ matrix.project }}
           path: reports/results.json
           retention-days: 7
 
@@ -181,7 +213,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-chromium-traces
+          name: ${{ matrix.project }}-traces
           path: test-results
           retention-days: 7
 
@@ -251,84 +283,17 @@ jobs:
           path: test-results
           retention-days: 7
 
-  # The same twenty cases on the engines Chromium cannot speak for. It runs on
-  # merge rather than on every pull request: WebKit and a phone viewport catch
-  # rendering and layout problems, which is not the feedback a review needs
-  # within seconds.
-  #
-  # It runs beside the other test jobs under a deliberate worker budget: one
-  # each for the functional and visual jobs, two here because this job carries
-  # forty cases and would otherwise become the critical path.
-  #
-  # The budget is a precaution rather than a measured limit. One run failed with
-  # six browser instances against the shared demo host, the two heaviest cases
-  # timing out while the same checkout passed on WebKit in that same run. Later
-  # runs then passed with roughly twelve instances against it, from several pull
-  # requests at once, so the host's capacity is variable rather than a clean
-  # threshold and that single failure is not proof of one. Keeping the budget
-  # costs nothing here and removes the suite as a suspect when something does
-  # time out.
-  e2e-webkit:
-    name: e2e-webkit
-    needs: [prepare-playwright-image, static-checks]
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-      packages: read
-    container:
-      image: ${{ needs.prepare-playwright-image.outputs.image }}
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Link dependencies from the image
-        run: ln -s /workspace/node_modules node_modules
-
-      - name: Run the suite on WebKit
-        env:
-          E2E_BROWSERS: WebKit
-          E2E_VIEWPORT: 1920x1080
-        run: npm run test:e2e:webkit
-
-      - name: Upload Allure results
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: allure-results-webkit
-          path: allure-results
-          retention-days: 7
-
-      - name: Upload JSON report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: results-json-webkit
-          path: reports/results.json
-          retention-days: 7
-
-      - name: Upload failure artifacts
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: e2e-webkit-traces
-          path: test-results
-          retention-days: 7
-
   # The single check the branch protection requires.
   #
   # GitHub counts a skipped job as a satisfied requirement, so requiring the
-  # test jobs directly would be hollow: the WebKit job is skipped on pull
+  # test jobs directly would be hollow: the WebKit entry is absent on pull
   # requests by design, and any job that stops running would silently stop
   # being enforced. This job always runs, reads the results of the others, and
   # fails on anything that is not success or a deliberate skip. Adding a job
   # later means adding it here rather than editing repository settings.
   ci-gate:
     name: ci-gate
-    needs: [static-checks, e2e-chromium, e2e-webkit, visual-regression]
+    needs: [static-checks, e2e, visual-regression]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -346,7 +311,7 @@ jobs:
 
   publish-dashboard:
     name: publish-dashboard
-    needs: [e2e-chromium, e2e-webkit, visual-regression]
+    needs: [e2e, visual-regression]
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
@@ -369,7 +334,7 @@ jobs:
       - name: Collect functional results
         uses: actions/download-artifact@v8
         with:
-          name: allure-results-chromium
+          name: allure-results-e2e-chromium
           path: results/functional
 
       - name: Collect visual results
@@ -381,7 +346,7 @@ jobs:
       - name: Collect WebKit results
         uses: actions/download-artifact@v8
         with:
-          name: allure-results-webkit
+          name: allure-results-e2e-webkit
           path: results/webkit
 
       # WebKit results join the functional ones instead of forming a report of
@@ -475,7 +440,7 @@ jobs:
         env:
           GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          node utils/scripts/build-metrics.mjs             --suite functional=json-reports/results-json-chromium/results.json             --suite functional-webkit=json-reports/results-json-webkit/results.json             --suite visual=json-reports/results-json-vr/results.json             --history previous-metrics/history.json             --out allure-report/metrics
+          node utils/scripts/build-metrics.mjs             --suite functional=json-reports/results-json-e2e-chromium/results.json             --suite functional-webkit=json-reports/results-json-e2e-webkit/results.json             --suite visual=json-reports/results-json-vr/results.json             --history previous-metrics/history.json             --out allure-report/metrics
 
       # The HTML report is published alongside Allure because it carries the
       # traces: Allure shows what failed, the trace viewer shows why.
