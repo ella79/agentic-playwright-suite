@@ -125,6 +125,35 @@ function runCheck(document, check, where) {
     return;
   }
 
+  /* The engine a result ran on is written twice by the suite: once as the name
+     of the branch it sits under, once as a parameter on the result. The page
+     relies on that, because it is how a branch that is an engine is told apart
+     from a branch that is an area, and reading the tree position instead would
+     break the moment a display grouping is reorganised.
+     The check is about consistency rather than presence: a parent whose
+     branches are areas carries no such parameter and is fine, a parent whose
+     branches are engines must carry it on every result. What must never happen
+     is half and half, because then the page reads the same tree two ways. */
+  if (check.kind === "branchEngine") {
+    (document.children || [])
+      .filter((parent) => !check.under || parent.name === check.under)
+      .forEach((parent) => {
+        (parent.children || []).forEach((branch) => {
+          const tests = leaves(branch);
+          if (!tests.length) return;
+          const matching = tests.filter((test) => (test.parameters || []).includes(branch.name));
+          if (matching.length && matching.length !== tests.length) {
+            problems.push(
+              `${where}: branch "${branch.name}" under "${parent.name}" carries its own name as a ` +
+                `parameter on ${matching.length} of ${tests.length} results. It has to be all or none, ` +
+                `or the page cannot tell an engine from an area.`,
+            );
+          }
+        });
+      });
+    return;
+  }
+
   if (check.kind === "leaves") {
     const found = leaves(document);
     if (found.length < (check.minCount ?? 1)) {

@@ -1,15 +1,22 @@
 {
   "name": "portfolio-qa-suite-page",
-  "version": 1,
+  "version": 2,
   "consumer": "https://ella79.github.io/portfolio/qa-suite.html",
   "provider": "https://ella79.github.io/agentic-playwright-suite/",
   "providerRepository": "https://github.com/ella79/agentic-playwright-suite",
-  "description": "What the portfolio's QA suite page reads out of the published Allure report. It is deliberately narrow: everything the page does not touch is free to change without warning. The provider can verify this file against a freshly generated report before publishing, and the consumer runs it on a schedule against the published one.",
+  "description": "What the portfolio's QA suite page reads out of the published Allure report. It is deliberately narrow: everything the page does not touch is free to change without warning. The provider verifies this file against a freshly generated report before publishing, and the consumer runs it on a schedule against the published one.",
+  "changelog": [
+    {
+      "version": 2,
+      "note": "The cross browser results moved into the root report as an engine branch under Functional E2E, so /cross-browser/ and its two documents are gone from this contract. Added the branchEngine check: a branch is an engine when its results carry its name as a parameter, which is how the page tells an engine apart from an area without reading tree position. Written to hold on both the old and the new shape, so it does not fail during the change itself."
+    },
+    { "version": 1, "note": "First contract, written when the cross browser results were published as their own report." }
+  ],
   "documents": [
     {
       "path": "widgets/summary.json",
       "required": true,
-      "usedFor": "the four headline numbers, and whether the run came back clean",
+      "usedFor": "the headline numbers, and whether the run came back clean",
       "checks": [
         { "field": "statistic.total", "type": "number", "min": 1 },
         { "field": "statistic.passed", "type": "number" },
@@ -22,110 +29,49 @@
     {
       "path": "data/suites.json",
       "required": true,
-      "usedFor": "the suite column, the replay, the per area split and the slowest tests",
+      "usedFor": "the suite column, the replay, the engines, the per area split, the distinct case count and the slowest tests",
       "checks": [
-        {
-          "kind": "suiteNames",
-          "expect": ["Functional E2E", "Visual regression"],
-          "exact": true
-        },
-        {
-          "kind": "leaves",
-          "minCount": 1,
-          "require": ["status", "time.duration", "time.start", "name"]
-        }
+        { "kind": "suiteNames", "expect": ["Functional E2E", "Visual regression"], "exact": true },
+        { "kind": "leaves", "minCount": 1, "require": ["status", "time.duration", "time.start", "name"] },
+        { "kind": "branchEngine", "under": "Functional E2E" }
       ]
     },
     {
       "path": "widgets/executors.json",
       "required": false,
       "usedFor": "the build name and the link to the CI run",
-      "checks": [
-        {
-          "kind": "arrayOf",
-          "minLength": 1,
-          "each": [{ "field": "buildName", "type": "string" }]
-        }
-      ]
+      "checks": [{ "kind": "arrayOf", "minLength": 1, "each": [{ "field": "buildName", "type": "string" }] }]
     },
     {
       "path": "widgets/environment.json",
       "required": false,
       "usedFor": "the environment panel",
-      "checks": [
-        {
-          "kind": "arrayOf",
-          "minLength": 1,
-          "each": [{ "field": "name", "type": "string" }]
-        }
-      ]
+      "checks": [{ "kind": "arrayOf", "minLength": 1, "each": [{ "field": "name", "type": "string" }] }]
     },
     {
       "path": "widgets/history-trend.json",
       "required": false,
       "usedFor": "the run history chart",
-      "checks": [
-        {
-          "kind": "arrayOf",
-          "minLength": 1,
-          "each": [{ "field": "data.total", "type": "number" }]
-        }
-      ]
+      "checks": [{ "kind": "arrayOf", "minLength": 1, "each": [{ "field": "data.total", "type": "number" }] }]
     },
     {
       "path": "widgets/duration-trend.json",
       "required": false,
       "usedFor": "the height of each bar in the run history chart",
-      "checks": [
-        {
-          "kind": "arrayOf",
-          "minLength": 1,
-          "each": [{ "field": "data.duration", "type": "number" }]
-        }
-      ]
+      "checks": [{ "kind": "arrayOf", "minLength": 1, "each": [{ "field": "data.duration", "type": "number" }] }]
     },
     {
       "path": "widgets/retry-trend.json",
       "required": false,
       "usedFor": "the retry count in the provenance strip",
-      "checks": [
-        {
-          "kind": "arrayOf",
-          "minLength": 1,
-          "each": [{ "field": "data.retry", "type": "number" }]
-        }
-      ]
-    },
-    {
-      "path": "cross-browser/widgets/summary.json",
-      "required": false,
-      "usedFor": "the cross browser band",
-      "checks": [{ "field": "statistic.total", "type": "number", "min": 1 }]
-    },
-    {
-      "path": "cross-browser/data/suites.json",
-      "required": false,
-      "usedFor": "which engines the functional cases were replayed on",
-      "checks": [
-        { "kind": "leaves", "minCount": 1, "require": ["status", "parameters"] }
-      ]
+      "checks": [{ "kind": "arrayOf", "minLength": 1, "each": [{ "field": "data.retry", "type": "number" }] }]
     }
   ],
   "links": [
-    {
-      "path": "",
-      "usedFor": "the report embedded at the bottom of the page, and the results dashboard link"
-    },
+    { "path": "", "usedFor": "the report embedded at the bottom of the page, and the results dashboard link" },
     { "path": "functional/", "usedFor": "published link" },
     { "path": "visual/", "usedFor": "published link" },
-    {
-      "path": "cross-browser/",
-      "usedFor": "published link, and the cross browser band"
-    },
-    {
-      "path": "playwright-report/",
-      "usedFor": "published link, and the trace viewer offered when a run is not clean"
-    },
+    { "path": "playwright-report/", "usedFor": "published link, and the trace viewer offered when a run is not clean" },
     { "path": "metrics/", "usedFor": "published link" }
   ]
 }
