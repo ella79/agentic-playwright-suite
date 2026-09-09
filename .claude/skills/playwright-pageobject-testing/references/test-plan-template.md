@@ -36,7 +36,11 @@ What this plan deliberately leaves out, with the reason.
 ## Rules
 
 - `Type` is one of `happy`, `edge`, `error`. Every area carries at least one non-happy case.
-- IDs are continuous across the whole suite, `TC-01` upward, and never reused after a swap.
+- IDs are assigned in sequence, `TC-01` upward, taking the next number after the highest the suite
+  holds. They are never reused and never renumbered: the ID is what ties the plan to the test title,
+  to `STATUS.md` and, for a visual case, to the baseline name.
+- A retired case leaves its number behind. The gap is the record that it existed; closing it by
+  renumbering would silently repoint every one of those links.
 - The scenario column reads as behaviour. `A visitor adds a product from its detail page`, not
   `test add to cart`.
 - The expected column is observable: what a person would see, not which function ran.

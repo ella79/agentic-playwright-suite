@@ -35,7 +35,18 @@ yarn test:e2e          # functional suite
 yarn docker:vr         # visual suite, in the image CI uses
 ```
 
+One case at a time while developing it, the suite afterwards:
+
+```bash
+yarn playwright test --grep "TC-12"
+yarn test:e2e
+```
+
 The full command list is in [`docs/architecture.md`](docs/architecture.md).
+
+Where a run leaves things: `playwright-report/` for the HTML report and its traces,
+`reports/junit/results.xml` for the machine readable one, `test-results/` for the artefacts of a
+failure, including the expected, actual and diff images of a screenshot comparison.
 
 ## What runs when
 
@@ -90,6 +101,22 @@ utils/        Page objects, fixtures, test data, scripts
 .claude/      Six agents, three skills, slash commands
 env/docker/   Execution images for CI and local use
 ```
+
+## When something looks broken
+
+**The whole functional suite fails at the same step.** Look at the other engine in that run: if
+WebKit passed the same twenty cases, the demo host was overloaded, not the suite. Three test jobs
+hit it in parallel on `main`. Re-run with that hypothesis rather than editing a test.
+
+**Visual cases fail locally with no obvious diff.** Baselines are Chromium on Linux. A local run on
+Windows or macOS compares against a set that was never committed. Use `yarn docker:vr`, which runs
+in the image CI uses.
+
+**`yarn` is missing or the wrong version.** The repository pins Yarn 4 through Corepack in
+`packageManager`. Run `corepack enable` once; there is nothing to install globally.
+
+**No report after a run.** The HTML report is written by the run itself. Run the suite, then
+`yarn test:e2e:report`.
 
 ## Read further
 

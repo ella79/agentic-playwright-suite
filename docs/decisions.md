@@ -8,27 +8,25 @@ against an account the suite has to create in the first place. Sharing one accou
 deletion test destroys the session every other test depends on, and parallel workers competing over
 one identity. Isolation is worth more than the second it saves.
 
-**Page objects are constructed, the account is a fixture.** The two solve different problems, and the
-choice only makes sense once they are told apart.
+**Page objects reach tests as fixtures. Reversed on 2026-09-10.**
 
-A page object, in [the original definition of the pattern](https://martinfowler.com/bliki/PageObject.html),
-"wraps an HTML page, or fragment, with an application specific API, allowing you to manipulate page
-elements without digging around in the HTML". It is a vocabulary: it lets a test say what a person
-does rather than which element is clicked.
+The suite originally constructed them in each test, and the reasoning was that the two mechanisms
+solve different problems: a page object is a vocabulary, wrapping
+[a page or fragment with an application specific API](https://martinfowler.com/bliki/PageObject.html),
+while a fixture exists
+[to establish the environment for each test](https://playwright.dev/docs/test-fixtures) and owns its
+teardown. Page objects here hold locators and methods and nothing else, so making each one a fixture
+looked like using an environment mechanism to do a constructor's job.
 
-A fixture, in [Playwright's own words](https://playwright.dev/docs/test-fixtures), exists "to
-establish the environment for each test, giving the test everything it needs and nothing else", and
-it owns both halves of that, the setup and the teardown, in one place.
+That argument was answered by the same documentation it cited. Playwright's fixtures page recommends
+fixtures over `beforeEach` and shows page objects delivered that way, and the field agrees: a
+constructor repeated in every test is repetition, and the `let` variable that removes it shares
+mutable state between tests with no teardown at all. Neither alternative is better than a fixture
+built on demand for the tests that name it.
 
-The page objects here hold locators and methods and nothing else. There is no state to prepare
-before one is used and nothing to clean up after, so turning each into a fixture would use an
-environment mechanism to do a constructor's job. A spec builds the pages it works with, which is
-also what [Playwright's page object guide](https://playwright.dev/docs/pom) does in its own
-examples.
-
-The account is the opposite case, and it is why the distinction matters. A test that needs a signed
-in user needs that user to exist before it starts and to be gone when it ends, or every run leaves
-another account behind on a public site. That is environment, so that is a fixture.
+What did not change is the account. It needs a user to exist before a test starts and to be gone
+when it ends, or a public site collects abandoned accounts. That is environment, and it is why the
+distinction was worth arguing about in the first place.
 
 **No custom screenshot runtime.** A wrapper enforcing named capture strategies pays for itself
 across hundreds of visual tests. Across twenty it is indirection with nobody to pay for it. Native
