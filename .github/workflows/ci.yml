@@ -457,11 +457,24 @@ jobs:
       # not what this run found, but whether the suite is trustworthy and which
       # way it is moving. It deliberately repeats none of Allure's case level
       # detail.
+      #
+      # It runs after allure generate on purpose: the classification table wants
+      # the rules from env/allure/categories.json and the counts Allure worked
+      # out for them, and the second of those only exists once the report has
+      # been built. Passing neither is what left that table saying no categories
+      # file was provided while the report's own Categories tab listed twenty.
       - name: Build the suite health page
         env:
           GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          node utils/scripts/build-metrics.mjs             --suite functional=json-reports/results-json-e2e-chromium/results.json             --suite functional-webkit=json-reports/results-json-e2e-webkit/results.json             --suite visual=json-reports/results-json-vr/results.json             --history previous-metrics/history.json             --out allure-report/metrics
+          node utils/scripts/build-metrics.mjs \
+            --suite functional=json-reports/results-json-e2e-chromium/results.json \
+            --suite functional-webkit=json-reports/results-json-e2e-webkit/results.json \
+            --suite visual=json-reports/results-json-vr/results.json \
+            --history previous-metrics/history.json \
+            --categories env/allure/categories.json \
+            --allure allure-report \
+            --out allure-report/metrics
 
       # The HTML report is published alongside Allure because it carries the
       # traces: Allure shows what failed, the trace viewer shows why.
