@@ -1,1 +1,1 @@
-{"reportName":"Functional E2E","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":20,"unknown":0,"total":20},"time":{"start":1788932144920,"stop":1788932258405,"duration":113485,"minDuration":3823,"maxDuration":9095,"sumDuration":112909}}
+{"reportName":"Functional E2E","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":20,"unknown":0,"total":20},"time":{"start":1788941991090,"stop":1788942118944,"duration":127854,"minDuration":4188,"maxDuration":14038,"sumDuration":127235}}
