@@ -3,12 +3,12 @@
   "enabledMcpjsonServers": ["playwright-test", "playwright"],
   "permissions": {
     "allow": [
-      "Bash(yarn test:e2e)",
-      "Bash(yarn test:vr)",
-      "Bash(yarn test:vr:update)",
-      "Bash(yarn typecheck)",
-      "Bash(yarn lint)",
-      "Bash(yarn stylecheck)",
+      "Bash(npm run test:e2e)",
+      "Bash(npm run test:vr)",
+      "Bash(npm run test:vr:update)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)",
+      "Bash(npm run stylecheck)",
       "Bash(npx playwright test:*)",
       "mcp__playwright-test__browser_navigate",
       "mcp__playwright-test__browser_snapshot",

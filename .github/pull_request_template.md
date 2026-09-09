@@ -8,7 +8,7 @@
 
 ## Checks
 
-- [ ] `yarn typecheck`, `yarn lint`, `yarn stylecheck` pass
+- [ ] `npm run typecheck`, `npm run lint`, `npm run stylecheck` pass
 - [ ] Affected cases pass without retries
 - [ ] Coverage change respects the suite caps, or names the case it replaces
 - [ ] New visual baselines were generated in the CI image, not on the host

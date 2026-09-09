@@ -39,7 +39,7 @@ repository" section each one ends with.
 
 ## When Not To Use MCP
 
-- **Not for running the suite.** Tests run through `yarn test:e2e` and `yarn test:vr`. MCP explores
+- **Not for running the suite.** Tests run through `npm run test:e2e` and `npm run test:vr`. MCP explores
   and generates; it does not execute the suite.
 - **Not as a recorder.** A transcribed click sequence is not a test: it has no page objects, no
   intent, and assertions only where someone remembered them. Use what the session established, then

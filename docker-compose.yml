@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/workspace
       - /workspace/node_modules
-    command: yarn test:e2e
+    command: npm run test:e2e
 
   # Visual suite against the committed Linux baselines.
   vr:
@@ -17,7 +17,7 @@ services:
     volumes:
       - .:/workspace
       - /workspace/node_modules
-    command: yarn test:vr
+    command: npm run test:vr
 
   # Regenerates Linux baselines on any host. This is the only supported way to
   # update them locally: baselines produced outside this image belong to a
@@ -29,4 +29,4 @@ services:
     volumes:
       - .:/workspace
       - /workspace/node_modules
-    command: yarn test:vr:update
+    command: npm run test:vr:update

@@ -22,9 +22,9 @@ or behaviour assertions in VR specs are still defects in this repo.
 ## Validation Commands
 
 ```bash
-yarn typecheck && yarn lint && yarn stylecheck
-yarn test:e2e
-yarn test:vr
+npm run typecheck && npm run lint && npm run stylecheck
+npm run test:e2e
+npm run test:vr
 ```
 
 A test that only passes on retry is a failing test. Investigate the flake; do not raise retries to
@@ -33,5 +33,5 @@ paper over it.
 ## Boundaries
 
 - Never invent a test plan yourself. That is the planner's job, and it explores the live app first.
-- Never modify baseline PNGs directly. Regenerate them with `yarn test:vr:update` and review the diff.
+- Never modify baseline PNGs directly. Regenerate them with `npm run test:vr:update` and review the diff.
 - Stop and report if the same test fails healing twice.

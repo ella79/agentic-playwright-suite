@@ -31,15 +31,15 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
-          cache: yarn
+          cache: npm
 
-      - run: yarn install --frozen-lockfile
+      - run: npm ci
 
       - name: Install Chromium
-        run: yarn playwright:install:chromium
+        run: npm run playwright:install:chromium
 
       - name: Regenerate baselines
-        run: yarn test:vr:update
+        run: npm run test:vr:update
 
       - name: Commit baselines
         run: |

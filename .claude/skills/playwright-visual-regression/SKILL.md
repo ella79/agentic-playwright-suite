@@ -117,8 +117,8 @@ never see it. If one appears in a diff, the bug is in the base page object, not 
 ## Baseline Management
 
 ```bash
-yarn test:vr            # run against committed baselines
-yarn test:vr:update     # regenerate after an intentional UI change
+npm run test:vr            # run against committed baselines
+npm run test:vr:update     # regenerate after an intentional UI change
 ```
 
 - Baselines are committed. They are the reference the suite is judged against.

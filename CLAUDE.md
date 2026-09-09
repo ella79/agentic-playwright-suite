@@ -11,17 +11,17 @@ E2E and visual regression test suite for [Automation Exercise](https://automatio
 
 ## Commands
 
-| Command                             | Purpose                                                |
-| ----------------------------------- | ------------------------------------------------------ |
-| `yarn test:e2e`                     | Run all functional E2E tests                           |
-| `yarn test:e2e:headed`              | Run with visible browser                               |
-| `yarn test:e2e:ui`                  | Playwright interactive UI                              |
-| `yarn test:vr`                      | Run all visual regression tests                        |
-| `yarn test:vr:update`               | Regenerate VR baselines after an intentional UI change |
-| `yarn test:e2e:report`              | Open last Playwright HTML report                       |
-| `yarn typecheck`                    | TypeScript check (no emit)                             |
-| `yarn lint` / `yarn lint:fix`       | ESLint check / auto-fix                                |
-| `yarn stylecheck` / `yarn stylefix` | Prettier check / auto-fix                              |
+| Command                                   | Purpose                                                |
+| ----------------------------------------- | ------------------------------------------------------ |
+| `npm run test:e2e`                        | Run all functional E2E tests                           |
+| `npm run test:e2e:headed`                 | Run with visible browser                               |
+| `npm run test:e2e:ui`                     | Playwright interactive UI                              |
+| `npm run test:vr`                         | Run all visual regression tests                        |
+| `npm run test:vr:update`                  | Regenerate VR baselines after an intentional UI change |
+| `npm run test:e2e:report`                 | Open last Playwright HTML report                       |
+| `npm run typecheck`                       | TypeScript check (no emit)                             |
+| `npm run lint` / `npm run lint:fix`       | ESLint check / auto-fix                                |
+| `npm run stylecheck` / `npm run stylefix` | Prettier check / auto-fix                              |
 
 Base URL defaults to `https://automationexercise.com`. Override with `E2E_BASE_URL`.
 
@@ -82,7 +82,7 @@ Browser access goes through the MCP servers in `.mcp.json`: `playwright-test` fo
 
 GitHub Actions (`.github/workflows/ci.yml`), seven jobs in three stages:
 
-1. **build**: `prepare-playwright-image` builds `env/docker/e2e-playwright.Dockerfile` and pushes it to ghcr.io. Every later job runs inside that image, so dependencies and browsers install once. The tag hashes `package.json` plus `yarn.lock`, so a dependency change forces a rebuild.
+1. **build**: `prepare-playwright-image` builds `env/docker/e2e-playwright.Dockerfile` and pushes it to ghcr.io. Every later job runs inside that image, so dependencies and browsers install once. The tag hashes `package.json` plus `package-lock.json`, so a dependency change forces a rebuild.
 2. **check**: `static-checks` runs typecheck, lint and format check, and uploads lint findings to code scanning. It gates everything after it.
 3. **end2end**: `e2e-playwright`, `visual-regression` and `cross-browser` run in parallel under a worker budget of four browser instances against the shared demo host. `cross-browser` runs the same twenty functional cases on WebKit and mobile Safari and is skipped on pull requests. `publish-dashboard` then merges the reports, restores Allure trend history, builds the suite health page and deploys everything to GitHub Pages, on `main` only.
 

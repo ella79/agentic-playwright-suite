@@ -10,9 +10,9 @@ WORKDIR /workspace
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 ENV CI=true
 
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
 
-CMD ["yarn", "test:e2e"]
+CMD ["npm", "run", "test:e2e"]
