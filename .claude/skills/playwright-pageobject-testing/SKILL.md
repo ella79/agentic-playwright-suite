@@ -1,6 +1,11 @@
 ---
 name: playwright-pageobject-testing
 description: Coding standard for tests and page objects in this repository, locator priority, page object structure, fixtures, assertions, and the anti-patterns that get a change rejected. Use before writing or reviewing any test code.
+paths:
+  - tests/**
+  - vr-tests/**
+  - utils/**
+  - specs/test-plans/**
 ---
 
 # Page Object Testing Skill
@@ -63,6 +68,23 @@ Rules:
   returns the modal's component object.
 - Export every class from `utils/pageObjects/index.ts`, and register it as a fixture in
   `utils/fixtures/testFixtures.ts`.
+
+## Artefacts and traceability
+
+| Artefact             | Shape                                                                |
+| -------------------- | -------------------------------------------------------------------- |
+| Functional test plan | [references/test-plan-template.md](references/test-plan-template.md) |
+| Spec file            | Below, under Spec Structure                                          |
+| Page object          | Above, under Page Object Structure                                   |
+| `specs/STATUS.md`    | Existing tables only: counts, findings, open decisions               |
+
+Page objects are shared by both suites, so this file is the only place their standard lives. The
+visual skill covers what is specific to a screenshot.
+
+One chain has to hold, because the published dashboard reads it: the plan ID becomes the test title,
+the test file carries the `// spec:` header pointing at that plan, `STATUS.md` counts the case, and
+for a visual case the baseline name matches the plan's screenshot column. Break a link and a result
+stops tracing back to the plan that justifies it.
 
 ## Spec Structure
 

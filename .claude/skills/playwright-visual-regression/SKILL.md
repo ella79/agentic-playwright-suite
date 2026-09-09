@@ -1,6 +1,9 @@
 ---
 name: playwright-visual-regression
 description: Create and maintain visual regression tests, what to screenshot, how to stabilize state first, threshold selection, masking third-party noise, and baseline management. Use when adding VR coverage or diagnosing a flaky screenshot.
+paths:
+  - vr-tests/**
+  - specs/vr-test-plans/**
 ---
 
 # Visual Regression Skill
@@ -26,6 +29,10 @@ cries wolf gets ignored, which is worse than having none.
 Playwright appends the platform suffix (`-chromium-linux.png`) itself. Baselines are generated on
 Linux to match CI. A baseline captured on Windows or macOS will not match and must not be
 committed.
+
+## Plan shape
+
+`specs/vr-test-plans/` follows [references/vr-plan-template.md](references/vr-plan-template.md).
 
 ## Spec Structure
 

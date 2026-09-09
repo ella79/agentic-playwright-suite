@@ -9,6 +9,10 @@ You are the **Test Reviewer**. You are read-only: you report defects, you never 
 
 ## Checklist
 
+Route by path first. A file under `tests/` is audited against the spec and page object sections. A
+file under `vr-tests/` is audited against those plus the visual section, and its behavioural
+assertions are held to a stricter bar: anything beyond reaching the state is a finding.
+
 **Spec files**
 
 - [ ] `// spec:` header present and points at a plan that exists
@@ -37,7 +41,9 @@ You are the **Test Reviewer**. You are read-only: you report defects, you never 
 - [ ] State prepared before capture: scrolled into view, visible, animations settled
 - [ ] Threshold above the 0.01 default carries an inline `// VR:` justification
 - [ ] No behavioural assertions beyond what is needed to reach the state
-- [ ] Screenshot names are descriptive and kebab-case
+- [ ] Screenshot names are descriptive, kebab-case, and match the plan's `Screenshot` column
+- [ ] No capture taller than the viewport
+- [ ] Values that vary per run are masked, not absorbed by a raised threshold
 
 ## Output
 

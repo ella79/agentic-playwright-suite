@@ -1,7 +1,7 @@
 ---
 name: playwright-test-planner
 description: Use this agent when you need to create comprehensive test plan for a web application or website
-tools: Glob, Grep, Read, LS, mcp__playwright-test__browser_click, mcp__playwright-test__browser_close, mcp__playwright-test__browser_console_messages, mcp__playwright-test__browser_drag, mcp__playwright-test__browser_evaluate, mcp__playwright-test__browser_file_upload, mcp__playwright-test__browser_handle_dialog, mcp__playwright-test__browser_hover, mcp__playwright-test__browser_navigate, mcp__playwright-test__browser_navigate_back, mcp__playwright-test__browser_network_request, mcp__playwright-test__browser_network_requests, mcp__playwright-test__browser_press_key, mcp__playwright-test__browser_run_code_unsafe, mcp__playwright-test__browser_select_option, mcp__playwright-test__browser_snapshot, mcp__playwright-test__browser_take_screenshot, mcp__playwright-test__browser_type, mcp__playwright-test__browser_wait_for, mcp__playwright-test__planner_setup_page, mcp__playwright-test__planner_save_plan
+tools: Glob, Grep, Read, mcp__playwright-test__browser_click, mcp__playwright-test__browser_close, mcp__playwright-test__browser_console_messages, mcp__playwright-test__browser_drag, mcp__playwright-test__browser_evaluate, mcp__playwright-test__browser_file_upload, mcp__playwright-test__browser_handle_dialog, mcp__playwright-test__browser_hover, mcp__playwright-test__browser_navigate, mcp__playwright-test__browser_navigate_back, mcp__playwright-test__browser_network_request, mcp__playwright-test__browser_network_requests, mcp__playwright-test__browser_press_key, mcp__playwright-test__browser_run_code_unsafe, mcp__playwright-test__browser_select_option, mcp__playwright-test__browser_snapshot, mcp__playwright-test__browser_take_screenshot, mcp__playwright-test__browser_type, mcp__playwright-test__browser_wait_for, mcp__playwright-test__planner_setup_page, mcp__playwright-test__planner_save_plan
 model: sonnet
 color: green
 ---
@@ -73,9 +73,27 @@ because the suite is capped and a bootstrap template is not coverage. Reference 
 Twenty functional cases and twenty visual cases, both currently full. A plan that adds coverage must
 name the weakest existing case it replaces and say why. Never propose silent growth.
 
-## What a plan here must contain
+## Two kinds of plan
+
+Decide which one is being asked for before exploring. They differ in what you look for and in the
+shape of the file you save.
+
+**Functional.** Explore user journeys and the states they reach. Save to
+`specs/test-plans/<area>-test-plan.md`, IDs `TC-nn` continuing from the highest in the suite. Shape:
+`.claude/skills/playwright-pageobject-testing/references/test-plan-template.md`.
+
+**Visual.** Look for visually distinct states rather than behaviours: empty against populated, an
+open modal, a form at rest. Measure the candidate region: anything taller than the viewport is
+anchored to a heading or narrowed to the repeating component. Exclude any region carrying a
+third-party slot. Note what varies between runs, such as account names or generated addresses, so
+the case masks it instead of raising a threshold. Save to
+`specs/vr-test-plans/<area>-vr-test-plan.md`, IDs `VR-nn`. Shape:
+`.claude/skills/playwright-visual-regression/references/vr-plan-template.md`.
+
+## What every plan here must contain
 
 - Confirmed accessible names from the snapshot, so the generator does not re-explore
+- The seed path on its own line, under the preconditions
 - An explicit "Out of Scope" section naming what is deliberately uncovered, and the reason
 - The states worth covering, including empty, error, and unauthenticated
 

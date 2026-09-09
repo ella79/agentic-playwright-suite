@@ -60,16 +60,15 @@ Quick rules:
 
 ## Agent System
 
-This project uses a Playwright QA agent hierarchy in `.claude/agents/`. Start with **playwright-test-manager** or **playwright-test-companion** for any new session or coverage question.
+This project uses a Playwright QA agent hierarchy in `.claude/agents/`. Start with **playwright-test-manager** for any new session or coverage question: it owns the cycle and delegates to the four specialists.
 
-| Agent                       | Role                                                                            | Source                        |
-| --------------------------- | ------------------------------------------------------------------------------- | ----------------------------- |
-| `playwright-test-manager`   | Senior QA authority, strategy, coverage gaps, quality gates, session continuity | hand-written                  |
-| `playwright-test-companion` | Orchestrator, drives full plan→implement→review→validate cycles                 | hand-written                  |
-| `playwright-test-planner`   | Explores the live app and writes test plans to `specs/`                         | `init-agents` + project rules |
-| `playwright-test-generator` | Implements individual test cases from a plan                                    | `init-agents` + project rules |
-| `playwright-test-reviewer`  | Read-only auditor, checks code against conventions                              | hand-written                  |
-| `playwright-test-healer`    | Debugs and fixes failing tests                                                  | `init-agents` + project rules |
+| Agent                       | Role                                                                                  | Source                        |
+| --------------------------- | ------------------------------------------------------------------------------------- | ----------------------------- |
+| `playwright-test-manager`   | Owns scope, the caps, the quality gates, and the plan→implement→review→validate cycle | hand-written                  |
+| `playwright-test-planner`   | Explores the live app and writes test plans to `specs/`                               | `init-agents` + project rules |
+| `playwright-test-generator` | Implements individual test cases from a plan                                          | `init-agents` + project rules |
+| `playwright-test-reviewer`  | Read-only auditor, checks code against conventions                                    | hand-written                  |
+| `playwright-test-healer`    | Debugs and fixes failing tests                                                        | `init-agents` + project rules |
 
 Regenerate the three generated agents after a Playwright upgrade with `npx playwright init-agents --loop=claude`, then re-append the "Project rules for this repository" section each one ends with.
 
