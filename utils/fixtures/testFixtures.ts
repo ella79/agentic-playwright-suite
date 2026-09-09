@@ -2,9 +2,16 @@ import { expect, test as base } from "@playwright/test";
 import { applyAllureLabels } from "./allureLabels";
 import {
   AccountInfoPage,
+  CartPage,
+  CheckoutPage,
   ConfirmationPage,
+  ContactUsPage,
   HomePage,
   LoginPage,
+  OrderConfirmationPage,
+  PaymentPage,
+  ProductDetailPage,
+  ProductsPage,
 } from "../pageObjects";
 import { buildAccount, type TestAccount } from "../testData";
 import { url } from "../url";
@@ -14,7 +21,26 @@ export interface ActiveAccount extends TestAccount {
   deleted: boolean;
 }
 
-interface Fixtures {
+/**
+ * Page objects reach a test as fixtures, the shape Playwright's fixtures
+ * documentation recommends: built on demand for the tests that name them, so a
+ * spec declares the surfaces it touches in its signature.
+ */
+interface PageObjects {
+  homePage: HomePage;
+  productsPage: ProductsPage;
+  productDetailPage: ProductDetailPage;
+  loginPage: LoginPage;
+  accountInfoPage: AccountInfoPage;
+  confirmationPage: ConfirmationPage;
+  cartPage: CartPage;
+  checkoutPage: CheckoutPage;
+  paymentPage: PaymentPage;
+  orderConfirmationPage: OrderConfirmationPage;
+  contactUsPage: ContactUsPage;
+}
+
+interface Fixtures extends PageObjects {
   uniqueAccount: ActiveAccount;
 }
 
@@ -75,6 +101,50 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     });
 
     await use(page);
+  },
+
+  homePage: async ({ page }, use) => {
+    await use(new HomePage(page));
+  },
+
+  productsPage: async ({ page }, use) => {
+    await use(new ProductsPage(page));
+  },
+
+  productDetailPage: async ({ page }, use) => {
+    await use(new ProductDetailPage(page));
+  },
+
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page));
+  },
+
+  accountInfoPage: async ({ page }, use) => {
+    await use(new AccountInfoPage(page));
+  },
+
+  confirmationPage: async ({ page }, use) => {
+    await use(new ConfirmationPage(page));
+  },
+
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
+  },
+
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
+  },
+
+  paymentPage: async ({ page }, use) => {
+    await use(new PaymentPage(page));
+  },
+
+  orderConfirmationPage: async ({ page }, use) => {
+    await use(new OrderConfirmationPage(page));
+  },
+
+  contactUsPage: async ({ page }, use) => {
+    await use(new ContactUsPage(page));
   },
 
   /**

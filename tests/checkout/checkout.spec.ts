@@ -1,12 +1,6 @@
 // spec: specs/test-plans/checkout-test-plan.md
+// seed: specs/seed.spec.ts
 import { expect, test } from "../../utils/fixtures/testFixtures";
-import {
-  CartPage,
-  CheckoutPage,
-  OrderConfirmationPage,
-  PaymentPage,
-  ProductDetailPage,
-} from "../../utils/pageObjects";
 import { paymentCard, products } from "../../utils/testData";
 import { urlPattern } from "../../utils/url";
 
@@ -14,13 +8,12 @@ test.describe("Checkout", () => {
   test("TC-17: a signed-in user can complete an order end to end", async ({
     page,
     uniqueAccount,
+    productDetailPage,
+    cartPage,
+    checkoutPage,
+    paymentPage,
+    orderConfirmationPage,
   }) => {
-    const productDetailPage = new ProductDetailPage(page);
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
-    const paymentPage = new PaymentPage(page);
-    const orderConfirmationPage = new OrderConfirmationPage(page);
-
     await test.step("add a product to the cart", async () => {
       await productDetailPage.gotoProductDetailPage(products.blueTop.id);
       const modal = await productDetailPage.addToCart();

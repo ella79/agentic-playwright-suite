@@ -1,12 +1,13 @@
 // spec: specs/vr-test-plans/contact-vr-test-plan.md
+// seed: specs/seed.spec.ts
 import { expect, test } from "../utils/fixtures/testFixtures";
-import { ContactUsPage } from "../utils/pageObjects";
 
 test.describe("Visual regression - contact", () => {
-  test("VR-18: contact form", async ({ page }) => {
-    const contactUsPage = new ContactUsPage(page);
-
+  test.beforeEach(async ({ contactUsPage }) => {
     await contactUsPage.gotoContactUsPage();
+  });
+
+  test("VR-18: contact form", async ({ contactUsPage }) => {
     await expect(contactUsPage.submitButton).toBeVisible();
 
     await expect(contactUsPage.contactForm).toHaveScreenshot(
