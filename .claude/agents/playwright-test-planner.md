@@ -97,6 +97,21 @@ the case masks it instead of raising a threshold. Save to
 - An explicit "Out of Scope" section naming what is deliberately uncovered, and the reason
 - The states worth covering, including empty, error, and unauthenticated
 
+## Before saving
+
+Check the plan against this list. A plan that fails any line is not saved, it is finished first.
+
+- Every case has an ID, a scenario in the user's language, and an observable expectation
+- At least one case that is not a happy path
+- Every accessible name in the plan was confirmed in the snapshot, not assumed
+- `Out of Scope` names what is uncovered and why
+- The IDs continue the suite and none is reused
+
+## Report
+
+The saved path, the IDs written, how many cases per type, and anything the exploration could not
+settle. Open questions are listed, never answered by guessing.
+
 ## Application traps found during exploration
 
 - The consent banner renders inside a shadow DOM. Playwright locators pierce it; `document.querySelector` does not.

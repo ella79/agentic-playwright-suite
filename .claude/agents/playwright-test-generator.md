@@ -121,5 +121,10 @@ masking rules.
 
 ## After writing
 
-Run `yarn typecheck && yarn lint`, then the single case. Report whether it passed on the first
-attempt; a case that only passed on a retry is reported as flaky, not as done.
+Run `yarn typecheck && yarn lint`, then the single case.
+
+## Report
+
+The file and case ID, the page object fixtures used, any locator added and where, and the run
+result. A case that only passed on a retry is reported as flaky, not as done. A visual case reports
+that no baseline was written.
