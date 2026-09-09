@@ -36,6 +36,11 @@ viewport instead of being told them twice, and it exposes generation tools that 
 server does not have. [`@playwright/mcp`](https://github.com/microsoft/playwright-mcp) stays
 registered for exploration outside test authoring.
 
+Both servers run from pinned local installs rather than `npx -y ...@latest`. An unpinned launcher
+resolves and executes a package on every start with no lockfile behind it, which is the documented
+supply-chain risk for MCP servers, and it also hides version changes from Renovate. `@playwright/mcp`
+is a dependency like any other; the authoring server ships inside `@playwright/test`.
+
 The skills are enforced rather than suggested. Four rules from
 `.claude/skills/playwright-pageobject-testing/SKILL.md`, namely no hard waits, no skipped tests, no
 forced clicks and every test must assert, are configured as ESLint errors scoped to spec files. A

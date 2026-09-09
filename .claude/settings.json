@@ -1,5 +1,4 @@
 {
-  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["playwright-test", "playwright"],
   "permissions": {
     "allow": [
@@ -9,7 +8,6 @@
       "Bash(yarn typecheck)",
       "Bash(yarn lint)",
       "Bash(yarn stylecheck)",
-      "Bash(npx playwright test:*)",
       "mcp__playwright-test__browser_navigate",
       "mcp__playwright-test__browser_snapshot",
       "mcp__playwright-test__browser_click",
