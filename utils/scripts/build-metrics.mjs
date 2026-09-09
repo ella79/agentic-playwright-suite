@@ -10,6 +10,8 @@
 //     --suite functional=reports/functional.json \
 //     --suite visual=reports/visual.json \
 //     --history previous/history.json \
+//     --categories env/allure/categories.json \
+//     --allure allure-report \
 //     --out site/metrics
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -50,6 +52,7 @@ const options = {
   history: undefined,
   out: "metrics",
   categories: undefined,
+  allure: undefined,
 };
 for (let i = 0; i < args.length; i += 2) {
   const [flag, value] = [args[i], args[i + 1]];
@@ -57,6 +60,7 @@ for (let i = 0; i < args.length; i += 2) {
   if (flag === "--history") options.history = value;
   if (flag === "--out") options.out = value;
   if (flag === "--categories") options.categories = value;
+  if (flag === "--allure") options.allure = value;
 }
 
 const percentile = (values, p) => {
@@ -221,7 +225,7 @@ function donut(rows, { size = 190, thickness = 34 } = {}) {
       const circle = `<circle class="slice" cx="${size / 2}" cy="${size / 2}" r="${round(radius, 2)}"
         stroke="${SLICE_COLOURS[i % SLICE_COLOURS.length]}" stroke-width="${thickness}"
         stroke-dasharray="${round(length, 2)} ${round(circumference - length, 2)}"
-        stroke-dashoffset="${round(-offset, 2)}"><title>${escape(r.label)}: ${r.value}</title></circle>`;
+        stroke-dashoffset="${round(-offset, 2)}"><title>${escape(r.title ?? `${r.label}: ${r.value}`)}</title></circle>`;
       offset += length;
       return circle;
     })
@@ -230,7 +234,7 @@ function donut(rows, { size = 190, thickness = 34 } = {}) {
   const legend = rows
     .map(
       (r, i) =>
-        `<li><span class="swatch" style="background:${SLICE_COLOURS[i % SLICE_COLOURS.length]}"></span>
+        `<li title="${escape(r.title ?? `${r.label}: ${r.value}`)}"><span class="swatch" style="background:${SLICE_COLOURS[i % SLICE_COLOURS.length]}"></span>
          ${escape(r.label)} <b>${r.value}</b> <span class="none">${Math.round((r.value / total) * 100)}%</span></li>`,
     )
     .join("");
@@ -246,9 +250,21 @@ function donut(rows, { size = 190, thickness = 34 } = {}) {
 }
 
 /**
- * Allure's own Categories tab only lists failures, so it reads as empty while
- * the suite is green. The taxonomy is worth showing regardless: it says what
- * this suite expects to go wrong and how it will be named when it does.
+ * Two halves of the same table, and the page was showing neither.
+ *
+ * The taxonomy is what this suite expects to go wrong and what each kind will
+ * be called when it does. It is worth showing while everything is green, so it
+ * comes from the rules file rather than from a run.
+ *
+ * What a run actually matched is the other half, and that only exists once
+ * something has failed. Allure works it out when it generates the report and
+ * writes the answer to widgets/categories.json, so this reads it there rather
+ * than matching the regexes a second time and risking a different answer from
+ * the Categories tab one click away.
+ *
+ * Neither half was reaching the page: the flag that carries the taxonomy was
+ * never passed, so the section said no categories file was provided on runs
+ * where Allure was listing twenty assertion failures.
  */
 let categories = [];
 if (options.categories) {
@@ -258,6 +274,64 @@ if (options.categories) {
     categories = [];
   }
 }
+
+/** name -> how many results the report put in that category */
+let matched = new Map();
+if (options.allure) {
+  try {
+    const widget = JSON.parse(
+      await readFile(
+        join(options.allure, "widgets", "categories.json"),
+        "utf-8",
+      ),
+    );
+    // an array in some versions, { total, items } in others
+    const items = Array.isArray(widget) ? widget : (widget.items ?? []);
+    matched = new Map(
+      items.map((item) => [
+        item.name,
+        {
+          total: item.statistic?.total ?? 0,
+          failed: item.statistic?.failed ?? 0,
+          broken: item.statistic?.broken ?? 0,
+          skipped: item.statistic?.skipped ?? 0,
+        },
+      ]),
+    );
+  } catch {
+    matched = new Map();
+  }
+}
+
+/**
+ * The taxonomy in its declared order, then anything the report matched that the
+ * taxonomy does not name. Allure's own catch-all buckets land in the second
+ * group, and dropping them would hide exactly the failures nobody classified.
+ */
+const categoryRows = [
+  ...categories.map((c) => ({
+    name: c.name,
+    means: c.description ?? (c.matchedStatuses ?? []).join(", "),
+    hit: matched.get(c.name),
+  })),
+  ...[...matched.entries()]
+    .filter(([name]) => !categories.some((c) => c.name === name))
+    .map(([name, hit]) => ({
+      name,
+      means: "Matched by the report without a rule of this suite's own.",
+      hit,
+    })),
+];
+
+/** "20 results, all failed" reads better than a bare number and a legend. */
+const hitCell = (hit) => {
+  if (!hit || !hit.total) return '<span class="none">none in this run</span>';
+  const parts = [];
+  for (const status of ["failed", "broken", "skipped"]) {
+    if (hit[status]) parts.push(`${hit[status]} ${status}`);
+  }
+  return `<b>${hit.total}</b> ${parts.length ? `<span class="none">(${parts.join(", ")})</span>` : ""}`;
+};
 
 const seconds = (ms) => `${round(ms / 1000, 1)}s`;
 const escape = (text) =>
@@ -371,7 +445,23 @@ const html = `<!doctype html>
 </nav>
 
 <h2>Current run</h2>
-${donut(suites.map((s) => ({ label: label(s.name), value: s.total })))}
+${donut(
+  // A slice is a suite on an engine, so hovering it should say how that suite
+  // came out on that engine. It used to repeat the case count printed beside
+  // it in the legend, which is the one thing already on screen.
+  suites.map((s) => ({
+    label: label(s.name),
+    value: s.total,
+    title: `${label(s.name)}: ${[
+      `${s.passed} passed`,
+      s.failed ? `${s.failed} failed` : "",
+      s.skipped ? `${s.skipped} skipped` : "",
+      s.flaky ? `${s.flaky} flaky` : "",
+    ]
+      .filter(Boolean)
+      .join(", ")} of ${s.total}`,
+  })),
+)}
 <table>
   <thead><tr><th>Suite</th><th>Cases, cap</th><th>Pass rate</th><th>Flaky rate</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
   <tbody>${suiteRows}</tbody>
@@ -396,18 +486,18 @@ ${donut(suites.map((s) => ({ label: label(s.name), value: s.total })))}
 </table>
 
 <h2>How a failure gets classified</h2>
-<p class="sub">Applied automatically to any failure in the report. Empty while everything passes, which is the point.</p>
+<p class="sub">The rules this suite carries, and how many results of this run each of them caught. The rules stand whether or not anything matched them; the counts are the ones the <a href="../#categories">Categories tab</a> of the report shows.</p>
 <table>
-  <thead><tr><th>Category</th><th>Matches</th></tr></thead>
+  <thead><tr><th>Category</th><th>What it means</th><th>In this run</th></tr></thead>
   <tbody>${
-    categories.length
-      ? categories
+    categoryRows.length
+      ? categoryRows
           .map(
             (c) =>
-              `<tr><th scope="row">${escape(c.name)}</th><td>${escape(c.description ?? (c.matchedStatuses ?? []).join(", "))}</td></tr>`,
+              `<tr><th scope="row">${escape(c.name)}</th><td>${escape(c.means)}</td><td>${hitCell(c.hit)}</td></tr>`,
           )
           .join("")
-      : '<tr><td colspan="2" class="none">No categories file was provided.</td></tr>'
+      : '<tr><td colspan="3" class="none">No categories file was provided.</td></tr>'
   }</tbody>
 </table>
 

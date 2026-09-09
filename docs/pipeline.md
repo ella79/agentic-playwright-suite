@@ -70,7 +70,10 @@ because Allure draws a single trend line per report, so a combined one could nev
 trend next to a functional one.
 
 `categories.json` classifies failures, since a screenshot diff, a host 5xx and a real assertion
-failure are three different conversations. `environmentInfo` records the base URL, browser,
+failure are three different conversations. The same file reaches the suite health page as
+`--categories`, alongside `--allure`, which points at the generated report so the page can read the
+counts Allure worked out for those rules rather than matching the regexes a second time and possibly
+disagreeing with the Categories tab one click away. `environmentInfo` records the base URL, browser,
 viewport, commit and branch behind a run. `executor.json` links the published report back to the
 pipeline run that produced it.
 
