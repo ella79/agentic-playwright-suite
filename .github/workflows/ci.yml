@@ -295,7 +295,7 @@ jobs:
   # later means adding it here rather than editing repository settings.
   ci-gate:
     name: ci-gate
-    needs: [static-checks, e2e, visual-regression]
+    needs: [static-checks, e2e, visual-regression, publish-dashboard]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -310,6 +310,20 @@ jobs:
             fi
           done
           echo "Every required job passed or was deliberately skipped."
+
+      # A skip is acceptable on a pull request, where the dashboard is not
+      # deployed at all. On main it is not: a publish that never ran leaves the
+      # published report silently stale, which is the failure this gate exists
+      # to make visible.
+      - name: The dashboard must publish on main
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          result="${{ needs.publish-dashboard.result }}"
+          if [ "$result" != "success" ]; then
+            echo "::error::publish-dashboard reported '$result' on main"
+            exit 1
+          fi
+          echo "The dashboard was published."
 
   publish-dashboard:
     name: publish-dashboard
