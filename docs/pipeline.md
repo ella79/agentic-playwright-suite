@@ -37,7 +37,7 @@ exist at all rather than existing and being skipped.
 
 Every job after the build runs inside the image the build produced, so browsers and dependencies are
 installed once instead of three times. The image tag carries the Playwright version and a hash of
-`package.json` plus `package-lock.json`, so a dependency change produces a new tag and no job can run against
+`package.json` plus `yarn.lock`, so a dependency change produces a new tag and no job can run against
 an image whose `node_modules` no longer match the lockfile.
 
 Traces, screenshots and visual diffs upload as artifacts on failure.
