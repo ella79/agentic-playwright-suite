@@ -176,6 +176,19 @@ because product photography is still streaming in. When a region is genuinely la
 viewport, anchor its heading with `scrollToTop` and capture the viewport instead, or scope the
 capture to the repeating component.
 
+## Page objects are shared
+
+Both suites use the same page objects. Never create a VR-only page object or a VR-only locator: a
+capture that needs an element the functional suite does not have means the element belongs in the
+existing page object.
+
+## Vendor documentation
+
+- [Visual comparisons](https://playwright.dev/docs/test-snapshots)
+- [`toHaveScreenshot` on a page](https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-screenshot-2)
+- [`toHaveScreenshot` on a locator](https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-screenshot-2)
+- [`snapshotPathTemplate`](https://playwright.dev/docs/api/class-testconfig#test-config-snapshot-path-template)
+
 ## Anti-Patterns
 
 - Screenshotting without a preceding visibility assertion

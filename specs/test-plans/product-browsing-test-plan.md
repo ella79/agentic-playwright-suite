@@ -8,6 +8,8 @@ full catalog.
 
 ## Preconditions
 
+Seed: `specs/seed.spec.ts`
+
 - Entry point: `/products`. No account required, the catalog is public.
 
 ## Test Cases

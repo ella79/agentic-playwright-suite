@@ -1,6 +1,6 @@
 # Home Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/home.vr.spec.ts`.
+Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/home.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
 
 ## Scope
 

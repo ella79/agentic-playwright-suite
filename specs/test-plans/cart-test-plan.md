@@ -7,6 +7,8 @@ guard that blocks anonymous checkout.
 
 ## Preconditions
 
+Seed: `specs/seed.spec.ts`
+
 - Cart state is per browser context, so each test starts with an empty cart automatically.
 - No account required except where stated.
 

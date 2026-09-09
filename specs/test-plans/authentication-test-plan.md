@@ -10,6 +10,8 @@ Not covered: password reset (the application does not implement one) and social 
 
 ## Preconditions
 
+Seed: `specs/seed.spec.ts`
+
 - Entry point: `/login`, which serves both the login form and the signup entry form.
 - Tests that need an existing account use the `uniqueAccount` fixture rather than a shared seed.
 

@@ -12,6 +12,8 @@ What this area covers, in two or three sentences. State the boundary, not the fe
 
 ## Preconditions
 
+Seed: `specs/seed.spec.ts`
+
 - What the suite provides automatically (fresh context, per-test account).
 - What a case must arrange itself.
 

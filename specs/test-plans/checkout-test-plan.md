@@ -10,6 +10,8 @@ this one exists to prove the flow holds together, not to cover each step's varia
 
 ## Preconditions
 
+Seed: `specs/seed.spec.ts`
+
 - A registered, signed-in user. Provided by the `uniqueAccount` fixture, which registers the
   account before the test and deletes it afterwards.
 - At least one product in the cart.

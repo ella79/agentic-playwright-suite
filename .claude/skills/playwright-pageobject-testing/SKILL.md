@@ -158,3 +158,13 @@ A test that deletes its own account sets `account.deleted = true` so teardown do
 | `let po` assigned in `beforeEach`  | Mutable state shared across tests, and no teardown. Use the fixture         |
 | Asserting on ad or consent content | Third-party, changes without notice, not our product                        |
 | A test that only passes on retry   | That is a failing test with extra steps                                     |
+
+## Vendor documentation
+
+Read the source rather than repeating it here when a rule needs its rationale.
+
+- [Best practices](https://playwright.dev/docs/best-practices)
+- [Locators](https://playwright.dev/docs/locators)
+- [Assertions](https://playwright.dev/docs/test-assertions)
+- [Fixtures](https://playwright.dev/docs/test-fixtures), the shape this repository's page objects follow
+- [Page object model](https://playwright.dev/docs/pom)
