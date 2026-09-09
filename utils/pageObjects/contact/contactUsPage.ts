@@ -21,13 +21,18 @@ export class ContactUsPage extends BaseAppPage {
     // The .contact-form class wraps two blocks; the form element itself is
     // the one that carries the fields.
     this.contactForm = page.locator("#contact-us-form");
-    this.nameInput = page.getByTestId("name");
-    this.emailInput = page.getByTestId("email");
-    this.subjectInput = page.getByTestId("subject");
-    this.messageTextarea = page.getByTestId("message");
+    // Scoped to the form. The footer newsletter input is placeheld "Your email
+    // address", which a page wide getByPlaceholder("Email") also matches.
+    this.nameInput = this.contactForm.getByPlaceholder("Name");
+    this.emailInput = this.contactForm.getByPlaceholder("Email");
+    this.subjectInput = this.contactForm.getByPlaceholder("Subject");
+    this.messageTextarea =
+      this.contactForm.getByPlaceholder("Your Message Here");
     // File input has no data-qa hook and no accessible name.
-    this.fileInput = page.locator('input[name="upload_file"]');
-    this.submitButton = page.getByTestId("submit-button");
+    this.fileInput = this.contactForm.locator('input[name="upload_file"]');
+    this.submitButton = this.contactForm.getByRole("button", {
+      name: "Submit",
+    });
     // The page carries two elements with this exact text: the contact form's
     // status banner and a hidden one belonging to the newsletter widget.
     this.successMessage = page

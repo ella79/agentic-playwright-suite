@@ -32,27 +32,36 @@ export class AccountInfoPage extends BaseAppPage {
   constructor(page: Page) {
     super(page);
     this.enterAccountInfoHeading = page.getByText("Enter Account Information");
+    // CSS: the form has no accessible name, so it has no form role to
+    // address. Scoped by action because the page carries more than one form.
     this.accountForm = page.locator('form[action="/signup"]');
-    // Radios carry values but no accessible names in this markup.
-    this.titleMrsRadio = page.locator("#id_gender2");
-    this.nameInput = page.getByTestId("name");
-    this.emailInput = page.getByTestId("email");
-    this.passwordInput = page.getByTestId("password");
+    this.titleMrsRadio = page.getByLabel("Mrs.");
+    this.nameInput = page.getByLabel("Name *", { exact: true });
+    this.emailInput = page.getByLabel("Email *", { exact: true });
+    this.passwordInput = page.getByLabel("Password *");
+    // Test ids: the three date selects carry no label and no placeholder.
     this.birthDaySelect = page.getByTestId("days");
     this.birthMonthSelect = page.getByTestId("months");
     this.birthYearSelect = page.getByTestId("years");
-    this.newsletterCheckbox = page.locator("#newsletter");
-    this.specialOffersCheckbox = page.locator("#optin");
-    this.firstNameInput = page.getByTestId("first_name");
-    this.lastNameInput = page.getByTestId("last_name");
-    this.companyInput = page.getByTestId("company");
-    this.addressInput = page.getByTestId("address");
-    this.countrySelect = page.getByTestId("country");
-    this.stateInput = page.getByTestId("state");
-    this.cityInput = page.getByTestId("city");
+    this.newsletterCheckbox = page.getByLabel("Sign up for our newsletter!");
+    this.specialOffersCheckbox = page.getByLabel(
+      "Receive special offers from our partners!",
+    );
+    this.firstNameInput = page.getByLabel("First name *");
+    this.lastNameInput = page.getByLabel("Last name *");
+    this.companyInput = page.getByLabel("Company", { exact: true });
+    this.addressInput = page.getByLabel(
+      "Address * (Street address, P.O. Box, Company name, etc.)",
+    );
+    this.countrySelect = page.getByLabel("Country *");
+    this.stateInput = page.getByLabel("State *");
+    this.cityInput = page.getByLabel("City *");
+    // Test id: the only field on this form with no label element.
     this.zipcodeInput = page.getByTestId("zipcode");
-    this.mobileNumberInput = page.getByTestId("mobile_number");
-    this.createAccountButton = page.getByTestId("create-account");
+    this.mobileNumberInput = page.getByLabel("Mobile Number *");
+    this.createAccountButton = page.getByRole("button", {
+      name: "Create Account",
+    });
   }
 
   async fillAccountDetails(account: TestAccount): Promise<void> {

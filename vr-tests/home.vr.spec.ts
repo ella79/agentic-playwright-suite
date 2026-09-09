@@ -27,7 +27,7 @@ test.describe("Visual regression - home", () => {
 
     await expect(homePage.featuresItemsHeading).toBeVisible();
     await homePage.scrollToTop(homePage.featuresItemsHeading);
-    await homePage.waitForImagesLoaded(homePage.featuresItemsSection);
+    await homePage.waitForImagesLoaded(homePage.featuredProductsGrid);
 
     await expect(page).toHaveScreenshot(
       "home-features-items.png",

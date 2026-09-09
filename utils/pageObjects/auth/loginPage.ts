@@ -24,12 +24,19 @@ export class LoginPage extends BaseAppPage {
 
   constructor(page: Page) {
     super(page);
+    // CSS: a form has no role until it carries an accessible name, and these
+    // carry none. Scoped by action because the page holds two of them, and the
+    // scope is what lets the fields inside be addressed by placeholder: both
+    // forms have a field placeheld "Email Address".
+    this.loginForm = page.locator('form[action="/login"]');
+    this.signupForm = page.locator('form[action="/signup"]');
+
     this.loginHeading = page.getByRole("heading", {
       name: "Login to your account",
     });
-    this.loginEmailInput = page.getByTestId("login-email");
-    this.loginPasswordInput = page.getByTestId("login-password");
-    this.loginButton = page.getByTestId("login-button");
+    this.loginEmailInput = this.loginForm.getByPlaceholder("Email Address");
+    this.loginPasswordInput = this.loginForm.getByPlaceholder("Password");
+    this.loginButton = page.getByRole("button", { name: "Login" });
     this.loginErrorMessage = page.getByText(
       "Your email or password is incorrect!",
     );
@@ -37,14 +44,10 @@ export class LoginPage extends BaseAppPage {
     this.signupHeading = page.getByRole("heading", {
       name: "New User Signup!",
     });
-    this.signupNameInput = page.getByTestId("signup-name");
-    this.signupEmailInput = page.getByTestId("signup-email");
-    this.signupButton = page.getByTestId("signup-button");
+    this.signupNameInput = this.signupForm.getByPlaceholder("Name");
+    this.signupEmailInput = this.signupForm.getByPlaceholder("Email Address");
+    this.signupButton = page.getByRole("button", { name: "Signup" });
     this.signupErrorMessage = page.getByText("Email Address already exist!");
-
-    // Form containers have no accessible names; scoped by action for VR captures.
-    this.loginForm = page.locator('form[action="/login"]');
-    this.signupForm = page.locator('form[action="/signup"]');
   }
 
   async gotoLoginPage(): Promise<void> {
