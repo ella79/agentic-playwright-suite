@@ -1,0 +1,107 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: tests/auth/authentication.spec.ts >> Authentication >> TC-03: signing in with wrong credentials is rejected
+- Location: tests/auth/authentication.spec.ts:53:7
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: getByRole('heading', { name: 'Login to your account' })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByRole('heading', { name: 'Login to your account' }) with timeout 5000ms
+  - waiting for getByRole('heading', { name: 'Login to your account' })
+
+```
+
+```yaml
+- text: Please wait while your request is being verified...
+```
+
+# Test source
+
+```ts
+  1  | import { expect, type Locator, type Page } from "@playwright/test";
+  2  | import { BaseAppPage } from "../baseAppPage";
+  3  | import { url } from "../../url";
+  4  | 
+  5  | /**
+  6  |  * The application serves login and signup entry from one route, as two separate
+  7  |  * forms. Both are modelled here because a user sees a single page.
+  8  |  */
+  9  | export class LoginPage extends BaseAppPage {
+  10 |   readonly loginHeading: Locator;
+  11 |   readonly loginEmailInput: Locator;
+  12 |   readonly loginPasswordInput: Locator;
+  13 |   readonly loginButton: Locator;
+  14 |   readonly loginErrorMessage: Locator;
+  15 | 
+  16 |   readonly signupHeading: Locator;
+  17 |   readonly signupNameInput: Locator;
+  18 |   readonly signupEmailInput: Locator;
+  19 |   readonly signupButton: Locator;
+  20 |   readonly signupErrorMessage: Locator;
+  21 | 
+  22 |   readonly loginForm: Locator;
+  23 |   readonly signupForm: Locator;
+  24 | 
+  25 |   constructor(page: Page) {
+  26 |     super(page);
+  27 |     // CSS: a form has no role until it carries an accessible name, and these
+  28 |     // carry none. Scoped by action because the page holds two of them, and the
+  29 |     // scope is what lets the fields inside be addressed by placeholder: both
+  30 |     // forms have a field placeheld "Email Address".
+  31 |     this.loginForm = page.locator('form[action="/login"]');
+  32 |     this.signupForm = page.locator('form[action="/signup"]');
+  33 | 
+  34 |     this.loginHeading = page.getByRole("heading", {
+  35 |       name: "Login to your account",
+  36 |     });
+  37 |     this.loginEmailInput = this.loginForm.getByPlaceholder("Email Address");
+  38 |     this.loginPasswordInput = this.loginForm.getByPlaceholder("Password");
+  39 |     this.loginButton = page.getByRole("button", { name: "Login" });
+  40 |     this.loginErrorMessage = page.getByText(
+  41 |       "Your email or password is incorrect!",
+  42 |     );
+  43 | 
+  44 |     this.signupHeading = page.getByRole("heading", {
+  45 |       name: "New User Signup!",
+  46 |     });
+  47 |     this.signupNameInput = this.signupForm.getByPlaceholder("Name");
+  48 |     this.signupEmailInput = this.signupForm.getByPlaceholder("Email Address");
+  49 |     this.signupButton = page.getByRole("button", { name: "Signup" });
+  50 |     this.signupErrorMessage = page.getByText("Email Address already exist!");
+  51 |   }
+  52 | 
+  53 |   async gotoLoginPage(): Promise<void> {
+  54 |     await this.goto(url.login);
+  55 |     await expect(this.page).toHaveURL(new RegExp(`${url.login}$`));
+> 56 |     await expect(this.loginHeading).toBeVisible();
+     |                                     ^ Error: expect(locator).toBeVisible() failed
+  57 |   }
+  58 | 
+  59 |   async login(email: string, password: string): Promise<void> {
+  60 |     await this.loginEmailInput.fill(email);
+  61 |     await this.loginPasswordInput.fill(password);
+  62 |     await this.loginButton.click();
+  63 |   }
+  64 | 
+  65 |   async startSignup(name: string, email: string): Promise<void> {
+  66 |     await this.signupNameInput.fill(name);
+  67 |     await this.signupEmailInput.fill(email);
+  68 |     await this.signupButton.click();
+  69 |   }
+  70 | }
+  71 | 
+```
