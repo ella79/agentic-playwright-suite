@@ -102,8 +102,26 @@ function runCheck(document, check, where) {
 
   if (check.kind === "suiteNames") {
     const found = (document.children || []).map((child) => child.name);
+
+    /* The engine moved into the parent suite name, so the top level now holds
+       "Functional E2E · Chromium" where it held "Functional E2E". Allure's own
+       Overview reads only that level, and while both engines shared a parent it
+       drew one bar for forty results: a run that failed every case on one
+       engine and passed every case on the other looked like one suite that half
+       worked.
+       This contract is about which suites exist, not which engines they ran on,
+       so it compares the names with the engine taken off. Both shapes pass,
+       which is what lets the change land on either side of the pair first. */
+    const separator = check.engineSuffix;
+    const baseOf = (name) => {
+      if (!separator) return name;
+      const at = name.indexOf(separator);
+      return at === -1 ? name : name.slice(0, at);
+    };
+    const bases = found.map(baseOf);
+
     check.expect.forEach((name) => {
-      if (!found.includes(name)) {
+      if (!bases.includes(name)) {
         problems.push(`${where}: suite "${name}" is gone, top level holds [${found.join(", ")}]`);
       }
     });
@@ -114,14 +132,55 @@ function runCheck(document, check, where) {
        A contract that only checks what must exist does not catch that. */
     if (check.exact) {
       found
-        .filter((name) => !check.expect.includes(name))
+        .filter((name) => !check.expect.includes(baseOf(name)))
         .forEach((name) => {
           problems.push(
             `${where}: unexpected top level suite "${name}". The page counts every suite in this ` +
               `report into its totals, so a new one silently inflates them.`,
           );
         });
+
+      /* A suite that appears both on its own and split by engine is the same
+         silent inflation wearing a different hat: the page folds the split ones
+         back under one parent and would then hold two suites of that name, both
+         counted. */
+      if (separator) {
+        check.expect.forEach((name) => {
+          const plain = found.filter((one) => one === name).length;
+          const split = found.filter((one) => one !== name && baseOf(one) === name).length;
+          if (plain && split) {
+            problems.push(
+              `${where}: "${name}" is at the top level both on its own and split by engine, so its ` +
+                `results are counted twice.`,
+            );
+          }
+        });
+      }
     }
+    return;
+  }
+
+  /* With the engine in the parent suite name, that name is the only thing
+     saying which engine a branch ran on, while the page filters the replay on
+     the parameter each result carries. The two have to agree, or a visitor
+     presses a chip labelled WebKit and watches something else play. */
+  if (check.kind === "parentEngine") {
+    const separator = check.separator ?? " · ";
+    (document.children || []).forEach((parent) => {
+      const at = parent.name.indexOf(separator);
+      if (at === -1) return;
+      const engine = parent.name.slice(at + separator.length);
+      const tests = leaves(parent);
+      if (!tests.length) return;
+      const matching = tests.filter((test) => (test.parameters || []).includes(engine));
+      if (matching.length !== tests.length) {
+        problems.push(
+          `${where}: "${parent.name}" names ${engine}, but ${tests.length - matching.length} of ` +
+            `${tests.length} results underneath do not carry it as a parameter. The page filters on ` +
+            `the parameter, so the chip and the replay would disagree.`,
+        );
+      }
+    });
     return;
   }
 
