@@ -19,7 +19,7 @@ export abstract class BaseAppPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.header = page.locator("#header");
+    this.header = page.getByRole("banner");
     this.cartLink = page.getByRole("link", { name: "Cart", exact: true });
     this.signupLoginLink = page.getByRole("link", { name: "Signup / Login" });
     this.contactUsLink = page.getByRole("link", { name: "Contact us" });

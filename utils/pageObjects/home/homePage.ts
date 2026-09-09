@@ -4,7 +4,7 @@ import { url } from "../../url";
 
 export class HomePage extends BaseAppPage {
   readonly featuresItemsHeading: Locator;
-  readonly featuresItemsSection: Locator;
+  readonly featuredProductsGrid: Locator;
   readonly subscriptionHeading: Locator;
   readonly subscriptionEmailInput: Locator;
   readonly subscriptionSubmitButton: Locator;
@@ -16,8 +16,10 @@ export class HomePage extends BaseAppPage {
     this.featuresItemsHeading = page.getByRole("heading", {
       name: "Features Items",
     });
-    // No accessible name on the products container: it is a layout wrapper.
-    this.featuresItemsSection = page.locator(".features_items");
+    // CSS: the grid is a layout wrapper with no role and no accessible
+    // name, so nothing semantic addresses it. It is a capture boundary, not
+    // something a user interacts with.
+    this.featuredProductsGrid = page.locator(".features_items");
     this.subscriptionHeading = page.getByRole("heading", {
       name: "Subscription",
     });
@@ -27,7 +29,7 @@ export class HomePage extends BaseAppPage {
     this.subscriptionSuccessMessage = page.getByText(
       "You have been successfully subscribed!",
     );
-    this.footer = page.locator("#footer");
+    this.footer = page.getByRole("contentinfo");
   }
 
   async gotoHomePage(): Promise<void> {

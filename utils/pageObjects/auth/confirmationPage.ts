@@ -10,14 +10,12 @@ export class ConfirmationPage extends BaseAppPage {
   readonly accountCreatedBanner: Locator;
   readonly accountDeletedBanner: Locator;
   readonly continueButton: Locator;
-  readonly banner: Locator;
 
   constructor(page: Page) {
     super(page);
     this.accountCreatedBanner = page.getByText(/account created/i);
     this.accountDeletedBanner = page.getByText(/account deleted/i);
     this.continueButton = page.getByTestId("continue-button");
-    this.banner = page.locator("#form");
   }
 
   async continue(): Promise<void> {
