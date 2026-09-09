@@ -28,12 +28,16 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Corepack first: setup-node's yarn cache probe runs `yarn cache dir`
+      # with the runner's global yarn 1, which refuses to run in a project that
+      # pins yarn 4 through packageManager.
+      - run: corepack enable
+
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: yarn
 
-      - run: corepack enable
       - run: yarn install --immutable
 
       - name: Install Chromium
