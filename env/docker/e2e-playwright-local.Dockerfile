@@ -13,7 +13,7 @@ WORKDIR /workspace
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci
 
-CMD ["yarn", "test:vr"]
+CMD ["npm", "run", "test:vr"]

@@ -9,24 +9,24 @@
 ## Commands
 
 ```bash
-yarn install
-yarn playwright:install:chromium
-yarn test:e2e
+npm install
+npm run playwright:install:chromium
+npm run test:e2e
 ```
 
-| Command                             | Purpose                                                 |
-| ----------------------------------- | ------------------------------------------------------- |
-| `yarn test:e2e`                     | Run the functional suite                                |
-| `yarn test:e2e:headed`              | Run it with a visible browser                           |
-| `yarn test:e2e:ui`                  | Open the Playwright UI runner                           |
-| `yarn test:vr`                      | Run the visual suite against the committed baselines    |
-| `yarn docker:vr`                    | Run the visual suite in the same Linux image CI uses    |
-| `yarn docker:vr:update`             | Regenerate baselines with rendering identical to CI     |
-| `yarn test:seed`                    | Run the environment seed the agents generate tests from |
-| `yarn test:e2e:report`              | Open the last HTML report                               |
-| `yarn typecheck`                    | TypeScript, no emit                                     |
-| `yarn lint` / `yarn lint:fix`       | ESLint                                                  |
-| `yarn stylecheck` / `yarn stylefix` | Prettier                                                |
+| Command                                   | Purpose                                                 |
+| ----------------------------------------- | ------------------------------------------------------- |
+| `npm run test:e2e`                        | Run the functional suite                                |
+| `npm run test:e2e:headed`                 | Run it with a visible browser                           |
+| `npm run test:e2e:ui`                     | Open the Playwright UI runner                           |
+| `npm run test:vr`                         | Run the visual suite against the committed baselines    |
+| `npm run docker:vr`                       | Run the visual suite in the same Linux image CI uses    |
+| `npm run docker:vr:update`                | Regenerate baselines with rendering identical to CI     |
+| `npm run test:seed`                       | Run the environment seed the agents generate tests from |
+| `npm run test:e2e:report`                 | Open the last HTML report                               |
+| `npm run typecheck`                       | TypeScript, no emit                                     |
+| `npm run lint` / `npm run lint:fix`       | ESLint                                                  |
+| `npm run stylecheck` / `npm run stylefix` | Prettier                                                |
 
 ## Environment Variables
 
@@ -77,7 +77,7 @@ Baselines are Chromium on Linux at 1920x1080. Screenshots differ between platfor
 produced on Windows or macOS will never match a runner. Regenerate them in the image CI uses:
 
 ```bash
-yarn docker:vr:update
+npm run docker:vr:update
 ```
 
 Baselines written directly on a host are gitignored, and the visual job fails outright when none are

@@ -38,7 +38,7 @@ depend on the engine or the viewport.
 |     | **Total**                        |                             | **20**     | **20**      | **20** | **0**  | **0** | **0**   | **0** |
 
 Cap: 20. Full. Baselines are Chromium on Linux at 1920x1080, generated in the CI image
-(`yarn docker:vr:update`); the visual job fails if none are committed rather than seeding its own.
+(`npm run docker:vr:update`); the visual job fails if none are committed rather than seeding its own.
 
 ## Findings Raised Against the Application
 

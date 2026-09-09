@@ -42,7 +42,7 @@ jobs:
         id: meta
         run: |
           version=$(node -p "require('./package.json').devDependencies['@playwright/test']")
-          deps=$(cat package.json yarn.lock | sha256sum | cut -c1-12)
+          deps=$(cat package.json package-lock.json | sha256sum | cut -c1-12)
           image="${REGISTRY}/${IMAGE_NAME}:v${version}-${deps}"
           echo "image=${image,,}" >> "$GITHUB_OUTPUT"
           echo "Image: ${image,,}"
@@ -92,7 +92,7 @@ jobs:
         run: ln -s /workspace/node_modules node_modules
 
       - name: TypeScript
-        run: yarn typecheck:ci
+        run: npm run typecheck:ci
 
       # Two runs on purpose. The SARIF formatter writes to a file, so a run
       # that only produces SARIF fails with an empty log and leaves whoever
@@ -103,12 +103,12 @@ jobs:
       - name: ESLint
         id: eslint
         continue-on-error: true
-        run: yarn lint:ci
+        run: npm run lint:ci
 
       - name: ESLint report for code scanning
         if: always()
         continue-on-error: true
-        run: yarn lint:sarif
+        run: npm run lint:sarif
 
       - name: Upload lint findings to code scanning
         if: always()
@@ -118,7 +118,7 @@ jobs:
           category: eslint
 
       - name: Prettier
-        run: yarn stylecheck:ci
+        run: npm run stylecheck:ci
 
       - name: Fail if ESLint reported problems
         if: steps.eslint.outcome == 'failure'
@@ -147,7 +147,7 @@ jobs:
         run: ln -s /workspace/node_modules node_modules
 
       - name: Run functional suite
-        run: yarn test:e2e --workers=1
+        run: npm run test:e2e -- --workers=1
 
       - name: Upload Allure results
         if: always()
@@ -212,12 +212,12 @@ jobs:
           count=$(find vr-tests -name '*-linux.png' | wc -l)
           echo "Found $count Linux baselines"
           if [ "$count" -eq 0 ]; then
-            echo "::error::No Linux baselines committed. Run yarn docker:vr:update and commit the result."
+            echo "::error::No Linux baselines committed. Run npm run docker:vr:update and commit the result."
             exit 1
           fi
 
       - name: Run visual suite
-        run: yarn test:vr --workers=1
+        run: npm run test:vr -- --workers=1
 
       - name: Upload Allure results
         if: always()
@@ -292,7 +292,7 @@ jobs:
         env:
           E2E_BROWSERS: WebKit and mobile Safari
           E2E_VIEWPORT: 1920x1080 desktop and iPhone 15
-        run: yarn test:cross-browser
+        run: npm run test:cross-browser
 
       - name: Upload Allure results
         if: always()
@@ -357,14 +357,14 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
-          cache: yarn
+          cache: npm
 
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
 
-      - run: yarn install --frozen-lockfile
+      - run: npm ci
 
       - name: Collect functional results
         uses: actions/download-artifact@v8

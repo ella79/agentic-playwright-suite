@@ -58,8 +58,8 @@ A portfolio suite that sprawls stops demonstrating judgment.
 
 A workflow is not complete until:
 
-- `yarn test:e2e` passes without relying on retries
-- `yarn typecheck`, `yarn lint`, `yarn stylecheck` are clean
+- `npm run test:e2e` passes without relying on retries
+- `npm run typecheck`, `npm run lint`, `npm run stylecheck` are clean
 - every new spec file has a `// spec:` header pointing at a real plan
 - no `test.skip()` anywhere in the suite
 - page object methods are task-oriented and locators are `readonly`

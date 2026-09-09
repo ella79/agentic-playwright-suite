@@ -22,7 +22,7 @@ its state belongs in `tests/`, not here.
 ## Baseline Environment
 
 Baselines are Chromium on Linux at 1920x1080, generated in the same image CI runs
-(`yarn docker:vr:update`) and committed from there. Text renders differently on Windows and macOS,
+(`npm run docker:vr:update`) and committed from there. Text renders differently on Windows and macOS,
 so a baseline produced on either would never match, locally generated ones are gitignored rather
 than committed, and the visual job fails outright if no Linux baseline is present rather than
 quietly writing one and reporting success.

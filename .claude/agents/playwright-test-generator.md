@@ -100,9 +100,9 @@ also `.claude/skills/playwright-visual-regression/SKILL.md`.
 - `waitForTimeout`, or any non-retrying assertion such as `expect(await locator.count())`
 - Locators disambiguated with `nth()` rather than scoping to a container
 
-`yarn lint` enforces several of these and fails the pipeline before any test runs.
+`npm run lint` enforces several of these and fails the pipeline before any test runs.
 
 ## After writing
 
-Run `yarn typecheck && yarn lint`, then the single case. Report whether it passed on the first
+Run `npm run typecheck && npm run lint`, then the single case. Report whether it passed on the first
 attempt; a case that only passed on a retry is reported as flaky, not as done.
