@@ -31,15 +31,16 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
-          cache: npm
+          cache: yarn
 
-      - run: npm ci
+      - run: corepack enable
+      - run: yarn install --immutable
 
       - name: Install Chromium
-        run: npm run playwright:install:chromium
+        run: yarn playwright:install:chromium
 
       - name: Regenerate baselines
-        run: npm run test:vr:update
+        run: yarn test:vr:update
 
       - name: Commit baselines
         run: |

@@ -15,5 +15,5 @@ Requirements:
   `.claude/skills/playwright-visual-regression/SKILL.md`.
 - Reuse existing page objects before writing new ones. Any new class extends `BaseAppPage` or
   `BaseComponentPage` and is exported from `utils/pageObjects/index.ts`.
-- Run `npm run typecheck && npm run lint`, then the single case, and report whether it passed on the
+- Run `yarn typecheck && yarn lint`, then the single case, and report whether it passed on the
   first attempt. A case that only passed on a retry is reported as flaky, not as done.

@@ -61,19 +61,20 @@ Rules:
 - Method names describe the user's task (`addToCart`), not the mechanics (`clickAddButton`).
 - A method that navigates to another page returns that page object; a method that opens a modal
   returns the modal's component object.
-- Export every class from `utils/pageObjects/index.ts`.
+- Export every class from `utils/pageObjects/index.ts`, and register it as a fixture in
+  `utils/fixtures/testFixtures.ts`.
 
 ## Spec Structure
 
 ```typescript
 // spec: specs/test-plans/cart-test-plan.md
-import { expect } from "@playwright/test";
-import { test } from "../../utils/fixtures/testFixtures";
-import { CartPage } from "../../utils/pageObjects";
+// seed: specs/seed.spec.ts
+import { expect, test } from "../../utils/fixtures/testFixtures";
 
 test.describe("Cart", () => {
   test("TC-05: adding a product from the detail page puts it in the cart", async ({
-    page,
+    productDetailPage,
+    cartPage,
   }) => {
     // ...
   });
@@ -81,6 +82,14 @@ test.describe("Cart", () => {
 ```
 
 - The `// spec:` header is mandatory. It is how coverage is traced back to a plan.
+- The `// seed:` header names the seed spec the environment is bootstrapped from,
+  `specs/seed.spec.ts`. Both headers are the format Playwright's own generator agent emits.
+- Page objects arrive as fixtures, named in the test signature. Never `new SomePage(page)` in a
+  spec, and never a `let po` assigned in `beforeEach`: the first repeats construction in every
+  test, the second shares mutable state across them. Playwright's fixtures documentation is
+  explicit that fixtures replace both.
+- A `beforeEach` is for navigation shared by every case in the file, and it takes the page object
+  as a fixture too.
 - `test.describe` groups related scenarios. `test.step` marks distinct phases **within one
   scenario**, not every action. A step is worth adding when a failure would otherwise leave the
   reader guessing which phase broke, typically an arrange phase followed by the behaviour under
@@ -90,6 +99,17 @@ test.describe("Cart", () => {
 added product`, not `TC-05: test cart`.
 
 ## Fixtures
+
+Everything a test needs arrives through `utils/fixtures/testFixtures.ts`.
+
+| Fixture                              | Provides                                                       |
+| ------------------------------------ | -------------------------------------------------------------- |
+| `homePage`, `cartPage`, and the rest | One page object per surface, built for the tests that name it  |
+| `uniqueAccount`                      | A throwaway registered account, deleted afterwards             |
+| `page`                               | Playwright's page with ad, analytics and consent hosts aborted |
+
+A new page object gets a fixture in the same commit that adds the class. Fixtures are on demand, so
+an unused one costs nothing.
 
 Tests needing a logged-in user take the `uniqueAccount` fixture. It signs up a throwaway account
 before the test and deletes it afterwards, so no test depends on data another test left behind and
@@ -112,5 +132,7 @@ A test that deletes its own account sets `account.deleted = true` so teardown do
 | Inline locator in a spec           | The next locator change then has to be made in N places                     |
 | `test.skip()` for a known bug      | Hides intent. `test.fixme()` says "this should pass and does not"           |
 | `nth(0)` to resolve ambiguity      | Couples the test to DOM order. Scope to a container instead                 |
+| `new SomePage(page)` in a spec     | The page object is a fixture. Name it in the signature instead              |
+| `let po` assigned in `beforeEach`  | Mutable state shared across tests, and no teardown. Use the fixture         |
 | Asserting on ad or consent content | Third-party, changes without notice, not our product                        |
 | A test that only passes on retry   | That is a failing test with extra steps                                     |

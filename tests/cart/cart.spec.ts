@@ -1,20 +1,14 @@
 // spec: specs/test-plans/cart-test-plan.md
+// seed: specs/seed.spec.ts
 import { expect, test } from "../../utils/fixtures/testFixtures";
-import {
-  CartPage,
-  ProductDetailPage,
-  ProductsPage,
-} from "../../utils/pageObjects";
 import { products } from "../../utils/testData";
 import { url } from "../../utils/url";
 
 test.describe("Cart", () => {
   test("TC-12: a product added from its detail page appears in the cart", async ({
-    page,
+    productDetailPage,
+    cartPage,
   }) => {
-    const productDetailPage = new ProductDetailPage(page);
-    const cartPage = new CartPage(page);
-
     await test.step("add the product from its detail page", async () => {
       await productDetailPage.gotoProductDetailPage(products.blueTop.id);
       const modal = await productDetailPage.addToCart();
@@ -32,11 +26,9 @@ test.describe("Cart", () => {
   });
 
   test("TC-13: a product added from the catalog listing appears in the cart", async ({
-    page,
+    productsPage,
+    cartPage,
   }) => {
-    const productsPage = new ProductsPage(page);
-    const cartPage = new CartPage(page);
-
     await test.step("add the product from the catalog listing", async () => {
       await productsPage.gotoProductsPage();
       const modal = await productsPage.addProductToCartFromListing(
@@ -52,11 +44,9 @@ test.describe("Cart", () => {
   });
 
   test("TC-14: the quantity set before adding is the quantity in the cart", async ({
-    page,
+    productDetailPage,
+    cartPage,
   }) => {
-    const productDetailPage = new ProductDetailPage(page);
-    const cartPage = new CartPage(page);
-
     await test.step("set the quantity to three before adding", async () => {
       await productDetailPage.gotoProductDetailPage(products.menTshirt.id);
       await productDetailPage.setQuantity(3);
@@ -72,11 +62,9 @@ test.describe("Cart", () => {
   });
 
   test("TC-15: removing the only product empties the cart", async ({
-    page,
+    productDetailPage,
+    cartPage,
   }) => {
-    const productDetailPage = new ProductDetailPage(page);
-    const cartPage = new CartPage(page);
-
     await test.step("start from a cart holding one product", async () => {
       await productDetailPage.gotoProductDetailPage(products.blueTop.id);
       const modal = await productDetailPage.addToCart();
@@ -94,10 +82,9 @@ test.describe("Cart", () => {
 
   test("TC-16: an anonymous visitor cannot reach checkout", async ({
     page,
+    productDetailPage,
+    cartPage,
   }) => {
-    const productDetailPage = new ProductDetailPage(page);
-    const cartPage = new CartPage(page);
-
     await test.step("fill the cart without signing in", async () => {
       await productDetailPage.gotoProductDetailPage(products.blueTop.id);
       const addedModal = await productDetailPage.addToCart();

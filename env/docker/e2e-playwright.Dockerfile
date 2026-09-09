@@ -10,9 +10,9 @@ WORKDIR /workspace
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 ENV CI=true
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json yarn.lock .yarnrc.yml ./
+RUN corepack enable && yarn install --immutable
 
 COPY . .
 
-CMD ["npm", "run", "test:e2e"]
+CMD ["yarn", "test:e2e"]

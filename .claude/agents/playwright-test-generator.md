@@ -82,7 +82,8 @@ also `.claude/skills/playwright-visual-regression/SKILL.md`.
   locator in a spec and never call `page.click()` or `page.fill()` from a test.
 - If the locator you need does not exist yet, add it to the page object first, then use it.
 - New page object classes extend `BaseAppPage` (URL-addressable pages) or `BaseComponentPage`
-  (modals, root-scoped) and are exported from `utils/pageObjects/index.ts`.
+  (modals, root-scoped), are exported from `utils/pageObjects/index.ts`, and get a fixture in
+  `utils/fixtures/testFixtures.ts`.
 - Method names describe the user's task (`addToCart`), not the mechanics (`clickAddButton`).
 
 ## Imports and fixtures
@@ -90,19 +91,22 @@ also `.claude/skills/playwright-visual-regression/SKILL.md`.
 - Import `test` and `expect` from `../../utils/fixtures/testFixtures`, never from `@playwright/test`.
   The project fixture blocks third-party ad and consent traffic; a test importing the bare runner
   gets none of that.
+- Page objects are fixtures, named in the test signature. The skill's Spec Structure section is the
+  reference; follow it exactly, including the `// spec:` and `// seed:` headers.
 - Any test needing a signed-in user takes the `uniqueAccount` fixture, which registers a throwaway
   account and deletes it afterwards. Do not register accounts by hand.
 
 ## Conventions the reviewer will reject a file for
 
-- Missing `// spec:` header pointing at a real plan
+- Missing `// spec:` or `// seed:` header, or a `// spec:` pointing at a plan that does not exist
+- A page object constructed in a spec instead of taken as a fixture
 - `test.skip()` instead of `test.fixme()`
 - `waitForTimeout`, or any non-retrying assertion such as `expect(await locator.count())`
 - Locators disambiguated with `nth()` rather than scoping to a container
 
-`npm run lint` enforces several of these and fails the pipeline before any test runs.
+`yarn lint` enforces several of these and fails the pipeline before any test runs.
 
 ## After writing
 
-Run `npm run typecheck && npm run lint`, then the single case. Report whether it passed on the first
+Run `yarn typecheck && yarn lint`, then the single case. Report whether it passed on the first
 attempt; a case that only passed on a retry is reported as flaky, not as done.

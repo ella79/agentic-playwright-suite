@@ -3,30 +3,33 @@
 ## Prerequisites
 
 - Node.js 20 or later
-- Yarn
+- Yarn 4, provided by Corepack: `package.json` pins it in `packageManager`, so `corepack enable` is
+  all a machine needs. `yarn.lock` is the only lockfile and CI installs with `yarn install --immutable`, which fails outright
+  if the lockfile is missing or out of step with `package.json`. Installing with another package
+  manager would add a second lockfile and an install CI cannot reproduce.
 - Docker Desktop, only if you intend to work on visual regression
 
 ## Commands
 
 ```bash
-npm install
-npm run playwright:install:chromium
-npm run test:e2e
+yarn install
+yarn playwright:install:chromium
+yarn test:e2e
 ```
 
-| Command                                   | Purpose                                                 |
-| ----------------------------------------- | ------------------------------------------------------- |
-| `npm run test:e2e`                        | Run the functional suite                                |
-| `npm run test:e2e:headed`                 | Run it with a visible browser                           |
-| `npm run test:e2e:ui`                     | Open the Playwright UI runner                           |
-| `npm run test:vr`                         | Run the visual suite against the committed baselines    |
-| `npm run docker:vr`                       | Run the visual suite in the same Linux image CI uses    |
-| `npm run docker:vr:update`                | Regenerate baselines with rendering identical to CI     |
-| `npm run test:seed`                       | Run the environment seed the agents generate tests from |
-| `npm run test:e2e:report`                 | Open the last HTML report                               |
-| `npm run typecheck`                       | TypeScript, no emit                                     |
-| `npm run lint` / `npm run lint:fix`       | ESLint                                                  |
-| `npm run stylecheck` / `npm run stylefix` | Prettier                                                |
+| Command                             | Purpose                                                 |
+| ----------------------------------- | ------------------------------------------------------- |
+| `yarn test:e2e`                     | Run the functional suite                                |
+| `yarn test:e2e:headed`              | Run it with a visible browser                           |
+| `yarn test:e2e:ui`                  | Open the Playwright UI runner                           |
+| `yarn test:vr`                      | Run the visual suite against the committed baselines    |
+| `yarn docker:vr`                    | Run the visual suite in the same Linux image CI uses    |
+| `yarn docker:vr:update`             | Regenerate baselines with rendering identical to CI     |
+| `yarn test:seed`                    | Run the environment seed the agents generate tests from |
+| `yarn test:e2e:report`              | Open the last HTML report                               |
+| `yarn typecheck`                    | TypeScript, no emit                                     |
+| `yarn lint` / `yarn lint:fix`       | ESLint                                                  |
+| `yarn stylecheck` / `yarn stylefix` | Prettier                                                |
 
 ## Environment Variables
 
@@ -62,10 +65,21 @@ cross match. Every locator is a `readonly` property and no spec reaches the DOM 
 hatch. Where a control genuinely has no accessible name, such as an icon only button, the CSS
 fallback carries an inline comment saying why.
 
-**Fixtures own lifecycle, not construction.** Specs construct their own page objects. What is a
-fixture is the account: it registers a throwaway user, yields it, and removes it afterwards while
-asserting the removal actually happened. No shared account, no shared storage state, nothing for
-parallel workers to contend over.
+**Everything a test needs arrives as a fixture.** Page objects included: a spec names the surfaces
+it touches in its signature, `async ({ cartPage, productDetailPage })`, and Playwright builds only
+those. This is the shape Playwright's own fixtures documentation recommends, and it rules out both
+alternatives seen in the wild: constructing page objects in every test, which repeats the same four
+lines everywhere, and a `let` at describe level assigned in `beforeEach`, which shares mutable state
+between tests and has no teardown.
+
+The account is the fixture that carries real lifecycle: it registers a throwaway user, yields it,
+and removes it afterwards while asserting the removal actually happened. No shared account, no
+shared storage state, nothing for parallel workers to contend over.
+
+**Two headers on every spec.** `// spec:` points at the plan the cases come from, which is how the
+dashboard links a result back to its justification. `// seed:` names the seed spec the environment
+is bootstrapped from. Both are the header format Playwright's own generator agent emits, so a
+generated file and a hand-written one are indistinguishable.
 
 **Third party noise is blocked rather than tolerated.** Advertising, analytics and consent
 management hosts are aborted at the route level. None of it is the product under test, and all of it
@@ -77,7 +91,7 @@ Baselines are Chromium on Linux at 1920x1080. Screenshots differ between platfor
 produced on Windows or macOS will never match a runner. Regenerate them in the image CI uses:
 
 ```bash
-npm run docker:vr:update
+yarn docker:vr:update
 ```
 
 Baselines written directly on a host are gitignored, and the visual job fails outright when none are

@@ -17,3 +17,8 @@ vr-tests/**/*-darwin.png
 
 # Reports generated locally for inspection, never committed.
 allure-report-local/
+
+# Yarn (node-modules linker, global cache: nothing but local state lands here)
+.yarn/*
+!.yarn/patches
+.pnp.*

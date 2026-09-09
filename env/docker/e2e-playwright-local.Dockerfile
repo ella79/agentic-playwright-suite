@@ -13,7 +13,7 @@ WORKDIR /workspace
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json yarn.lock .yarnrc.yml ./
+RUN corepack enable && yarn install --immutable
 
-CMD ["npm", "run", "test:vr"]
+CMD ["yarn", "test:vr"]

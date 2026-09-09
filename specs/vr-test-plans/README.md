@@ -19,20 +19,12 @@ Behaviour is never asserted here. Each case reaches a state and captures it; whe
 anything is the functional suite's job. A case that needs more than the minimum interaction to reach
 its state belongs in `tests/`, not here.
 
-## Baseline Environment
+## Constraints A Plan Must Respect
 
-Baselines are Chromium on Linux at 1920x1080, generated in the same image CI runs
-(`npm run docker:vr:update`) and committed from there. Text renders differently on Windows and macOS,
-so a baseline produced on either would never match, locally generated ones are gitignored rather
-than committed, and the visual job fails outright if no Linux baseline is present rather than
-quietly writing one and reporting success.
-
-## Size Rule
-
-No baseline may be taller than the viewport. A diff in an image nobody can scan gets approved
-without being read, which is worse than having no test. Where a region is genuinely larger, the
-catalog grid is over thirteen thousand pixels tall, the plan anchors its heading to the top of the
-viewport and captures the viewport instead.
+Baselines are Chromium on Linux at 1920x1080, and no baseline may be taller than the viewport: a
+plan that asks for a capture larger than one screen anchors a heading and takes the viewport
+instead. Both rules, with their reasoning and the baseline workflow, live in
+[`playwright-visual-regression`](../../.claude/skills/playwright-visual-regression/SKILL.md).
 
 ## Thresholds
 

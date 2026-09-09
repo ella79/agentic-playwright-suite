@@ -19,7 +19,7 @@ on Linux, generated in the same image CI runs. New coverage replaces an existing
 growing the suite, because twenty cases that can each be justified demonstrate more than two hundred
 nobody can explain.
 
-Built with Playwright, TypeScript, npm, Docker, Allure, GitHub Actions and Renovate, with Claude
+Built with Playwright, TypeScript, Yarn, Docker, Allure, GitHub Actions and Renovate, with Claude
 Code agents reaching the browser over MCP.
 
 The target is a public demo storefront, so every run crosses a real network and hits a real database
@@ -29,10 +29,10 @@ pipeline produces.
 ## Run it
 
 ```bash
-npm install
-npm run playwright:install:chromium
-npm run test:e2e          # functional suite
-npm run docker:vr         # visual suite, in the image CI uses
+yarn install
+yarn playwright:install:chromium
+yarn test:e2e          # functional suite
+yarn docker:vr         # visual suite, in the image CI uses
 ```
 
 The full command list is in [`docs/architecture.md`](docs/architecture.md).

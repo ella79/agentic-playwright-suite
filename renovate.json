@@ -17,7 +17,7 @@
       ],
       "semanticCommitType": "chore",
       "prBodyNotes": [
-        ":warning: After merging, regenerate the visual baselines with `npm run docker:vr:update` and commit them. A browser update moves glyph rendering, so the committed baselines will no longer match.",
+        ":warning: After merging, regenerate the visual baselines with `yarn docker:vr:update` and commit them. A browser update moves glyph rendering, so the committed baselines will no longer match.",
         "Regenerate the agent definitions with `npx playwright init-agents --loop=claude`, then re-append the project rules section each one ends with. They are generated from the installed version.",
         "Check that the Dockerfile tags in `env/docker/` and the version in `package.json` name the same release."
       ]

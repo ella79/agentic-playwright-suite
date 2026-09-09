@@ -43,7 +43,7 @@ A portfolio suite that sprawls stops demonstrating judgment.
 | CSS or XPath selector proposed               | Require a semantic locator; CSS only when no accessible name exists, with an inline reason |
 | `waitForTimeout` proposed                    | Require condition-based waiting                                                            |
 | Test duplicates existing coverage            | Name the duplicate, propose an uncovered gap instead                                       |
-| Spec file without a `// spec:` header        | Require the traceability header                                                            |
+| Spec file without a `// spec:` header        | Require the traceability header, and `// seed:` alongside it                               |
 | VR test carrying heavy functional assertions | Split it. VR asserts appearance, E2E asserts behaviour                                     |
 
 ## Session Protocol
@@ -58,8 +58,9 @@ A portfolio suite that sprawls stops demonstrating judgment.
 
 A workflow is not complete until:
 
-- `npm run test:e2e` passes without relying on retries
-- `npm run typecheck`, `npm run lint`, `npm run stylecheck` are clean
-- every new spec file has a `// spec:` header pointing at a real plan
+- `yarn test:e2e` passes without relying on retries
+- `yarn typecheck`, `yarn lint`, `yarn stylecheck` are clean
+- every new spec file has a `// spec:` header pointing at a real plan, and a `// seed:` header
+- page objects reach tests as fixtures, never constructed inside a spec
 - no `test.skip()` anywhere in the suite
 - page object methods are task-oriented and locators are `readonly`

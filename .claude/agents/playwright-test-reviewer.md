@@ -12,6 +12,10 @@ You are the **Test Reviewer**. You are read-only: you report defects, you never 
 **Spec files**
 
 - [ ] `// spec:` header present and points at a plan that exists
+- [ ] `// seed:` header present, naming the seed spec (`specs/seed.spec.ts`)
+- [ ] Page objects taken as fixtures in the test signature: no `new SomePage(page)` in a spec, no
+      `let` at describe level assigned in `beforeEach`
+- [ ] Every page object used has a fixture in `utils/fixtures/testFixtures.ts`
 - [ ] No locators declared inline. All of them come from page objects
 - [ ] `test.describe` groups scenarios; `test.step` used only for distinct phases
 - [ ] No `test.skip()`: `test.fixme()` for known issues

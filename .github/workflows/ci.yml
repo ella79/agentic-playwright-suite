@@ -42,7 +42,7 @@ jobs:
         id: meta
         run: |
           version=$(node -p "require('./package.json').devDependencies['@playwright/test']")
-          deps=$(cat package.json package-lock.json | sha256sum | cut -c1-12)
+          deps=$(cat package.json yarn.lock | sha256sum | cut -c1-12)
           image="${REGISTRY}/${IMAGE_NAME}:v${version}-${deps}"
           echo "image=${image,,}" >> "$GITHUB_OUTPUT"
           echo "Image: ${image,,}"
@@ -92,7 +92,7 @@ jobs:
         run: ln -s /workspace/node_modules node_modules
 
       - name: TypeScript
-        run: npm run typecheck:ci
+        run: yarn typecheck:ci
 
       # Two runs on purpose. The SARIF formatter writes to a file, so a run
       # that only produces SARIF fails with an empty log and leaves whoever
@@ -103,12 +103,12 @@ jobs:
       - name: ESLint
         id: eslint
         continue-on-error: true
-        run: npm run lint:ci
+        run: yarn lint:ci
 
       - name: ESLint report for code scanning
         if: always()
         continue-on-error: true
-        run: npm run lint:sarif
+        run: yarn lint:sarif
 
       - name: Upload lint findings to code scanning
         if: always()
@@ -118,7 +118,7 @@ jobs:
           category: eslint
 
       - name: Prettier
-        run: npm run stylecheck:ci
+        run: yarn stylecheck:ci
 
       - name: Fail if ESLint reported problems
         if: steps.eslint.outcome == 'failure'
@@ -179,6 +179,8 @@ jobs:
         env:
           E2E_BROWSERS: ${{ matrix.project == 'e2e-webkit' && 'WebKit' || 'Chromium' }}
           E2E_VIEWPORT: 1920x1080
+        # npx, not yarn: this job runs on the image node_modules through a
+        # symlink and never installs, so yarn has no install state to verify.
         run: npx playwright test --project=${{ matrix.project }} --workers=1
 
       - name: Upload Allure results
@@ -244,12 +246,12 @@ jobs:
           count=$(find vr-tests -name '*-linux.png' | wc -l)
           echo "Found $count Linux baselines"
           if [ "$count" -eq 0 ]; then
-            echo "::error::No Linux baselines committed. Run npm run docker:vr:update and commit the result."
+            echo "::error::No Linux baselines committed. Run yarn docker:vr:update and commit the result."
             exit 1
           fi
 
       - name: Run visual suite
-        run: npm run test:vr -- --workers=1
+        run: yarn test:vr --workers=1
 
       - name: Upload Allure results
         if: always()
@@ -322,14 +324,15 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
-          cache: npm
+          cache: yarn
 
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
 
-      - run: npm ci
+      - run: corepack enable
+      - run: yarn install --immutable
 
       - name: Collect functional results
         uses: actions/download-artifact@v8
@@ -422,9 +425,9 @@ jobs:
 
       - name: Generate the reports
         run: |
-          npx allure generate results/combined --clean -o allure-report
-          npx allure generate results/functional --clean -o allure-report/functional
-          npx allure generate results/visual --clean -o allure-report/visual
+          yarn allure generate results/combined --clean -o allure-report
+          yarn allure generate results/functional --clean -o allure-report/functional
+          yarn allure generate results/visual --clean -o allure-report/visual
 
       - name: Collect JSON reports
         uses: actions/download-artifact@v8
@@ -453,7 +456,7 @@ jobs:
 
       - name: Merge reports from both test jobs
         run: |
-          npx playwright merge-reports --reporter html ./all-blob-reports
+          yarn playwright merge-reports --reporter html ./all-blob-reports
           mv playwright-report allure-report/playwright-report
 
       # The portfolio page reads this report and publishes a contract naming

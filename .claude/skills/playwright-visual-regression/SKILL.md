@@ -27,6 +27,30 @@ Playwright appends the platform suffix (`-chromium-linux.png`) itself. Baselines
 Linux to match CI. A baseline captured on Windows or macOS will not match and must not be
 committed.
 
+## Spec Structure
+
+```typescript
+// spec: specs/vr-test-plans/cart-vr-test-plan.md
+// seed: specs/seed.spec.ts
+import { expect, test } from "../utils/fixtures/testFixtures";
+
+test.describe("Visual regression - cart", () => {
+  test.beforeEach(async ({ cartPage }) => {
+    await cartPage.gotoCartPage();
+  });
+
+  test("VR-10: empty cart state", async ({ cartPage }) => {
+    await expect(cartPage.emptyCartMessage).toBeVisible();
+
+    await expect(cartPage.cartItemsSection).toHaveScreenshot("cart-empty.png");
+  });
+});
+```
+
+Headers, fixtures and the rest of the coding standard are in
+`.claude/skills/playwright-pageobject-testing/SKILL.md`. What follows here is only what is specific
+to a screenshot.
+
 ## What To Screenshot
 
 **Do:** the default state of a component, a state that is visually distinct (empty cart vs
@@ -117,9 +141,15 @@ never see it. If one appears in a diff, the bug is in the base page object, not 
 ## Baseline Management
 
 ```bash
-npm run test:vr            # run against committed baselines
-npm run test:vr:update     # regenerate after an intentional UI change
+yarn test:vr            # run against committed baselines
+yarn docker:vr          # run in the Linux image CI uses
+yarn docker:vr:update   # regenerate with rendering identical to CI
+yarn test:vr:report     # open the last report, with the diffs
 ```
+
+Baselines are Chromium on Linux. A set written on the host is gitignored, so regeneration goes
+through Docker locally, or through the `Update VR baselines` workflow, which takes a mandatory
+reason, commits it with the baselines, and uploads the regenerated set for review.
 
 - Baselines are committed. They are the reference the suite is judged against.
 - Update them only when the visual change is intentional **and verified**: look at the diff image in
