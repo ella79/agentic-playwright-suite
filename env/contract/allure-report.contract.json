@@ -1,0 +1,131 @@
+{
+  "name": "portfolio-qa-suite-page",
+  "version": 1,
+  "consumer": "https://ella79.github.io/portfolio/qa-suite.html",
+  "provider": "https://ella79.github.io/agentic-playwright-suite/",
+  "providerRepository": "https://github.com/ella79/agentic-playwright-suite",
+  "description": "What the portfolio's QA suite page reads out of the published Allure report. It is deliberately narrow: everything the page does not touch is free to change without warning. The provider can verify this file against a freshly generated report before publishing, and the consumer runs it on a schedule against the published one.",
+  "documents": [
+    {
+      "path": "widgets/summary.json",
+      "required": true,
+      "usedFor": "the four headline numbers, and whether the run came back clean",
+      "checks": [
+        { "field": "statistic.total", "type": "number", "min": 1 },
+        { "field": "statistic.passed", "type": "number" },
+        { "field": "statistic.failed", "type": "number" },
+        { "field": "statistic.broken", "type": "number" },
+        { "field": "time.duration", "type": "number", "min": 1 },
+        { "field": "time.stop", "type": "number", "min": 1 }
+      ]
+    },
+    {
+      "path": "data/suites.json",
+      "required": true,
+      "usedFor": "the suite column, the replay, the per area split and the slowest tests",
+      "checks": [
+        {
+          "kind": "suiteNames",
+          "expect": ["Functional E2E", "Visual regression"],
+          "exact": true
+        },
+        {
+          "kind": "leaves",
+          "minCount": 1,
+          "require": ["status", "time.duration", "time.start", "name"]
+        }
+      ]
+    },
+    {
+      "path": "widgets/executors.json",
+      "required": false,
+      "usedFor": "the build name and the link to the CI run",
+      "checks": [
+        {
+          "kind": "arrayOf",
+          "minLength": 1,
+          "each": [{ "field": "buildName", "type": "string" }]
+        }
+      ]
+    },
+    {
+      "path": "widgets/environment.json",
+      "required": false,
+      "usedFor": "the environment panel",
+      "checks": [
+        {
+          "kind": "arrayOf",
+          "minLength": 1,
+          "each": [{ "field": "name", "type": "string" }]
+        }
+      ]
+    },
+    {
+      "path": "widgets/history-trend.json",
+      "required": false,
+      "usedFor": "the run history chart",
+      "checks": [
+        {
+          "kind": "arrayOf",
+          "minLength": 1,
+          "each": [{ "field": "data.total", "type": "number" }]
+        }
+      ]
+    },
+    {
+      "path": "widgets/duration-trend.json",
+      "required": false,
+      "usedFor": "the height of each bar in the run history chart",
+      "checks": [
+        {
+          "kind": "arrayOf",
+          "minLength": 1,
+          "each": [{ "field": "data.duration", "type": "number" }]
+        }
+      ]
+    },
+    {
+      "path": "widgets/retry-trend.json",
+      "required": false,
+      "usedFor": "the retry count in the provenance strip",
+      "checks": [
+        {
+          "kind": "arrayOf",
+          "minLength": 1,
+          "each": [{ "field": "data.retry", "type": "number" }]
+        }
+      ]
+    },
+    {
+      "path": "cross-browser/widgets/summary.json",
+      "required": false,
+      "usedFor": "the cross browser band",
+      "checks": [{ "field": "statistic.total", "type": "number", "min": 1 }]
+    },
+    {
+      "path": "cross-browser/data/suites.json",
+      "required": false,
+      "usedFor": "which engines the functional cases were replayed on",
+      "checks": [
+        { "kind": "leaves", "minCount": 1, "require": ["status", "parameters"] }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "path": "",
+      "usedFor": "the report embedded at the bottom of the page, and the results dashboard link"
+    },
+    { "path": "functional/", "usedFor": "published link" },
+    { "path": "visual/", "usedFor": "published link" },
+    {
+      "path": "cross-browser/",
+      "usedFor": "published link, and the cross browser band"
+    },
+    {
+      "path": "playwright-report/",
+      "usedFor": "published link, and the trace viewer offered when a run is not clean"
+    },
+    { "path": "metrics/", "usedFor": "published link" }
+  ]
+}
