@@ -1,12 +1,10 @@
 // Groups the Allure Packages tab by suite.
 //
 // allure-playwright derives the package label from the file path, and every
-// path here starts with the repository folder, so both suites collapse into one
-// node and their files interleave. The reporter exposes no option for this and
-// a second label is ignored: Allure keeps the first one it finds. Rewriting the
-// leading segment after the run is the only place the change can be made, and
-// it keeps what the tab is for, the file structure, while separating the two
-// suites at the top of the tree.
+// path starts with the repository folder, so both suites collapse into one
+// node. The reporter exposes no option, and a second label is ignored: Allure
+// keeps the first. Rewriting the leading segment after the run is the only
+// place the change fits, and it leaves the file structure intact.
 //
 // Usage: node utils/scripts/group-allure-packages.mjs <results-dir> [...]
 import { readdir, readFile, writeFile } from "node:fs/promises";

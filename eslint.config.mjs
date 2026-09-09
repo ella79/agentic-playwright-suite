@@ -77,10 +77,9 @@ export default [
       "reports/**",
       "allure-results/**",
       "allure-report/**",
-      // Vendored from ella79/portfolio. Reformatting or "fixing" it would
-      // make the copy diverge from upstream, which is the one property that
-      // makes vendoring safe: the file here is byte for byte the file that
-      // was reviewed there.
+      // Vendored from ella79/portfolio. Linting or reformatting it would make
+      // the copy diverge from the file that was reviewed there, which is the
+      // one property worth having.
       "env/contract/**",
     ],
   },

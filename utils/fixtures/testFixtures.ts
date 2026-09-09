@@ -53,17 +53,13 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     await page.route(THIRD_PARTY_HOSTS, (route) => route.abort());
 
     /**
-     * The demo host sporadically sheds a cart write with a 503, observed in a
-     * trace as `GET /add_to_cart/1?quantity=1 -> 503` (261ms) on a page whose
-     * every other request, scripts included, returned 200. The application's
-     * own JavaScript ignores the failed response and surfaces nothing, so the
-     * confirmation modal never opens and the test waits out its timeout on a
-     * state that can no longer arrive.
+     * The demo host sporadically sheds a cart write with a 503, seen in a trace
+     * as `GET /add_to_cart/1?quantity=1 -> 503` on a page where every other
+     * request returned 200. The app ignores the failure silently, so the modal
+     * never opens and the test times out on a state that cannot arrive.
      *
-     * Re-issuing only that request keeps host capacity noise out of the
-     * functional signal. It is one retry, not a loop, and it changes nothing
-     * about what the tests assert: an endpoint that is actually broken still
-     * returns 5xx twice and still fails the test.
+     * One retry on that request, not a loop. It changes nothing the tests
+     * assert: an endpoint that is genuinely broken still fails twice.
      */
     await page.route(CART_WRITE_ENDPOINTS, async (route, request) => {
       if (request.method() !== "GET") {

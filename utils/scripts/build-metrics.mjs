@@ -1,11 +1,9 @@
 // Builds the suite health page from Playwright's JSON reports.
 //
-// This is deliberately not the Allure dashboard. Allure answers what a given
-// run found, case by case. This answers whether the suite is trustworthy and
-// which way it is moving: how often it is flaky, how long it takes at the
-// ninety fifth percentile, which cases cost the most, and whether any of that
-// has crossed the threshold where someone should act. Nothing here repeats a
-// per test status list, because that already exists one click away.
+// Deliberately not the Allure dashboard. Allure answers what one run found,
+// case by case; this answers whether the suite is trustworthy and which way it
+// is moving: flaky rate, p95, the cases that cost the most, and whether any of
+// it crossed a threshold. It repeats no per test status, one click away.
 //
 // Usage:
 //   node utils/scripts/build-metrics.mjs \
@@ -28,10 +26,23 @@ const FLAKY_RATE_ACCEPTABLE = 5;
 const WINDOW = 30;
 
 /**
- * Suites with a deliberate ceiling on case count. Cross browser has none: it is
- * the same twenty cases on other engines, so a cap there would be meaningless.
+ * Suites with a deliberate ceiling on case count. The WebKit run has none: it
+ * is the same twenty cases on a second engine, so a cap there would be
+ * meaningless.
  */
 const CAPS = { functional: 20, visual: 20 };
+
+/**
+ * Display names only. The keys are the history keys, so they stay: renaming one
+ * orphans every run recorded against it. The label names the engine, because
+ * "functional" alone no longer says which of the two runs it is.
+ */
+const DISPLAY = {
+  functional: "functional (Chromium)",
+  "functional-webkit": "functional (WebKit)",
+  visual: "visual (Chromium)",
+};
+const label = (name) => DISPLAY[name] ?? name;
 
 const args = process.argv.slice(2);
 const options = {
@@ -193,6 +204,47 @@ function sparkline(values, { width = 260, height = 40, min, max }) {
   return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img"><polyline points="${points}" /></svg>`;
 }
 
+/** One slice per suite, sized by case count. */
+const SLICE_COLOURS = ["#4d7cfe", "#f2a541", "#3fae7a", "#a86ede", "#e2607a"];
+
+function donut(rows, { size = 190, thickness = 34 } = {}) {
+  const total = rows.reduce((sum, r) => sum + r.value, 0);
+  if (!total) return "<p class=none>nothing to chart yet</p>";
+
+  const radius = (size - thickness) / 2;
+  const circumference = 2 * Math.PI * radius;
+  let offset = 0;
+
+  const slices = rows
+    .map((r, i) => {
+      const length = (r.value / total) * circumference;
+      const circle = `<circle class="slice" cx="${size / 2}" cy="${size / 2}" r="${round(radius, 2)}"
+        stroke="${SLICE_COLOURS[i % SLICE_COLOURS.length]}" stroke-width="${thickness}"
+        stroke-dasharray="${round(length, 2)} ${round(circumference - length, 2)}"
+        stroke-dashoffset="${round(-offset, 2)}"><title>${escape(r.label)}: ${r.value}</title></circle>`;
+      offset += length;
+      return circle;
+    })
+    .join("");
+
+  const legend = rows
+    .map(
+      (r, i) =>
+        `<li><span class="swatch" style="background:${SLICE_COLOURS[i % SLICE_COLOURS.length]}"></span>
+         ${escape(r.label)} <b>${r.value}</b> <span class="none">${Math.round((r.value / total) * 100)}%</span></li>`,
+    )
+    .join("");
+
+  return `<div class="donut">
+    <svg viewBox="0 0 ${size} ${size}" role="img" aria-label="Cases per suite">
+      <g transform="rotate(-90 ${size / 2} ${size / 2})">${slices}</g>
+      <text x="${size / 2}" y="${size / 2 - 4}" class="donut-total">${total}</text>
+      <text x="${size / 2}" y="${size / 2 + 16}" class="donut-caption">results</text>
+    </svg>
+    <ul class="legend">${legend}</ul>
+  </div>`;
+}
+
 /**
  * Allure's own Categories tab only lists failures, so it reads as empty while
  * the suite is green. The taxonomy is worth showing regardless: it says what
@@ -224,7 +276,7 @@ const suiteRows = suites
       false,
     );
     return `<tr>
-      <th scope="row">${escape(s.name)}</th>
+      <th scope="row">${escape(label(s.name))}</th>
       <td>${CAPS[s.name] ? `${s.total} / ${CAPS[s.name]}` : s.total}</td>
       <td class="${pass}">${s.passRate}%</td>
       <td class="${flake}">${s.flakyRate}%</td>
@@ -244,7 +296,7 @@ const trendRows = suites
       .map((r) => r.suites?.[s.name]?.p95)
       .filter((v) => typeof v === "number");
     return `<tr>
-      <th scope="row">${escape(s.name)}</th>
+      <th scope="row">${escape(label(s.name))}</th>
       <td class="spark">${sparkline(passRates, { min: 0, max: 100 })}</td>
       <td class="spark">${sparkline(p95s, {})}</td>
     </tr>`;
@@ -252,7 +304,7 @@ const trendRows = suites
   .join("");
 
 const slowestRows = suites
-  .flatMap((s) => s.slowest.map((c) => ({ suite: s.name, ...c })))
+  .flatMap((s) => s.slowest.map((c) => ({ suite: label(s.name), ...c })))
   .sort((a, b) => b.duration - a.duration)
   .slice(0, 5)
   .map(
@@ -292,6 +344,14 @@ const html = `<!doctype html>
   .spark svg { width: 260px; height: 40px; }
   .spark polyline { fill: none; stroke: currentColor; stroke-width: 1.5; opacity: .8; }
   .none { opacity: .6; font-style: italic; }
+  .donut { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; margin: .5rem 0 1.5rem; }
+  .donut svg { width: 190px; height: 190px; flex: none; }
+  .donut .slice { fill: none; }
+  .donut-total { text-anchor: middle; font-size: 34px; font-weight: 700; fill: currentColor; }
+  .donut-caption { text-anchor: middle; font-size: 12px; fill: currentColor; opacity: .6; }
+  .legend { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+  .legend li { display: flex; align-items: center; gap: .5rem; }
+  .swatch { width: .8rem; height: .8rem; border-radius: 2px; flex: none; }
   nav a { margin-right: 1rem; }
   footer { margin-top: 3rem; opacity: .7; font-size: .9rem; }
   dl { display: grid; grid-template-columns: max-content 1fr; gap: .35rem 1rem; margin: .5rem 0 0; }
@@ -307,11 +367,11 @@ const html = `<!doctype html>
   <a href="../">Test results</a>
   <a href="../functional/">Functional report</a>
   <a href="../visual/">Visual report</a>
-  <a href="../cross-browser/">Cross browser</a>
   <a href="https://github.com/ella79/agentic-playwright-suite">Repository</a>
 </nav>
 
 <h2>Current run</h2>
+${donut(suites.map((s) => ({ label: label(s.name), value: s.total })))}
 <table>
   <thead><tr><th>Suite</th><th>Cases, cap</th><th>Pass rate</th><th>Flaky rate</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
   <tbody>${suiteRows}</tbody>
@@ -356,7 +416,7 @@ const html = `<!doctype html>
   <dt>Pass rate</dt><dd>${PASS_RATE_GOOD}% or above is healthy, ${PASS_RATE_ACCEPTABLE} to ${PASS_RATE_GOOD}% is acceptable during active development, below ${PASS_RATE_ACCEPTABLE}% means the suite has a stability problem rather than the application.</dd>
   <dt>Flaky rate</dt><dd>Below ${FLAKY_RATE_GOOD}% is the target. Past ${FLAKY_RATE_ACCEPTABLE}% the suite stops being believed, and a suite nobody believes is worse than no suite.</dd>
   <dt>Duration</dt><dd>Tracked as a trend, not a fixed limit. What matters is whether it is growing faster than coverage.</dd>
-  <dt>Coverage cap</dt><dd>Twenty cases for the functional suite and twenty for the visual one. New coverage replaces an existing case rather than adding to the count. Cross browser has no cap of its own: it runs the same functional cases on WebKit and on a phone viewport.</dd>
+  <dt>Coverage cap</dt><dd>Twenty cases for the functional suite and twenty for the visual one. New coverage replaces an existing case rather than adding to the count. The WebKit run has no cap of its own: it replays the same functional cases on a second engine.</dd>
 </dl>
 
 <footer>
@@ -375,6 +435,6 @@ await writeFile(join(options.out, "index.html"), html);
 console.log(`Metrics written to ${options.out} (${history.length} runs kept)`);
 for (const s of suites) {
   console.log(
-    `  ${s.name}: ${s.passRate}% pass, ${s.flakyRate}% flaky, p95 ${seconds(s.p95)}`,
+    `  ${label(s.name)}: ${s.passRate}% pass, ${s.flakyRate}% flaky, p95 ${seconds(s.p95)}`,
   );
 }

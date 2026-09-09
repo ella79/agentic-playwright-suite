@@ -15,16 +15,12 @@ export class PaymentPage extends BaseAppPage {
   constructor(page: Page) {
     super(page);
     this.paymentHeading = page.getByRole("heading", { name: "Payment" });
-    // The <form id="payment-form"> itself has a zero-height box: the app wraps
-    // every field in a Bootstrap 4 `.form-row`, but ships Bootstrap 3 CSS, which
-    // has no `.form-row` rule and therefore no clearfix. Each row contains only
-    // floated `.col-*` children, so the rows, and the form, collapse to
-    // height 0. The form still renders correctly because its parent grid column
-    // is floated and so contains the floats. Screenshotting the form directly is
-    // impossible (Playwright reports "element is not visible" for an empty
-    // bounding box), so capture that parent column, which is the form's real
-    // visual box and holds nothing else. Anchored to the form's id rather than
-    // the grid class so a Bootstrap upgrade does not silently retarget it.
+    // <form id="payment-form"> has a zero-height box: the app uses Bootstrap 4
+    // `.form-row` markup with Bootstrap 3 CSS, which has no such rule and so no
+    // clearfix, leaving every row holding only floated children. Playwright
+    // refuses to screenshot an empty bounding box, so capture the parent grid
+    // column, which is the form's real visual box and holds nothing else.
+    // Anchored to the form's id so a Bootstrap upgrade cannot retarget it.
     this.paymentForm = page.locator("div:has(> #payment-form)");
     this.nameOnCardInput = page.getByTestId("name-on-card");
     this.cardNumberInput = page.getByTestId("card-number");

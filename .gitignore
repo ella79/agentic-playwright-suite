@@ -14,3 +14,6 @@ vr-tests/**/*-win32.png
 vr-tests/**/*-darwin.png
 .env
 .DS_Store
+
+# Reports generated locally for inspection, never committed.
+allure-report-local/

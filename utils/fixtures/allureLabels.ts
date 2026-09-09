@@ -10,6 +10,7 @@ import {
   severity,
   Severity,
   story,
+  subSuite,
   suite,
   tag,
 } from "allure-js-commons";
@@ -22,13 +23,17 @@ const REPO_BLOB =
  * account. Everything else is normal severity; marking all twenty critical
  * would say nothing.
  */
-/** What each project actually drives, for the report's parameter. */
-const ENGINES: Record<string, string> = {
-  "e2e-playwright": "Chromium",
-  "visual-regression": "Chromium",
-  webkit: "WebKit",
-  "mobile-safari": "WebKit on iPhone 15",
-  seed: "Chromium",
+/**
+ * What each project contributes to the report tree. The two functional
+ * projects share a parent, so the report reads as one suite on two engines
+ * rather than two unrelated ones. Visual stays on Chromium: three engines
+ * would mean sixty baselines to review.
+ */
+const PROJECTS: Record<string, { parent: string; engine: string }> = {
+  "e2e-chromium": { parent: "Functional E2E", engine: "Chromium" },
+  "e2e-webkit": { parent: "Functional E2E", engine: "WebKit" },
+  "visual-regression": { parent: "Visual regression", engine: "Chromium" },
+  seed: { parent: "Functional E2E", engine: "Chromium" },
 };
 
 const CRITICAL_AREAS = new Set(["Checkout", "Authentication", "Cart"]);
@@ -49,25 +54,27 @@ function readPlanPath(specFile: string): string | undefined {
  */
 export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
   const isVisual = testInfo.project.name === "visual-regression";
-
-  // The report groups by this name. Cross browser runs the same cases twice,
-  // once per engine, so without a name per project both appear under one node
-  // and a reader cannot tell which engine a result came from.
-  const SUITE_NAMES: Record<string, string> = {
-    "e2e-playwright": "Functional E2E",
-    "visual-regression": "Visual regression",
-    webkit: "WebKit",
-    "mobile-safari": "Mobile Safari",
+  const project = PROJECTS[testInfo.project.name] ?? {
+    parent: "Functional E2E",
+    engine: "Chromium",
   };
-  const suiteName = SUITE_NAMES[testInfo.project.name] ?? testInfo.project.name;
   const area = (testInfo.titlePath[1] ?? "Uncategorised")
     .replace("Visual regression - ", "")
     .replace(/^\w/, (c) => c.toUpperCase());
 
-  await parentSuite(suiteName);
-  await suite(area);
+  await parentSuite(project.parent);
 
-  await epic(suiteName);
+  // Functional cases run twice, once per engine, so the engine is what tells
+  // two otherwise identical results apart; the area sits below it. Visual runs
+  // on one engine, where that branch would never fork.
+  if (isVisual) {
+    await suite(area);
+  } else {
+    await suite(project.engine);
+    await subSuite(area);
+  }
+
+  await epic(project.parent);
   await feature(area);
   await story(testInfo.title);
 
@@ -80,7 +87,7 @@ export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
   // Recorded as a parameter rather than only in the suite name, so Allure
   // treats the same case run on two engines as one case in two configurations
   // instead of two unrelated results.
-  await parameter("browser", ENGINES[testInfo.project.name] ?? "Chromium");
+  await parameter("browser", project.engine);
 
   const plan = readPlanPath(testInfo.file);
   if (plan) {

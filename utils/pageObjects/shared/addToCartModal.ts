@@ -20,15 +20,11 @@ export class AddToCartModal extends BaseComponentPage {
 
   async viewCart(): Promise<void> {
     await this.viewCartLink.click();
-    // The cart's controls are href-less anchors ("Proceed To Checkout" is
-    // `<a class="btn btn-default check_out">` with no href in both the
-    // anonymous and the signed-in state; the row delete icon is the same
-    // shape). Their behaviour is attached by the site's own JavaScript, so a
-    // click that lands before those scripts have executed is a silent no-op:
-    // Playwright reports the click as successful and the application does
-    // nothing. Arriving here via an in-page click only guarantees the new
-    // markup, not that its scripts have run, so wait for the document to
-    // finish loading before any caller interacts with it.
+    // The cart's controls are href-less anchors whose behaviour comes from the
+    // site's own JavaScript, so a click landing before those scripts run is a
+    // silent no-op: Playwright reports success and nothing happens. An in-page
+    // click guarantees the new markup, not that its scripts ran, so wait for
+    // the document to finish loading first.
     await this.page.waitForURL(`**${url.cart}`);
   }
 }

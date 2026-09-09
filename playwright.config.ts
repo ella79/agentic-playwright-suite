@@ -17,9 +17,9 @@ const allureReporter: ReporterDescription = [
     resultsDir: "allure-results",
     environmentInfo: {
       base_url: BASE_URL,
-      // What actually ran. The cross browser job overrides these, because a
-      // report that says Chromium while it holds WebKit results is worse than
-      // one that says nothing.
+      // What actually ran. The WebKit job overrides these, because a report
+      // saying Chromium while it holds WebKit results is worse than one that
+      // says nothing.
       browser: process.env.E2E_BROWSERS || "Chromium",
       viewport: process.env.E2E_VIEWPORT || "1920x1080",
       node: process.version,
@@ -71,22 +71,19 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "e2e-playwright",
+      name: "e2e-chromium",
       testDir: "./tests",
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1920, height: 1080 },
       },
     },
-    // Cross browser coverage runs the same twenty functional cases on the two
-    // engines Chromium cannot speak for. WebKit is the only way to reach
-    // Safari, which is the default browser on every iOS device, and the mobile
-    // project exercises the layout a phone actually gets. They are separate
-    // projects rather than extra cases: the coverage is the same, the surface
-    // is not. The visual suite stays on Chromium alone, because three engines
-    // would mean sixty baselines for a human to review.
+    // The same twenty cases replayed on the engine Chromium cannot speak for.
+    // WebKit is the only route to Safari, and it is a project rather than extra
+    // cases: same coverage, different surface. Visual stays on Chromium, since
+    // a second engine would double the baselines a human has to review.
     {
-      name: "webkit",
+      name: "e2e-webkit",
       testDir: "./tests",
       use: {
         ...devices["Desktop Safari"],
@@ -94,17 +91,11 @@ export default defineConfig({
       },
     },
     {
-      name: "mobile-safari",
-      testDir: "./tests",
-      use: { ...devices["iPhone 15"] },
-    },
-    {
-      // The agent seed. It has its own project because it is the template
-      // generated tests start from rather than coverage: inside the functional
-      // project it would run as a twenty-first case. The planner still needs to
-      // execute it to prove the environment initialises, so it needs a project
-      // to run under. It sits in specs/ beside the plans it bootstraps, matched
-      // by name so the rest of that directory stays Markdown.
+      // The agent seed: the template generated tests start from, not coverage.
+      // Inside the functional project it would run as a twenty-first case, but
+      // the planner still has to execute it to prove the environment
+      // initialises, so it gets a project of its own. It lives in specs/ beside
+      // the plans it bootstraps, matched by name.
       name: "seed",
       testDir: "./specs",
       testMatch: /seed\.spec\.ts/,
