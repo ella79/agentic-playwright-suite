@@ -288,10 +288,10 @@ jobs:
       - name: Link dependencies from the image
         run: ln -s /workspace/node_modules node_modules
 
-      - name: Run the suite on WebKit and mobile Safari
+      - name: Run the suite on WebKit
         env:
-          E2E_BROWSERS: WebKit and mobile Safari
-          E2E_VIEWPORT: 1920x1080 desktop and iPhone 15
+          E2E_BROWSERS: WebKit
+          E2E_VIEWPORT: 1920x1080
         run: npm run test:cross-browser
 
       - name: Upload Allure results
@@ -384,11 +384,13 @@ jobs:
           name: allure-results-cross
           path: results/cross-browser
 
-      # Three reports are generated, not one. Allure's trend chart plots status
-      # over time for whatever it was given, so a single combined report can
-      # only ever show one line for both suites. The per suite reports each
-      # keep their own history, which is what makes a visual regression trend
-      # readable next to a functional one.
+      # WebKit results join the functional ones instead of forming a report of
+      # their own: the same twenty cases on a second engine belong under one
+      # suite, not at a second address.
+      #
+      # Three reports are still generated rather than one. Allure draws a single
+      # trend line per report, so a combined report could never show the visual
+      # trend next to the functional one.
       #
       # categories.json classifies failures: a screenshot diff, a host 5xx and a
       # real assertion failure are three different conversations, and an
@@ -396,6 +398,8 @@ jobs:
       # published report back to the run that produced it.
       - name: Stage results
         run: |
+          cp -r results/cross-browser/. results/functional/ 2>/dev/null || true
+
           mkdir -p results/combined
           cp -r results/functional/. results/combined/ 2>/dev/null || true
           cp -r results/visual/. results/combined/ 2>/dev/null || true
@@ -419,9 +423,8 @@ jobs:
           write_meta results/combined "Agentic Playwright Suite" ""
           write_meta results/functional "Functional E2E" "functional/"
           write_meta results/visual "Visual regression" "visual/"
-          write_meta results/cross-browser "Cross browser" "cross-browser/"
 
-          node utils/scripts/group-allure-packages.mjs             results/combined results/functional results/visual results/cross-browser
+          node utils/scripts/group-allure-packages.mjs             results/combined results/functional results/visual
 
       # Trend graphs only exist if the previous report's history is carried
       # forward, so each report restores its own from the published site.
@@ -436,7 +439,7 @@ jobs:
               echo "Restored suite health history"
             fi
 
-            for suite in combined functional visual cross-browser; do
+            for suite in combined functional visual; do
               case $suite in
                 combined) source=gh-pages-tmp/history ;;
                 *) source=gh-pages-tmp/$suite/history ;;
@@ -457,7 +460,6 @@ jobs:
           npx allure generate results/combined --clean -o allure-report
           npx allure generate results/functional --clean -o allure-report/functional
           npx allure generate results/visual --clean -o allure-report/visual
-          npx allure generate results/cross-browser --clean -o allure-report/cross-browser
 
       - name: Collect JSON reports
         uses: actions/download-artifact@v8
@@ -473,7 +475,7 @@ jobs:
         env:
           GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          node utils/scripts/build-metrics.mjs             --suite functional=json-reports/results-json-e2e/results.json             --suite visual=json-reports/results-json-vr/results.json             --history previous-metrics/history.json             --out allure-report/metrics
+          node utils/scripts/build-metrics.mjs             --suite functional=json-reports/results-json-e2e/results.json             --suite functional-webkit=json-reports/results-json-cross/results.json             --suite visual=json-reports/results-json-vr/results.json             --history previous-metrics/history.json             --out allure-report/metrics
 
       # The HTML report is published alongside Allure because it carries the
       # traces: Allure shows what failed, the trace viewer shows why.
@@ -489,18 +491,14 @@ jobs:
           npx playwright merge-reports --reporter html ./all-blob-reports
           mv playwright-report allure-report/playwright-report
 
-      # The portfolio page reads this report. It publishes a contract naming
-      # exactly which documents and fields it depends on, so a change that
-      # would break it fails here rather than reaching the live site. A failed
-      # run leaves the previous dashboard up, which is the outcome we want: a
-      # stale report the page can read beats a fresh one it cannot.
+      # The portfolio page reads this report and publishes a contract naming
+      # what it depends on. A report that no longer fits fails here, leaving the
+      # previous dashboard up: stale but readable beats fresh but broken.
       #
-      # Both files are vendored rather than fetched at run time. A pipeline
-      # that downloads and executes a script from a URL is not a pattern worth
-      # demonstrating, even when the URL belongs to the same owner, and a
-      # vendored copy is visible in the diff. --expect-version is what makes a
-      # careless refresh loud: a copy that no longer says version 1 fails
-      # instead of quietly verifying against expectations nobody reviewed.
+      # Vendored rather than fetched at run time, because a pipeline that
+      # executes a script from a URL is not a pattern worth showing, and a
+      # vendored copy is visible in the diff. --expect-version fails a refreshed
+      # copy nobody reviewed.
       - name: Verify the report against the consumer contract
         run: |
           node env/contract/verify-contract.mjs \

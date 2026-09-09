@@ -15,7 +15,7 @@ Runs on every push and pull request to `main`.
 | `static-checks`            | Typecheck, lint, format. Gates everything after it                                         |
 | `e2e-playwright`           | The functional suite                                                                       |
 | `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal              |
-| `cross-browser`            | The same twenty functional cases on WebKit and mobile Safari, skipped on pull requests     |
+| `cross-browser`            | The same twenty functional cases replayed on WebKit, skipped on pull requests              |
 | `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages |
 | `ci-gate`                  | Reads every other job's result. The only check the branch protection requires              |
 

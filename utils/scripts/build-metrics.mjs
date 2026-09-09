@@ -1,11 +1,9 @@
 // Builds the suite health page from Playwright's JSON reports.
 //
-// This is deliberately not the Allure dashboard. Allure answers what a given
-// run found, case by case. This answers whether the suite is trustworthy and
-// which way it is moving: how often it is flaky, how long it takes at the
-// ninety fifth percentile, which cases cost the most, and whether any of that
-// has crossed the threshold where someone should act. Nothing here repeats a
-// per test status list, because that already exists one click away.
+// Deliberately not the Allure dashboard. Allure answers what one run found,
+// case by case; this answers whether the suite is trustworthy and which way it
+// is moving: flaky rate, p95, the cases that cost the most, and whether any of
+// it crossed a threshold. It repeats no per test status, one click away.
 //
 // Usage:
 //   node utils/scripts/build-metrics.mjs \
@@ -28,10 +26,23 @@ const FLAKY_RATE_ACCEPTABLE = 5;
 const WINDOW = 30;
 
 /**
- * Suites with a deliberate ceiling on case count. Cross browser has none: it is
- * the same twenty cases on other engines, so a cap there would be meaningless.
+ * Suites with a deliberate ceiling on case count. The WebKit run has none: it
+ * is the same twenty cases on a second engine, so a cap there would be
+ * meaningless.
  */
 const CAPS = { functional: 20, visual: 20 };
+
+/**
+ * Display names only. The keys are the history keys, so they stay: renaming one
+ * orphans every run recorded against it. The label names the engine, because
+ * "functional" alone no longer says which of the two runs it is.
+ */
+const DISPLAY = {
+  functional: "functional (Chromium)",
+  "functional-webkit": "functional (WebKit)",
+  visual: "visual (Chromium)",
+};
+const label = (name) => DISPLAY[name] ?? name;
 
 const args = process.argv.slice(2);
 const options = {
@@ -224,7 +235,7 @@ const suiteRows = suites
       false,
     );
     return `<tr>
-      <th scope="row">${escape(s.name)}</th>
+      <th scope="row">${escape(label(s.name))}</th>
       <td>${CAPS[s.name] ? `${s.total} / ${CAPS[s.name]}` : s.total}</td>
       <td class="${pass}">${s.passRate}%</td>
       <td class="${flake}">${s.flakyRate}%</td>
@@ -244,7 +255,7 @@ const trendRows = suites
       .map((r) => r.suites?.[s.name]?.p95)
       .filter((v) => typeof v === "number");
     return `<tr>
-      <th scope="row">${escape(s.name)}</th>
+      <th scope="row">${escape(label(s.name))}</th>
       <td class="spark">${sparkline(passRates, { min: 0, max: 100 })}</td>
       <td class="spark">${sparkline(p95s, {})}</td>
     </tr>`;
@@ -252,7 +263,7 @@ const trendRows = suites
   .join("");
 
 const slowestRows = suites
-  .flatMap((s) => s.slowest.map((c) => ({ suite: s.name, ...c })))
+  .flatMap((s) => s.slowest.map((c) => ({ suite: label(s.name), ...c })))
   .sort((a, b) => b.duration - a.duration)
   .slice(0, 5)
   .map(
@@ -375,6 +386,6 @@ await writeFile(join(options.out, "index.html"), html);
 console.log(`Metrics written to ${options.out} (${history.length} runs kept)`);
 for (const s of suites) {
   console.log(
-    `  ${s.name}: ${s.passRate}% pass, ${s.flakyRate}% flaky, p95 ${seconds(s.p95)}`,
+    `  ${label(s.name)}: ${s.passRate}% pass, ${s.flakyRate}% flaky, p95 ${seconds(s.p95)}`,
   );
 }

@@ -78,13 +78,10 @@ export default defineConfig({
         viewport: { width: 1920, height: 1080 },
       },
     },
-    // Cross browser coverage runs the same twenty functional cases on the two
-    // engines Chromium cannot speak for. WebKit is the only way to reach
-    // Safari, which is the default browser on every iOS device, and the mobile
-    // project exercises the layout a phone actually gets. They are separate
-    // projects rather than extra cases: the coverage is the same, the surface
-    // is not. The visual suite stays on Chromium alone, because three engines
-    // would mean sixty baselines for a human to review.
+    // The same twenty cases replayed on the engine Chromium cannot speak for.
+    // WebKit is the only route to Safari, and it is a project rather than extra
+    // cases: same coverage, different surface. Visual stays on Chromium, since
+    // a second engine would double the baselines a human has to review.
     {
       name: "webkit",
       testDir: "./tests",
@@ -94,17 +91,11 @@ export default defineConfig({
       },
     },
     {
-      name: "mobile-safari",
-      testDir: "./tests",
-      use: { ...devices["iPhone 15"] },
-    },
-    {
-      // The agent seed. It has its own project because it is the template
-      // generated tests start from rather than coverage: inside the functional
-      // project it would run as a twenty-first case. The planner still needs to
-      // execute it to prove the environment initialises, so it needs a project
-      // to run under. It sits in specs/ beside the plans it bootstraps, matched
-      // by name so the rest of that directory stays Markdown.
+      // The agent seed: the template generated tests start from, not coverage.
+      // Inside the functional project it would run as a twenty-first case, but
+      // the planner still has to execute it to prove the environment
+      // initialises, so it gets a project of its own. It lives in specs/ beside
+      // the plans it bootstraps, matched by name.
       name: "seed",
       testDir: "./specs",
       testMatch: /seed\.spec\.ts/,

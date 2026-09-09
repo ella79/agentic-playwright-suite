@@ -57,14 +57,12 @@ export abstract class BaseAppPage {
   /**
    * Resolves once every image inside the scope has finished decoding.
    *
-   * Product photography streams in after load, so a region containing it keeps
-   * reflowing as each image arrives. A screenshot assertion waits for its
-   * target to be stable, and under parallel load the images can still be
-   * arriving when that wait expires, the capture then fails on stability
-   * rather than on any visual difference. Waiting for the images themselves
-   * fixes the cause; raising the screenshot timeout would only move the
-   * deadline. Images that fail to load settle through their error event, so a
-   * broken one cannot hang this.
+   * Product photography streams in after load, so a region holding it keeps
+   * reflowing. A screenshot assertion waits for stability, and under parallel
+   * load that wait can expire mid-arrival, failing on stability rather than on
+   * any visual difference. Waiting for the images fixes the cause; a longer
+   * screenshot timeout only moves the deadline. A broken image settles through
+   * its error event, so it cannot hang this.
    */
   async waitForImagesLoaded(scope: Locator): Promise<void> {
     await scope.evaluate(async (element: HTMLElement) => {
