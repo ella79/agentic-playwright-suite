@@ -3,8 +3,9 @@
 ```
    build                 check                  end2end
 
-prepare-playwright  →  static-checks  →  e2e-playwright     ┐
-      image                           →  visual-regression  ┴→  publish-dashboard
+                                     →  e2e-chromium       ┐
+prepare-playwright  →  static-checks  →  e2e-webkit         ┼→  publish-dashboard
+      image                           →  visual-regression  ┘
 ```
 
 Runs on every push and pull request to `main`.
@@ -13,9 +14,9 @@ Runs on every push and pull request to `main`.
 | -------------------------- | ------------------------------------------------------------------------------------------ |
 | `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry                  |
 | `static-checks`            | Typecheck, lint, format. Gates everything after it                                         |
-| `e2e-playwright`           | The functional suite                                                                       |
+| `e2e-chromium`             | The functional suite on Chromium                                                           |
 | `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal              |
-| `cross-browser`            | The same twenty functional cases replayed on WebKit, skipped on pull requests              |
+| `e2e-webkit`               | The same twenty functional cases replayed on WebKit, skipped on pull requests              |
 | `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages |
 | `ci-gate`                  | Reads every other job's result. The only check the branch protection requires              |
 
@@ -43,7 +44,7 @@ surface as an open alert.
 ## The Published Report
 
 Playwright project names match the CI job names, so a merged report labels every result
-`e2e-playwright` or `visual-regression` instead of leaving forty rows to be told apart by path.
+`e2e-chromium` or `visual-regression` instead of leaving forty rows to be told apart by path.
 
 Allure results are labelled by an automatic fixture rather than by hand, because a label applied
 only where someone remembered is one the report cannot rely on. Each result carries:

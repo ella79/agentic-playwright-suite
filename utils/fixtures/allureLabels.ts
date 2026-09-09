@@ -30,8 +30,8 @@ const REPO_BLOB =
  * would mean sixty baselines to review.
  */
 const PROJECTS: Record<string, { parent: string; engine: string }> = {
-  "e2e-playwright": { parent: "Functional E2E", engine: "Chromium" },
-  webkit: { parent: "Functional E2E", engine: "WebKit" },
+  "e2e-chromium": { parent: "Functional E2E", engine: "Chromium" },
+  "e2e-webkit": { parent: "Functional E2E", engine: "WebKit" },
   "visual-regression": { parent: "Visual regression", engine: "Chromium" },
   seed: { parent: "Functional E2E", engine: "Chromium" },
 };

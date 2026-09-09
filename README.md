@@ -13,11 +13,14 @@ MCP, and published from a containerised CI pipeline.
 | [Functional](https://ella79.github.io/agentic-playwright-suite/functional/) and [visual](https://ella79.github.io/agentic-playwright-suite/visual/) | Each suite with its own trend                                                   |
 | [Trace viewer](https://ella79.github.io/agentic-playwright-suite/playwright-report/)                                                                | Every step of every case, replayable                                            |
 
-**20 functional cases and 20 visual cases, both capped.** The functional cases also run on WebKit
-and on a phone viewport, so the same coverage is proven on the engine behind Safari and on the
-layout a phone gets. Visual baselines stay Chromium on Linux, generated in the same image CI runs. New coverage replaces an existing case rather than growing the
-suite, because twenty cases that can each be justified demonstrate more than two hundred nobody can
-explain.
+**20 functional cases and 20 visual cases, both capped.** The functional cases are replayed on
+WebKit, so the same coverage is proven on the engine behind Safari. Visual baselines stay Chromium
+on Linux, generated in the same image CI runs. New coverage replaces an existing case rather than
+growing the suite, because twenty cases that can each be justified demonstrate more than two hundred
+nobody can explain.
+
+Built with Playwright, TypeScript, npm, Docker, Allure, GitHub Actions and Renovate, with Claude
+Code agents reaching the browser over MCP.
 
 The target is a public demo storefront, so every run crosses a real network and hits a real database
 with third party advertising on the page. The failures that produces are the failures a real
@@ -51,7 +54,7 @@ the result of all the others. A job that stops running therefore cannot quietly 
 enforced.
 
 The test jobs run in parallel under a worker budget: one each for the functional and visual jobs,
-two for cross browser, which carries twice the cases. The budget is a precaution, not a measured
+two for the WebKit job. The budget is a precaution, not a measured
 limit. One run failed with six browser instances against the shared demo host, the two heaviest
 cases timing out while the same checkout passed on WebKit in that same run. Later runs passed with
 roughly twelve instances against it, so the host's capacity is variable rather than a clean

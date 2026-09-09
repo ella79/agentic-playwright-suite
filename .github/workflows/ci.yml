@@ -127,8 +127,8 @@ jobs:
           exit 1
 
   # Stage: end2end
-  e2e-playwright:
-    name: e2e-playwright
+  e2e-chromium:
+    name: e2e-chromium
     needs: [prepare-playwright-image, static-checks]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -153,7 +153,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: allure-results-e2e
+          name: allure-results-chromium
           path: allure-results
           retention-days: 7
 
@@ -163,7 +163,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: blob-report-e2e
+          name: blob-report-chromium
           path: blob-report
           retention-days: 7
 
@@ -173,7 +173,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: results-json-e2e
+          name: results-json-chromium
           path: reports/results.json
           retention-days: 7
 
@@ -181,7 +181,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-traces
+          name: e2e-chromium-traces
           path: test-results
           retention-days: 7
 
@@ -268,8 +268,8 @@ jobs:
   # threshold and that single failure is not proof of one. Keeping the budget
   # costs nothing here and removes the suite as a suspect when something does
   # time out.
-  cross-browser:
-    name: cross-browser
+  e2e-webkit:
+    name: e2e-webkit
     needs: [prepare-playwright-image, static-checks]
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -292,13 +292,13 @@ jobs:
         env:
           E2E_BROWSERS: WebKit
           E2E_VIEWPORT: 1920x1080
-        run: npm run test:cross-browser
+        run: npm run test:e2e:webkit
 
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: allure-results-cross
+          name: allure-results-webkit
           path: allure-results
           retention-days: 7
 
@@ -306,7 +306,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: results-json-cross
+          name: results-json-webkit
           path: reports/results.json
           retention-days: 7
 
@@ -314,21 +314,21 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: cross-browser-traces
+          name: e2e-webkit-traces
           path: test-results
           retention-days: 7
 
   # The single check the branch protection requires.
   #
   # GitHub counts a skipped job as a satisfied requirement, so requiring the
-  # test jobs directly would be hollow: cross browser is skipped on pull
+  # test jobs directly would be hollow: the WebKit job is skipped on pull
   # requests by design, and any job that stops running would silently stop
   # being enforced. This job always runs, reads the results of the others, and
   # fails on anything that is not success or a deliberate skip. Adding a job
   # later means adding it here rather than editing repository settings.
   ci-gate:
     name: ci-gate
-    needs: [static-checks, e2e-playwright, visual-regression, cross-browser]
+    needs: [static-checks, e2e-chromium, e2e-webkit, visual-regression]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -346,7 +346,7 @@ jobs:
 
   publish-dashboard:
     name: publish-dashboard
-    needs: [e2e-playwright, visual-regression, cross-browser]
+    needs: [e2e-chromium, e2e-webkit, visual-regression]
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
@@ -369,7 +369,7 @@ jobs:
       - name: Collect functional results
         uses: actions/download-artifact@v8
         with:
-          name: allure-results-e2e
+          name: allure-results-chromium
           path: results/functional
 
       - name: Collect visual results
@@ -378,11 +378,11 @@ jobs:
           name: allure-results-vr
           path: results/visual
 
-      - name: Collect cross browser results
+      - name: Collect WebKit results
         uses: actions/download-artifact@v8
         with:
-          name: allure-results-cross
-          path: results/cross-browser
+          name: allure-results-webkit
+          path: results/webkit
 
       # WebKit results join the functional ones instead of forming a report of
       # their own: the same twenty cases on a second engine belong under one
@@ -398,7 +398,7 @@ jobs:
       # published report back to the run that produced it.
       - name: Stage results
         run: |
-          cp -r results/cross-browser/. results/functional/ 2>/dev/null || true
+          cp -r results/webkit/. results/functional/ 2>/dev/null || true
 
           mkdir -p results/combined
           cp -r results/functional/. results/combined/ 2>/dev/null || true
@@ -475,7 +475,7 @@ jobs:
         env:
           GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          node utils/scripts/build-metrics.mjs             --suite functional=json-reports/results-json-e2e/results.json             --suite functional-webkit=json-reports/results-json-cross/results.json             --suite visual=json-reports/results-json-vr/results.json             --history previous-metrics/history.json             --out allure-report/metrics
+          node utils/scripts/build-metrics.mjs             --suite functional=json-reports/results-json-chromium/results.json             --suite functional-webkit=json-reports/results-json-webkit/results.json             --suite visual=json-reports/results-json-vr/results.json             --history previous-metrics/history.json             --out allure-report/metrics
 
       # The HTML report is published alongside Allure because it carries the
       # traces: Allure shows what failed, the trace viewer shows why.

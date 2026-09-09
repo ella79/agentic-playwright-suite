@@ -17,9 +17,9 @@ const allureReporter: ReporterDescription = [
     resultsDir: "allure-results",
     environmentInfo: {
       base_url: BASE_URL,
-      // What actually ran. The cross browser job overrides these, because a
-      // report that says Chromium while it holds WebKit results is worse than
-      // one that says nothing.
+      // What actually ran. The WebKit job overrides these, because a report
+      // saying Chromium while it holds WebKit results is worse than one that
+      // says nothing.
       browser: process.env.E2E_BROWSERS || "Chromium",
       viewport: process.env.E2E_VIEWPORT || "1920x1080",
       node: process.version,
@@ -71,7 +71,7 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "e2e-playwright",
+      name: "e2e-chromium",
       testDir: "./tests",
       use: {
         ...devices["Desktop Chrome"],
@@ -83,7 +83,7 @@ export default defineConfig({
     // cases: same coverage, different surface. Visual stays on Chromium, since
     // a second engine would double the baselines a human has to review.
     {
-      name: "webkit",
+      name: "e2e-webkit",
       testDir: "./tests",
       use: {
         ...devices["Desktop Safari"],
