@@ -10,8 +10,8 @@ home plan, so this pair is what proves the header actually changes.
 
 ## Cases
 
-| ID    | Screenshot               | State captured                                            |
-| ----- | ------------------------ | --------------------------------------------------------- |
+| ID    | Screenshot                         | State captured                                            |
+| ----- | ---------------------------------- | --------------------------------------------------------- |
 | VR-14 | `authentication-login-form`        | Login form, empty                                         |
 | VR-15 | `authentication-signup-form`       | Signup entry form, empty                                  |
 | VR-16 | `authentication-account-info-form` | Full registration form: title, dates, address, checkboxes |

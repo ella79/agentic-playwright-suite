@@ -8,14 +8,18 @@ test.describe("Visual regression - authentication", () => {
     await loginPage.gotoLoginPage();
     await expect(loginPage.loginButton).toBeVisible();
 
-    await expect(loginPage.loginForm).toHaveScreenshot("authentication-login-form.png");
+    await expect(loginPage.loginForm).toHaveScreenshot(
+      "authentication-login-form.png",
+    );
   });
 
   test("VR-15: signup entry form", async ({ loginPage }) => {
     await loginPage.gotoLoginPage();
     await expect(loginPage.signupButton).toBeVisible();
 
-    await expect(loginPage.signupForm).toHaveScreenshot("authentication-signup-form.png");
+    await expect(loginPage.signupForm).toHaveScreenshot(
+      "authentication-signup-form.png",
+    );
   });
 
   test("VR-16: full registration form", async ({
