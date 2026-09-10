@@ -8,7 +8,7 @@
   "changelog": [
     {
       "version": 3,
-      "note": "The engine moved into the parent suite name, so the top level now holds \"Functional E2E · Chromium\" and \"Functional E2E · WebKit\" where it held \"Functional E2E\". Allure's own Overview reads only that level and was drawing both engines as one bar, so a run that failed every case on one engine and passed every case on the other read as a single half-red suite. suiteNames gained engineSuffix, which compares the names with the engine taken off, so both shapes pass and neither repository has to deploy first. Added parentEngine: a parent that names an engine must carry that engine as a parameter on every result underneath, which is what the page filters the replay on. branchEngine stays, for the shape published before this."
+      "note": "The engine moved into the parent suite name, so the top level now holds \"Functional E2E · Chromium\", \"Functional E2E · WebKit\" and \"Visual regression · Chromium\" where it held two plain names. Allure's own Overview reads only that level and was drawing both engines as one bar, so a run that failed every case on one engine and passed every case on the other read as a single half-red suite. suiteNames gained engineSuffix, which compares the names with the engine taken off, so both shapes pass and neither repository has to deploy first. branchEngine is replaced by engineIsConsistent rather than repointed: filtered to a parent name that no longer exists it would have matched nothing and reported green forever, and even repointed there is no engine at the level it inspected any more. The replacement names no parent and walks whatever is in front of it, so it cannot go quietly vacuous the way its predecessor was about to. It does not require that a suite record an engine anywhere: a suite can carry it only as a parameter and the page derives it from there."
     },
     {
       "version": 2,
@@ -37,8 +37,7 @@
       "checks": [
         { "kind": "suiteNames", "expect": ["Functional E2E", "Visual regression"], "exact": true, "engineSuffix": " · " },
         { "kind": "leaves", "minCount": 1, "require": ["status", "time.duration", "time.start", "name"] },
-        { "kind": "branchEngine", "under": "Functional E2E" },
-        { "kind": "parentEngine", "separator": " · " }
+        { "kind": "engineIsConsistent", "separator": " · " }
       ]
     },
     {

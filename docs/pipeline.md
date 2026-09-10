@@ -55,13 +55,13 @@ to a branch in the report without a lookup table.
 Allure results are labelled by an automatic fixture rather than by hand, because a label applied
 only where someone remembered is one the report cannot rely on. Each result carries:
 
-| Label                      | Effect in the report                                                                             |
-| -------------------------- | ------------------------------------------------------------------------------------------------ |
-| `parentSuite`              | One row per suite and engine on the dashboard, `Functional E2E · Chromium` and so on             |
-| `suite`                    | The area inside that row                                                                         |
-| `epic`, `feature`, `story` | Populates the Behaviours tab                                                                     |
-| `severity`                 | Critical only where a failure means a user cannot buy or cannot reach their account              |
-| `link`                     | The plan that justifies the case, read from its own `// spec:` header, plus its source           |
+| Label                      | Effect in the report                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `parentSuite`              | One row per suite and engine on the dashboard, `Functional E2E · Chromium` and so on   |
+| `suite`                    | The area inside that row                                                               |
+| `epic`, `feature`, `story` | Populates the Behaviours tab                                                           |
+| `severity`                 | Critical only where a failure means a user cannot buy or cannot reach their account    |
+| `link`                     | The plan that justifies the case, read from its own `// spec:` header, plus its source |
 
 Three reports are published, not one per engine. The root report holds all sixty results, forty
 distinct cases with the functional twenty counted once per engine. `functional/` and `visual/` exist

@@ -160,56 +160,65 @@ function runCheck(document, check, where) {
     return;
   }
 
-  /* With the engine in the parent suite name, that name is the only thing
-     saying which engine a branch ran on, while the page filters the replay on
-     the parameter each result carries. The two have to agree, or a visitor
-     presses a chip labelled WebKit and watches something else play. */
-  if (check.kind === "parentEngine") {
+  /* The engine a result ran on is written twice: once in the tree, once as a
+     parameter on the result. The page reads the tree to label a chip and the
+     parameter to filter the replay, so the two have to agree or a visitor
+     presses WebKit and watches something else play.
+
+     Where the tree writes it has moved. It used to be the name of a branch
+     under the suite; it is now the suite's own name, because Allure's Overview
+     reads only the top level and was drawing both engines as one bar. Both
+     shapes are checked here, in one check rather than two, for the reason that
+     retired its predecessor: that one was filtered to a parent named "Functional
+     E2E", so once no parent is called that it would have matched nothing and
+     reported green for ever. A check that has quietly stopped inspecting
+     anything is worse than one that fails, because nobody goes looking for it.
+     This one names no parent and walks whatever is in front of it.
+
+     It deliberately does not insist that some suite record an engine somewhere.
+     A suite can carry the engine only as a parameter, with nothing in the tree
+     to say so, and the page handles that by deriving it; requiring otherwise
+     rejected a shape that works. */
+  if (check.kind === "engineIsConsistent") {
     const separator = check.separator ?? " · ";
+
     (document.children || []).forEach((parent) => {
       const at = parent.name.indexOf(separator);
-      if (at === -1) return;
-      const engine = parent.name.slice(at + separator.length);
-      const tests = leaves(parent);
-      if (!tests.length) return;
-      const matching = tests.filter((test) => (test.parameters || []).includes(engine));
-      if (matching.length !== tests.length) {
-        problems.push(
-          `${where}: "${parent.name}" names ${engine}, but ${tests.length - matching.length} of ` +
-            `${tests.length} results underneath do not carry it as a parameter. The page filters on ` +
-            `the parameter, so the chip and the replay would disagree.`,
-        );
-      }
-    });
-    return;
-  }
 
-  /* The engine a result ran on is written twice by the suite: once as the name
-     of the branch it sits under, once as a parameter on the result. The page
-     relies on that, because it is how a branch that is an engine is told apart
-     from a branch that is an area, and reading the tree position instead would
-     break the moment a display grouping is reorganised.
-     The check is about consistency rather than presence: a parent whose
-     branches are areas carries no such parameter and is fine, a parent whose
-     branches are engines must carry it on every result. What must never happen
-     is half and half, because then the page reads the same tree two ways. */
-  if (check.kind === "branchEngine") {
-    (document.children || [])
-      .filter((parent) => !check.under || parent.name === check.under)
-      .forEach((parent) => {
-        (parent.children || []).forEach((branch) => {
-          const tests = leaves(branch);
-          if (!tests.length) return;
-          const matching = tests.filter((test) => (test.parameters || []).includes(branch.name));
-          if (matching.length && matching.length !== tests.length) {
-            problems.push(
-              `${where}: branch "${branch.name}" under "${parent.name}" carries its own name as a ` +
-                `parameter on ${matching.length} of ${tests.length} results. It has to be all or none, ` +
-                `or the page cannot tell an engine from an area.`,
-            );
-          }
-        });
+      if (at !== -1) {
+        const engine = parent.name.slice(at + separator.length);
+        const tests = leaves(parent);
+        if (!tests.length) return;
+        const matching = tests.filter((test) => (test.parameters || []).includes(engine));
+        if (matching.length !== tests.length) {
+          problems.push(
+            `${where}: "${parent.name}" names ${engine}, but ${tests.length - matching.length} of ` +
+              `${tests.length} results underneath do not carry it as a parameter. The page filters ` +
+              `on the parameter, so the chip and the replay would disagree.`,
+          );
+        }
+        return;
+      }
+
+      /* the older shape, where a branch is an engine when every result under it
+         carries the branch's own name. A branch that is an area carries none,
+         which is fine; half and half is not, because then the page reads the
+         same tree two ways. */
+      (parent.children || []).forEach((branch) => {
+        const tests = leaves(branch);
+        if (!tests.length) return;
+        const matching = tests.filter((test) => (test.parameters || []).includes(branch.name));
+        if (!matching.length) return;
+        if (matching.length !== tests.length) {
+          problems.push(
+            `${where}: branch "${branch.name}" under "${parent.name}" carries its own name as a ` +
+              `parameter on ${matching.length} of ${tests.length} results. It has to be all or none, ` +
+              `or the page cannot tell an engine from an area.`,
+          );
+        }
       });
+    });
+
     return;
   }
 
