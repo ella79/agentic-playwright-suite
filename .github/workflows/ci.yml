@@ -503,7 +503,7 @@ jobs:
           node env/contract/verify-contract.mjs \
             --contract env/contract/allure-report.contract.json \
             --base ./allure-report \
-            --expect-version 2
+            --expect-version 3
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

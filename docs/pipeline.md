@@ -55,19 +55,25 @@ to a branch in the report without a lookup table.
 Allure results are labelled by an automatic fixture rather than by hand, because a label applied
 only where someone remembered is one the report cannot rely on. Each result carries:
 
-| Label                      | Effect in the report                                                                     |
-| -------------------------- | ---------------------------------------------------------------------------------------- |
-| `parentSuite`              | Splits the dashboard into Functional E2E and Visual regression under every status filter |
-| `suite`                    | The engine under Functional E2E, the area under Visual regression                        |
-| `subSuite`                 | The area, under the engine it ran on                                                     |
-| `epic`, `feature`, `story` | Populates the Behaviours tab                                                             |
-| `severity`                 | Critical only where a failure means a user cannot buy or cannot reach their account      |
-| `link`                     | The plan that justifies the case, read from its own `// spec:` header, plus its source   |
+| Label                      | Effect in the report                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `parentSuite`              | One row per suite and engine on the dashboard, `Functional E2E · Chromium` and so on   |
+| `suite`                    | The area inside that row                                                               |
+| `epic`, `feature`, `story` | Populates the Behaviours tab                                                           |
+| `severity`                 | Critical only where a failure means a user cannot buy or cannot reach their account    |
+| `link`                     | The plan that justifies the case, read from its own `// spec:` header, plus its source |
 
 Three reports are published, not one per engine. The root report holds all sixty results, forty
 distinct cases with the functional twenty counted once per engine. `functional/` and `visual/` exist
 because Allure draws a single trend line per report, so a combined one could never show a visual
 trend next to a functional one.
+
+The engine sits in `parentSuite` rather than a level below it because Allure's Overview reads only
+the top level of the suites tree. While both engines shared a parent, the dashboard drew one bar for
+forty results, and a run that failed every case on Chromium and passed every case on WebKit read as
+a single suite that half worked. The engine is still recorded as a parameter on every result as
+well, which is what the portfolio page filters its replay on, and the contract checks that the name
+and the parameter agree rather than trusting either alone.
 
 `categories.json` classifies failures, since a screenshot diff, a host 5xx and a real assertion
 failure are three different conversations. The same file reaches the suite health page as

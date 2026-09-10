@@ -1,11 +1,15 @@
 {
   "name": "portfolio-qa-suite-page",
-  "version": 2,
+  "version": 3,
   "consumer": "https://ella79.github.io/portfolio/qa-suite.html",
   "provider": "https://ella79.github.io/agentic-playwright-suite/",
   "providerRepository": "https://github.com/ella79/agentic-playwright-suite",
   "description": "What the portfolio's QA suite page reads out of the published Allure report. It is deliberately narrow: everything the page does not touch is free to change without warning. The provider verifies this file against a freshly generated report before publishing, and the consumer runs it on a schedule against the published one.",
   "changelog": [
+    {
+      "version": 3,
+      "note": "The engine moved into the parent suite name, so the top level now holds \"Functional E2E · Chromium\", \"Functional E2E · WebKit\" and \"Visual regression · Chromium\" where it held two plain names. Allure's own Overview reads only that level and was drawing both engines as one bar, so a run that failed every case on one engine and passed every case on the other read as a single half-red suite. suiteNames gained engineSuffix, which compares the names with the engine taken off, so both shapes pass and neither repository has to deploy first. branchEngine is replaced by engineIsConsistent rather than repointed: filtered to a parent name that no longer exists it would have matched nothing and reported green forever, and even repointed there is no engine at the level it inspected any more. The replacement names no parent and walks whatever is in front of it, so it cannot go quietly vacuous the way its predecessor was about to. It does not require that a suite record an engine anywhere: a suite can carry it only as a parameter and the page derives it from there."
+    },
     {
       "version": 2,
       "note": "The cross browser results moved into the root report as an engine branch under Functional E2E, so /cross-browser/ and its two documents are gone from this contract. Added the branchEngine check: a branch is an engine when its results carry its name as a parameter, which is how the page tells an engine apart from an area without reading tree position. Written to hold on both the old and the new shape, so it does not fail during the change itself."
@@ -31,9 +35,9 @@
       "required": true,
       "usedFor": "the suite column, the replay, the engines, the per area split, the distinct case count and the slowest tests",
       "checks": [
-        { "kind": "suiteNames", "expect": ["Functional E2E", "Visual regression"], "exact": true },
+        { "kind": "suiteNames", "expect": ["Functional E2E", "Visual regression"], "exact": true, "engineSuffix": " · " },
         { "kind": "leaves", "minCount": 1, "require": ["status", "time.duration", "time.start", "name"] },
-        { "kind": "branchEngine", "under": "Functional E2E" }
+        { "kind": "engineIsConsistent", "separator": " · " }
       ]
     },
     {
