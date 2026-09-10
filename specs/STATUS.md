@@ -3,19 +3,21 @@
 Progress of testing activities against the baseline: the plans in `specs/test-plans/` and
 `specs/vr-test-plans/`, and the suites in `tests/` and `vr-tests/`.
 
-Updated: 2026-09-08 · Source of truth for results:
+Updated: 2026-09-10 · Source of truth for results:
 [the published dashboard](https://ella79.github.io/agentic-playwright-suite/)
 
 ## Functional Coverage
 
-| #   | Feature Plan                    | Functional Test            | Test Cases | Implemented | Passed | Failed | Flaky | Skipped | Fixme |
-| --- | ------------------------------- | -------------------------- | ---------- | ----------- | ------ | ------ | ----- | ------- | ----- |
-| 1   | `authentication-test-plan.md`   | `authentication.spec.ts`   | 6          | 6           | 6      | 0      | 0     | 0       | 0     |
-| 2   | `product-browsing-test-plan.md` | `product-browsing.spec.ts` | 5          | 5           | 5      | 0      | 0     | 0       | 0     |
-| 3   | `cart-test-plan.md`             | `cart.spec.ts`             | 5          | 5           | 5      | 0      | 0     | 0       | 0     |
-| 4   | `checkout-test-plan.md`         | `checkout.spec.ts`         | 1          | 1           | 1      | 0      | 0     | 0       | 0     |
-| 5   | `engagement-test-plan.md`       | `engagement.spec.ts`       | 3          | 3           | 3      | 0      | 0     | 0       | 0     |
-|     | **Total**                       |                            | **20**     | **20**      | **20** | **0**  | **0** | **0**   | **0** |
+| #   | Feature Plan                  | Functional Test          | Test Cases | Implemented | Passed | Failed | Flaky | Skipped | Fixme |
+| --- | ----------------------------- | ------------------------ | ---------- | ----------- | ------ | ------ | ----- | ------- | ----- |
+| 1   | `authentication-test-plan.md` | `authentication.spec.ts` | 6          | 6           | 6      | 0      | 0     | 0       | 0     |
+| 2   | `products-test-plan.md`       | `products.spec.ts`       | 5          | 5           | 5      | 0      | 0     | 0       | 0     |
+| 3   | `cart-test-plan.md`           | `cart.spec.ts`           | 5          | 5           | 5      | 0      | 0     | 0       | 0     |
+| 4   | `checkout-test-plan.md`       | `checkout.spec.ts`       | 1          | 1           | 1      | 0      | 0     | 0       | 0     |
+| 5   | `contact-test-plan.md`        | `contact.spec.ts`        | 1          | 1           | 1      | 0      | 0     | 0       | 0     |
+| 6   | `product-detail-test-plan.md` | `product-detail.spec.ts` | 1          | 1           | 1      | 0      | 0     | 0       | 0     |
+| 7   | `home-test-plan.md`           | `home.spec.ts`           | 1          | 1           | 1      | 0      | 0     | 0       | 0     |
+|     | **Total**                     |                          | **20**     | **20**      | **20** | **0**  | **0** | **0**   | **0** |
 
 Cap: 20. Full. New coverage replaces an existing case rather than growing the suite.
 
@@ -27,14 +29,26 @@ which is the argument for the locator policy: roles and labels do not depend on 
 
 | #   | Feature Plan                     | Visual Test                 | Test Cases | Implemented | Passed | Failed | Flaky | Skipped | Fixme |
 | --- | -------------------------------- | --------------------------- | ---------- | ----------- | ------ | ------ | ----- | ------- | ----- |
-| 1   | `home-vr-test-plan.md`           | `home.vr.spec.ts`           | 3          | 3           | 3      | 0      | 0     | 0       | 0     |
+| 1   | `home-vr-test-plan.md`           | `home.vr.spec.ts`           | 4          | 4           | 4      | 0      | 0     | 0       | 0     |
 | 2   | `products-vr-test-plan.md`       | `products.vr.spec.ts`       | 4          | 4           | 4      | 0      | 0     | 0       | 0     |
 | 3   | `product-detail-vr-test-plan.md` | `product-detail.vr.spec.ts` | 2          | 2           | 2      | 0      | 0     | 0       | 0     |
 | 4   | `cart-vr-test-plan.md`           | `cart.vr.spec.ts`           | 4          | 4           | 4      | 0      | 0     | 0       | 0     |
-| 5   | `authentication-vr-test-plan.md` | `auth.vr.spec.ts`           | 4          | 4           | 4      | 0      | 0     | 0       | 0     |
-| 6   | `contact-vr-test-plan.md`        | `contact.vr.spec.ts`        | 1          | 1           | 1      | 0      | 0     | 0       | 0     |
+| 5   | `authentication-vr-test-plan.md` | `authentication.vr.spec.ts` | 2          | 2           | 2      | 0      | 0     | 0       | 0     |
+| 6   | `contact-vr-test-plan.md`        | `contact.vr.spec.ts`        | 2          | 2           | 2      | 0      | 0     | 0       | 0     |
 | 7   | `checkout-vr-test-plan.md`       | `checkout.vr.spec.ts`       | 2          | 2           | 2      | 0      | 0     | 0       | 0     |
 |     | **Total**                        |                             | **20**     | **20**      | **20** | **0**  | **0** | **0**   | **0** |
+
+VR-15 `authentication-signup-form` was retired and VR-21 `contact-success` took its slot, an
+approved one-for-one swap that leaves the cap at 20. The retirement is argued in the authentication
+plan; the retired baseline was deleted with the case. VR-21's baseline was generated in the CI Linux
+image with `--update-snapshots=missing`, so the other nineteen were left untouched, and reviewed
+before it was committed. The result columns above come from a subsequent `docker compose run --rm vr`
+against the committed baselines: 20 passed.
+
+VR-17 moved from the authentication feature to home: the site header is shared chrome and both of
+its states now sit in one file and one baseline directory. The totals are unchanged and no case
+changed behaviour. The renamed baseline is byte-identical to the one it replaced, and it was
+compared under its new name in the Linux image on 2026-09-10: 20 passed.
 
 Cap: 20. Full. Baselines are Chromium on Linux at 1920x1080, generated in the CI image
 (`yarn docker:vr:update`); the visual job fails if none are committed rather than seeding its own.
@@ -51,8 +65,10 @@ around silently.
    column is floated. VR-20 captures the container that has dimensions, with the cause recorded at
    the capture.
 3. The contact page renders the same success text twice, once for the form and once for a hidden
-   newsletter widget. TC-18 scopes to the visible one; the success state is excluded from VR-18 so
-   the duplication is not baked into a baseline.
+   newsletter widget. **Resolved as a markup-only defect.** Both nodes were measured: the second
+   sits in `col-md-9 hide form-group`, is 0 x 0 and never renders, so the duplication exists in the
+   DOM and cannot reach a screen or a baseline. TC-18 scopes to the visible node; VR-21 captures the
+   success state, which an earlier reading of this finding had wrongly excluded.
 4. `/delete_account` deletes on GET, with no confirmation step. The account fixture relies on it for
    teardown and asserts the outcome.
 

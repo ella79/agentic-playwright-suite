@@ -147,12 +147,6 @@ page, `contact` is a page, the review form is an area of the product detail page
 with no visual counterpart is a feature whose visual pass was never run, not a feature that does not
 need one.
 
-Three areas in this repository predate that rule and do not follow it: `tests/auth/` against
-`authentication-test-plan.md`, `tests/browsing/` against a visual side split into `products` and
-`product-detail`, and `tests/engagement/`, which groups three unrelated screens and therefore has no
-visual plan at all. Treat them as debt to be repaid when one of them is next touched, never as a
-pattern to copy.
-
 So a feature owns four artefacts, however many things it has to cover:
 
 ```

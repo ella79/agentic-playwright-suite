@@ -100,15 +100,17 @@ committed rather than writing its own and reporting success.
 ## Repository Structure
 
 ```
-tests/                                 Functional specs, one directory per feature area
-├── auth/authentication.spec.ts        TC-01 to TC-06
-├── browsing/product-browsing.spec.ts  TC-07 to TC-11
-├── cart/cart.spec.ts                  TC-12 to TC-16
-├── checkout/checkout.spec.ts          TC-17
-└── engagement/engagement.spec.ts      TC-18 to TC-20
+tests/                                 Functional specs, <feature>/<feature>.spec.ts
+├── authentication/                    TC-01 to TC-06
+├── cart/                              TC-12 to TC-16
+├── checkout/                          TC-17
+├── contact/                           TC-18
+├── home/                              TC-20
+├── product-detail/                    TC-19
+└── products/                          TC-07 to TC-11
 
 vr-tests/                              Visual specs and their committed baselines
-├── *.vr.spec.ts                       VR-01 to VR-20
+├── *.vr.spec.ts                       VR-01 to VR-21, less the retired VR-15
 └── *.vr.spec.ts-snapshots/            Chromium on Linux, 1920x1080
 
 specs/

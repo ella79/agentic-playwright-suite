@@ -5,6 +5,7 @@ import { url } from "../../url";
 export class ContactUsPage extends BaseAppPage {
   readonly getInTouchHeading: Locator;
   readonly contactForm: Locator;
+  readonly contactFormColumn: Locator;
   readonly nameInput: Locator;
   readonly emailInput: Locator;
   readonly subjectInput: Locator;
@@ -18,9 +19,15 @@ export class ContactUsPage extends BaseAppPage {
     this.getInTouchHeading = page.getByRole("heading", {
       name: "Get In Touch",
     });
-    // The .contact-form class wraps two blocks; the form element itself is
-    // the one that carries the fields.
+    // On the empty page .contact-form matches two elements, the outer column
+    // and the inner `contact-form row` that is the form itself, so the form is
+    // addressed by its id rather than by the class.
     this.contactForm = page.locator("#contact-us-form");
+    // The capture target for the success state. After submission the page
+    // re-renders: #contact-us-form is gone and the inner block with it, so
+    // .contact-form resolves to the outer column alone. #contact-page would
+    // have dragged the Feedback sidebar into the frame.
+    this.contactFormColumn = page.locator(".contact-form");
     // Scoped to the form. The footer newsletter input is placeheld "Your email
     // address", which a page wide getByPlaceholder("Email") also matches.
     this.nameInput = this.contactForm.getByPlaceholder("Name");
