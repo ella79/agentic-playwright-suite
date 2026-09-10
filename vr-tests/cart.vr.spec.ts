@@ -23,7 +23,7 @@ test.describe("Visual regression - cart", () => {
     await cartPage.waitForImagesLoaded(cartPage.cartTable);
 
     await expect(cartPage.cartTable).toHaveScreenshot("cart-single-item.png", {
-      maxDiffPixelRatio: 0.05, // the row carries the product thumbnail
+      maxDiffPixelRatio: 0.05, // VR: the row carries the product thumbnail
     });
   });
 

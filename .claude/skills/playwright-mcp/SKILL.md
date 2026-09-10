@@ -75,3 +75,11 @@ repository" section each one ends with.
 - `/delete_account` deletes immediately on GET. Do not navigate there while exploring with an
   account you still need.
 - Search matches category names as well as product names.
+
+## Vendor documentation
+
+[references/playwright-mcp-best-practices.md](references/playwright-mcp-best-practices.md) maps the official guidance onto the repository: the two servers, the flags that make a session match the suite, and what MCP is not for.
+
+- [Playwright MCP server](https://github.com/microsoft/playwright-mcp)
+- [Accessibility snapshots](https://playwright.dev/mcp/snapshots)
+- [Test agents](https://playwright.dev/docs/test-agents)
