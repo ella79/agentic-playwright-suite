@@ -242,6 +242,8 @@ would couple two pages that are free to diverge.
 ## Vendor documentation
 
 Read the source rather than repeating it here when a rule needs its rationale.
+[references/playwright-best-practices.md](references/playwright-best-practices.md) maps each piece of
+that guidance onto this repository and states where it departs, which the vendor pages cannot.
 
 - [Best practices](https://playwright.dev/docs/best-practices)
 - [Locators](https://playwright.dev/docs/locators)
