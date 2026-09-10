@@ -16,6 +16,7 @@ export abstract class BaseAppPage {
   readonly deleteAccountLink: Locator;
   readonly loggedInAs: Locator;
   readonly consentButton: Locator;
+  readonly scrollUpButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -27,6 +28,8 @@ export abstract class BaseAppPage {
     this.deleteAccountLink = page.getByRole("link", { name: "Delete Account" });
     this.loggedInAs = page.getByText("Logged in as");
     this.consentButton = page.getByRole("button", { name: "Consent" });
+    // No text and no role: a decorative anchor the scrollUp plugin injects.
+    this.scrollUpButton = page.locator("#scrollUp");
   }
 
   protected async goto(path: string): Promise<void> {
@@ -93,6 +96,16 @@ export abstract class BaseAppPage {
     await target.evaluate((element: Element) =>
       element.scrollIntoView({ block: "start", behavior: "instant" }),
     );
+  }
+
+  /**
+   * Scrolls with the wheel rather than the API on purpose. The control is fixed
+   * at a negative offset until the plugin animates it in, and it listens for a
+   * real scroll: `window.scrollTo` leaves it off screen and unclickable.
+   */
+  async scrollDownAndReturnToTop(): Promise<void> {
+    await this.page.mouse.wheel(0, 2500);
+    await this.scrollUpButton.click();
   }
 
   async logout(): Promise<void> {

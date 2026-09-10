@@ -32,4 +32,18 @@ test.describe("Visual regression - home", () => {
 
     await expect(homePage.footer).toHaveScreenshot("home-subscription.png");
   });
+
+  test("VR-17: site header for a signed-in user", async ({
+    homePage,
+    uniqueAccount,
+  }) => {
+    await expect(homePage.loggedInAs).toContainText(uniqueAccount.name);
+
+    await expect(homePage.header).toHaveScreenshot(
+      "home-header-signed-in.png",
+      {
+        mask: [homePage.loggedInAs], // the account name differs per run
+      },
+    );
+  });
 });

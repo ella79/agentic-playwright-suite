@@ -1,9 +1,9 @@
-// spec: specs/test-plans/product-browsing-test-plan.md
+// spec: specs/test-plans/products-test-plan.md
 // seed: specs/seed.spec.ts
 import { expect, test } from "../../utils/fixtures/testFixtures";
 import { products, searchTerms } from "../../utils/testData";
 
-test.describe("Product browsing", () => {
+test.describe("Products", () => {
   test("TC-07: the catalog lists products and one opens its detail page", async ({
     productsPage,
     productDetailPage,
@@ -65,13 +65,14 @@ test.describe("Product browsing", () => {
     await expect(productsPage.productCards.first()).toBeVisible();
   });
 
-  test("TC-11: filtering by brand lists that brand's products", async ({
+  test("TC-11: the scroll-up control returns the visitor to the top", async ({
     productsPage,
   }) => {
     await productsPage.gotoProductsPage();
-    await productsPage.openBrand("Polo");
-
-    await expect(productsPage.getBrandResultsHeading("Polo")).toBeVisible();
     await expect(productsPage.productCards.first()).toBeVisible();
+
+    await productsPage.scrollDownAndReturnToTop();
+
+    await expect(productsPage.allProductsHeading).toBeInViewport();
   });
 });
