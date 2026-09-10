@@ -18,24 +18,25 @@ import {
 const REPO_BLOB =
   "https://github.com/ella79/agentic-playwright-suite/blob/main";
 
+/** The visual project's name in `playwright.config.ts`. */
+const VISUAL_PROJECT = "vr";
+
+/**
+ * What each project contributes to the report tree. Visual stays on Chromium:
+ * three engines would mean sixty baselines to review.
+ */
+const PROJECTS: Record<string, { parent: string; engine: string }> = {
+  "e2e-chromium": { parent: "Functional E2E", engine: "Chromium" },
+  "e2e-webkit": { parent: "Functional E2E", engine: "WebKit" },
+  [VISUAL_PROJECT]: { parent: "Visual regression", engine: "Chromium" },
+  seed: { parent: "Functional E2E", engine: "Chromium" },
+};
+
 /**
  * Cases whose failure means a user cannot buy, or cannot get into their
  * account. Everything else is normal severity; marking all twenty critical
  * would say nothing.
  */
-/**
- * What each project contributes to the report tree. The two functional
- * projects share a parent, so the report reads as one suite on two engines
- * rather than two unrelated ones. Visual stays on Chromium: three engines
- * would mean sixty baselines to review.
- */
-const PROJECTS: Record<string, { parent: string; engine: string }> = {
-  "e2e-chromium": { parent: "Functional E2E", engine: "Chromium" },
-  "e2e-webkit": { parent: "Functional E2E", engine: "WebKit" },
-  "visual-regression": { parent: "Visual regression", engine: "Chromium" },
-  seed: { parent: "Functional E2E", engine: "Chromium" },
-};
-
 const CRITICAL_AREAS = new Set(["Checkout", "Authentication", "Cart"]);
 
 /** The `// spec:` header every spec file carries, so the link is never stale. */
@@ -53,7 +54,7 @@ function readPlanPath(specFile: string): string | undefined {
  * links to the plan that justifies its existence.
  */
 export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
-  const isVisual = testInfo.project.name === "visual-regression";
+  const isVisual = testInfo.project.name === VISUAL_PROJECT;
   const project = PROJECTS[testInfo.project.name] ?? {
     parent: "Functional E2E",
     engine: "Chromium",
@@ -62,18 +63,21 @@ export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
     .replace("Visual regression - ", "")
     .replace(/^\w/, (c) => c.toUpperCase());
 
-  await parentSuite(project.parent);
+  // The engine rides on the parent, not a level below it. The overview charts
+  // the top of the suites tree, so a shared "Functional E2E" parent drew both
+  // engines as one bar and a WebKit failure stayed invisible until someone
+  // expanded the tree. Split here, each engine gets its own row and its own
+  // count.
+  await parentSuite(`${project.parent} · ${project.engine}`);
+  await suite(area);
+  // allure-playwright fills subSuite from the describe titles whenever a test
+  // leaves it unset, which restates the area one level below itself. The spec
+  // file is the honest third level: it is the same today and forks the day an
+  // area grows a second file.
+  await subSuite(path.basename(testInfo.file));
 
-  // Functional cases run twice, once per engine, so the engine is what tells
-  // two otherwise identical results apart; the area sits below it. Visual runs
-  // on one engine, where that branch would never fork.
-  if (isVisual) {
-    await suite(area);
-  } else {
-    await suite(project.engine);
-    await subSuite(area);
-  }
-
+  // Behaviour is not per engine: the same case proves the same thing on both,
+  // so the epic stays unqualified and the Behaviors tab does not fork in two.
   await epic(project.parent);
   await feature(area);
   await story(testInfo.title);

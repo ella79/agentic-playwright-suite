@@ -17,7 +17,7 @@ was confirmed against a live accessibility snapshot first.
 | Server            | Command                              | Use for                                   |
 | ----------------- | ------------------------------------ | ----------------------------------------- |
 | `playwright-test` | `npx playwright run-test-mcp-server` | Planning, generating, and healing tests   |
-| `playwright`      | `npx @playwright/mcp`                | Ad-hoc exploration outside test authoring |
+| `playwright`      | `npx playwright-mcp`                 | Ad-hoc exploration outside test authoring |
 
 **Prefer `playwright-test`.** It reads `playwright.config.ts`, so it already knows this project's
 `baseURL`, the `data-qa` test id attribute and the 1920x1080 viewport, so an agent resolves locators

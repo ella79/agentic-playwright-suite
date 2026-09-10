@@ -1,6 +1,9 @@
 ---
 name: playwright-visual-regression
 description: Create and maintain visual regression tests, what to screenshot, how to stabilize state first, threshold selection, masking third-party noise, and baseline management. Use when adding VR coverage or diagnosing a flaky screenshot.
+paths:
+  - vr-tests/**
+  - specs/vr-test-plans/**
 ---
 
 # Visual Regression Skill
@@ -26,6 +29,32 @@ cries wolf gets ignored, which is worse than having none.
 Playwright appends the platform suffix (`-chromium-linux.png`) itself. Baselines are generated on
 Linux to match CI. A baseline captured on Windows or macOS will not match and must not be
 committed.
+
+## Plan shape
+
+`specs/vr-test-plans/` follows [references/vr-plan-template.md](references/vr-plan-template.md).
+
+## Before adding a capture
+
+Four questions, and a no to any of them means the case does not exist. Answer the first and the
+third by **taking one throwaway capture and looking at it**, never by reasoning about what the
+browser probably does: native validation bubbles, for instance, do appear in a Playwright screenshot
+and do persist, which is the opposite of what most people assume.
+
+1. Is this state **visually distinct** from one already captured, or does it merely repeat it?
+2. Does the region **fit the viewport**, or does it need anchoring to a heading?
+3. What **varies per run** in it, so it can be masked instead of tolerated by a threshold?
+4. Does it carry any **third-party slot**, in which case it is not capturable here at all?
+
+## Config that a capture depends on
+
+| Setting                     | Value                                             |
+| --------------------------- | ------------------------------------------------- |
+| Default `maxDiffPixelRatio` | `0.01`, set globally in `expect.toHaveScreenshot` |
+| `animations`                | `disabled`, also global                           |
+| Viewport                    | 1920x1080                                         |
+| Project                     | `visual-regression`, Chromium only                |
+| Baselines                   | `vr-tests/<area>.vr.spec.ts-snapshots/`, Linux    |
 
 ## Spec Structure
 
@@ -53,11 +82,17 @@ to a screenshot.
 
 ## What To Screenshot
 
-**Do:** the default state of a component, a state that is visually distinct (empty cart vs
-populated cart), an open modal, a form's layout, a confirmation page.
+**Do:** the states a component actually renders differently. The list the field agrees on is default,
+empty, error, success, and signed-in against signed-out, plus an open modal and a form's layout. An
+error state qualifies even though it carries text: what breaks there is the banner's colour, its
+placement and the reflow it causes, and no assertion notices any of that.
 
-**Do not:** every data permutation, text-only differences (assert those functionally), hover states
+**Do not:** every data permutation, a change of wording in the same rendered state, hover states
 (cursor position varies), or anything containing a third-party ad slot.
+
+The test is whether the **rendering** differs, not whether the **text** does. A filtered listing that
+draws the same grid with different products is one state; a listing that turns into an empty result
+block is another.
 
 ## The VR / E2E Boundary
 
@@ -168,6 +203,24 @@ the baseline is unreviewable, and the capture expires on the stability check und
 because product photography is still streaming in. When a region is genuinely larger than the
 viewport, anchor its heading with `scrollToTop` and capture the viewport instead, or scope the
 capture to the repeating component.
+
+## Page objects are shared
+
+Both suites use the same page objects, and that is the point: a capture often needs an element no
+functional case ever had a reason to address, most often a wrapper that gives the shot its frame.
+**Add it to the shared page object like any other locator.** A locator used by one visual case and no
+functional case is normal and correct.
+
+What is forbidden is a parallel structure: a VR-only page object class beside the real one, a
+locator written inline in a `.vr.spec.ts`, or a second name for an element the page object already
+exposes. The class is shared; which suite happens to use a given member is not a property of it.
+
+## Vendor documentation
+
+- [Visual comparisons](https://playwright.dev/docs/test-snapshots)
+- [`toHaveScreenshot` on a page](https://playwright.dev/docs/api/class-pageassertions#page-assertions-to-have-screenshot-2)
+- [`toHaveScreenshot` on a locator](https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-screenshot-2)
+- [`snapshotPathTemplate`](https://playwright.dev/docs/api/class-testconfig#test-config-snapshot-path-template)
 
 ## Anti-Patterns
 

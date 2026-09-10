@@ -1,23 +1,22 @@
 # The Agent Workflow
 
-`.claude/` holds six agents, three skills, two MCP server registrations and the slash commands that
+`.claude/` holds five agents, three skills, two MCP server registrations and the slash commands that
 connect them. They were used to build and audit this suite, not written as decoration.
 
 Planner, generator and healer are generated rather than hand written. `npx playwright init-agents
 --loop=claude` produces definitions matched to the installed Playwright version, carrying the exact
 tool names and call protocol of its authoring MCP server. Each then gains a project rules section,
 because the official definitions know nothing about this codebase: the generator's own example
-writes `page.click(...)` directly, which this repository does not allow. Manager, companion and
-reviewer are hand written, since the official set has no equivalent.
+writes `page.click(...)` directly, which this repository does not allow. Manager and reviewer are hand
+written, since the official set has no equivalent.
 
-| Agent                       | Responsibility                                   | Source        |
-| --------------------------- | ------------------------------------------------ | ------------- |
-| `playwright-test-manager`   | Strategy, coverage gaps, the caps, quality gates | hand written  |
-| `playwright-test-companion` | Full plan, implement, review, validate cycles    | hand written  |
-| `playwright-test-planner`   | Live exploration, then a written plan            | `init-agents` |
-| `playwright-test-generator` | One case at a time, from an existing plan        | `init-agents` |
-| `playwright-test-reviewer`  | Read only convention audit                       | hand written  |
-| `playwright-test-healer`    | Root cause diagnosis of failures                 | `init-agents` |
+| Agent                       | Responsibility                                  | Source        |
+| --------------------------- | ----------------------------------------------- | ------------- |
+| `playwright-test-manager`   | Scope, the caps, the gates, and the whole cycle | hand written  |
+| `playwright-test-planner`   | Live exploration, then a written plan           | `init-agents` |
+| `playwright-test-generator` | One case at a time, from an existing plan       | `init-agents` |
+| `playwright-test-reviewer`  | Read only convention audit                      | hand written  |
+| `playwright-test-healer`    | Root cause diagnosis of failures                | `init-agents` |
 
 | Command             | Effect                                                                      |
 | ------------------- | --------------------------------------------------------------------------- |
@@ -26,7 +25,9 @@ reviewer are hand written, since the official set has no equivalent.
 | `/implement <case>` | The generator implements exactly that case                                  |
 | `/review [files]`   | The reviewer audits against the checklist                                   |
 | `/heal <case>`      | The healer diagnoses before touching anything                               |
-| `/cycle <area>`     | The companion runs the whole loop                                           |
+| `/cycle <area>`     | The manager runs the whole loop                                             |
+| `/baseline [case]`  | The manager triages a failing visual case before any baseline changes       |
+| `/triage [run]`     | The manager separates an infrastructure failure from a test failure         |
 
 Two MCP servers are registered in `.mcp.json`. `playwright-test`
 (`npx playwright run-test-mcp-server`) is the authoring server the generated agents use. It reads
@@ -34,6 +35,11 @@ Two MCP servers are registered in `.mcp.json`. `playwright-test`
 viewport instead of being told them twice, and it exposes generation tools that a general browser
 server does not have. [`@playwright/mcp`](https://github.com/microsoft/playwright-mcp) stays
 registered for exploration outside test authoring.
+
+Both servers run from pinned local installs rather than `npx -y ...@latest`. An unpinned launcher
+resolves and executes a package on every start with no lockfile behind it, which is the documented
+supply-chain risk for MCP servers, and it also hides version changes from Renovate. `@playwright/mcp`
+is a dependency like any other; the authoring server ships inside `@playwright/test`.
 
 The skills are enforced rather than suggested. Four rules from
 `.claude/skills/playwright-pageobject-testing/SKILL.md`, namely no hard waits, no skipped tests, no
@@ -61,5 +67,8 @@ something narrower than it received.
    classifies it: application changed, test raced the UI, state left by another test, third party
    noise, or a genuine defect, which is parked with `test.fixme()` rather than repaired.
 
-The companion runs that chain for one area. The manager decides which area is next, and owns the
-caps. Skills are not chosen by the agents: they are the standards each step is measured against.
+The manager runs that chain for one area, decides which area is next, and owns the caps. Its
+workflows cover the cases a suite actually meets: a coverage request against a full cap, a new
+functional or visual case, a failing baseline, a red pipeline, an existing case that is wrong, a
+plan implemented only in part, and a health check. Skills are not chosen by the agents: they are the
+standards each step is measured against.

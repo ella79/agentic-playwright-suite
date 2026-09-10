@@ -6,6 +6,9 @@ import {
 
 const BASE_URL = process.env.E2E_BASE_URL || "https://automationexercise.com";
 
+/** Suffix that keeps each suite's local report in its own folder. */
+const SUITE = process.env.E2E_REPORT_SUFFIX ?? "";
+
 /**
  * The published dashboard is built from these results. environmentInfo fills
  * the report's Environment widget, so a run says what it executed against
@@ -52,9 +55,12 @@ export default defineConfig({
         ["json", { outputFile: "reports/results.json" }],
       ]
     : [
-        ["html", { open: "never" }],
+        // Local reports are written per suite. Both suites used to share one
+        // folder, so running the visual suite overwrote the functional report
+        // and `test:e2e:report` opened the wrong one.
+        ["html", { open: "never", outputFolder: `playwright-report${SUITE}` }],
         allureReporter,
-        ["junit", { outputFile: "reports/junit/results.xml" }],
+        ["junit", { outputFile: `reports/junit/results${SUITE}.xml` }],
       ],
   use: {
     baseURL: BASE_URL,
@@ -105,7 +111,7 @@ export default defineConfig({
       },
     },
     {
-      name: "visual-regression",
+      name: "vr",
       testDir: "./vr-tests",
       use: {
         ...devices["Desktop Chrome"],

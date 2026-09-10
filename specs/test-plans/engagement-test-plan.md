@@ -8,6 +8,8 @@ message, so each test asserts that message rather than any internal state.
 
 ## Preconditions
 
+Seed: `specs/seed.spec.ts`
+
 - No account required for any of these flows.
 - The contact form test uploads a fixture file from `utils/fixtures/files/`.
 

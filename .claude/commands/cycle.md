@@ -4,18 +4,17 @@ argument-hint: <feature area>
 allowed-tools: Task, Read, Write, Edit, Grep, Glob, Bash, TodoWrite
 ---
 
-Delegate to the **playwright-test-companion** agent.
+Delegate to the **playwright-test-manager** agent.
 
 Feature area: $ARGUMENTS
 
-It owns the full cycle and delegates each step:
+The manager owns the cycle. For a whole feature it runs W9, which chains the two suites in order:
+functional to green first, then the visual pass on the page object that pass built. For a single
+case it runs W2 or W3 alone. Either way it starts at W1 if the request would push a suite past its
+cap.
 
-1. `playwright-test-planner` writes the plan from live exploration
-2. `playwright-test-generator` implements each case, one at a time
-3. `playwright-test-reviewer` audits the resulting file set
-4. The companion runs `yarn typecheck && yarn lint && yarn stylecheck`, then the suite
-5. `playwright-test-healer` handles any failure
-6. `specs/STATUS.md` is updated with what landed
+Step order is planner, generator one case at a time, reviewer on the changed files, static checks,
+the case, the suite, healer on failure, then `specs/STATUS.md`.
 
-Step 3 is not optional because the tests pass. Report the cycle as a table: file, cases added,
-review findings, final run result.
+The review step is not optional because the tests pass. Report the cycle as a table: file, cases
+added, review findings, final run result.

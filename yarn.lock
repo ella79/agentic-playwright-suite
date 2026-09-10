@@ -215,6 +215,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@playwright/mcp@npm:0.0.80":
+  version: 0.0.80
+  resolution: "@playwright/mcp@npm:0.0.80"
+  dependencies:
+    playwright: "npm:1.63.0-alpha-2026-08-31"
+    playwright-core: "npm:1.63.0-alpha-2026-08-31"
+  bin:
+    playwright-mcp: cli.js
+  checksum: 10c0/d5b628948257fd008d4929796f6ae3367e1b08be8757952d37a4e6f9609e5c2b16b272baf01aa2ac930eb27dae6929694b397c71375d49bf5f79a385676d9cb2
+  languageName: node
+  linkType: hard
+
 "@playwright/test@npm:1.63.0":
   version: 1.63.0
   resolution: "@playwright/test@npm:1.63.0"
@@ -414,6 +426,7 @@ __metadata:
   resolution: "agentic-playwright-suite@workspace:."
   dependencies:
     "@microsoft/eslint-formatter-sarif": "npm:3.1.0"
+    "@playwright/mcp": "npm:0.0.80"
     "@playwright/test": "npm:1.63.0"
     "@types/node": "npm:24.13.3"
     "@typescript-eslint/eslint-plugin": "npm:8.70.0"
@@ -1305,6 +1318,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"playwright-core@npm:1.63.0-alpha-2026-08-31":
+  version: 1.63.0-alpha-2026-08-31
+  resolution: "playwright-core@npm:1.63.0-alpha-2026-08-31"
+  bin:
+    playwright-core: cli.js
+  checksum: 10c0/502654b75f156c1dad1f546b6da549c00e52ca1569b48137bd213b06584786f8fd62ca02ad7a053c6338dd602be44b1d4fe6e679fe79903f02efa6f2bd9a2f0d
+  languageName: node
+  linkType: hard
+
 "playwright@npm:1.63.0":
   version: 1.63.0
   resolution: "playwright@npm:1.63.0"
@@ -1313,6 +1335,17 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: 10c0/d1fd048a89be27c9aba6757dc4f70eff4a5163b49f439ad691767be8b2a482327d0dd1928b4f73c8fe0d8b33aab2c9dc2670424ab60f112d9e98e91b94e3b090
+  languageName: node
+  linkType: hard
+
+"playwright@npm:1.63.0-alpha-2026-08-31":
+  version: 1.63.0-alpha-2026-08-31
+  resolution: "playwright@npm:1.63.0-alpha-2026-08-31"
+  dependencies:
+    playwright-core: "npm:1.63.0-alpha-2026-08-31"
+  bin:
+    playwright: cli.js
+  checksum: 10c0/c97543b9661ffa54ecc5e4bc5a69f48bd1aa46f6712700a36b706fc557cb4971299e7d00e2d4fd640fd80e7cf0e7b2aa0234c930fa1f1936b5fc1ed05b8c98c8
   languageName: node
   linkType: hard
 
