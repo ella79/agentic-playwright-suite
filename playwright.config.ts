@@ -65,7 +65,10 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     testIdAttribute: "data-qa",
-    trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
+    // Kept for the failed attempt on every run, CI included. `on-first-retry`
+    // recorded only the retry, so a test that failed and then passed kept the
+    // trace of the run that passed and lost the one that failed.
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: process.env.CI ? "retain-on-failure" : "off",
   },
