@@ -5,7 +5,17 @@ Every plan in `specs/vr-test-plans/` uses this shape.
 ```markdown
 # <Area> Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/<area>.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
+Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
+
+## Metadata
+
+| Field       | Value                                        |
+| ----------- | -------------------------------------------- |
+| Page URL    | `/<route>`                                   |
+| Page Title  | The page's real `<title>`, read from the app |
+| Spec File   | `vr-tests/<area>.vr.spec.ts`                 |
+| Page Object | `utils/pageObjects/<area>/<name>Page.ts`     |
+| Baselines   | `vr-tests/<area>.vr.spec.ts-snapshots/`      |
 
 ## Scope
 
@@ -14,9 +24,9 @@ notices.
 
 ## Cases
 
-| ID    | Screenshot       | State captured         |
-| ----- | ---------------- | ---------------------- |
-| VR-nn | `<area>-<state>` | The state, in one line |
+| ID    | Name                           | Screenshot       | State captured         |
+| ----- | ------------------------------ | ---------------- | ---------------------- |
+| VR-nn | add-to-cart confirmation modal | `<area>-<state>` | The state, in one line |
 
 ## Notes
 
@@ -31,6 +41,21 @@ that cannot be captured stably, such as a carousel that advances on a timer.
 
 ## Rules
 
+- The `Metadata` block comes first, immediately after the title and before `## Scope`, so a reader
+  knows which page the plan covers and which files implement it without grepping for them. It is the
+  functional block plus `Baselines`, and it holds the spec file, so the opening line carries only the
+  conventions link and the seed.
+- `Page URL` is the route as `utils/url.ts` holds it. A plan that spans two surfaces names both, in
+  the order the flow visits them; the same goes for `Page Object` when the cases drive more than one
+  class.
+- `Page Title` is the live `<title>` of that page, read from the running application. It is never
+  derived from the heading, from the URL, or from what a title probably says.
+- `Name` is the case's test title, not a second description of the state. The spec titles the case
+  `<ID>: <Name>`, so the cell holds exactly the text that follows the ID prefix, character for
+  character. Whichever is written first, the other copies it: the plan and the spec hold one string
+  in two places, and a name reworded in either one breaks the link this column exists to create.
+- `Name` and `Screenshot` are two different strings and neither is derived from the other. The name
+  is the title a person reads in the report; the screenshot is the baseline file name.
 - The screenshot column holds the baseline name without `.png` and without the platform suffix
   Playwright appends. It must match the name in the spec exactly.
 - IDs are assigned in sequence, `VR-01` upward, taking the next number after the highest the suite

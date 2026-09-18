@@ -1,6 +1,16 @@
 # Home Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/home.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
+Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
+
+## Metadata
+
+| Field       | Value                                 |
+| ----------- | ------------------------------------- |
+| Page URL    | `/`                                   |
+| Page Title  | `Automation Exercise`                 |
+| Spec File   | `vr-tests/home.vr.spec.ts`            |
+| Page Object | `utils/pageObjects/home/homePage.ts`  |
+| Baselines   | `vr-tests/home.vr.spec.ts-snapshots/` |
 
 ## Scope
 
@@ -13,12 +23,12 @@ would split one component across two baseline directories.
 
 ## Cases
 
-| ID    | Screenshot              | State captured                                           |
-| ----- | ----------------------- | -------------------------------------------------------- |
-| VR-01 | `home-header-anonymous` | Site header with no session                              |
-| VR-02 | `home-features-items`   | Featured products grid, viewport-anchored                |
-| VR-03 | `home-subscription`     | Footer newsletter block                                  |
-| VR-17 | `home-header-signed-in` | Site header showing Logout, Delete Account, and the name |
+| ID    | Name                                 | Screenshot              | State captured                                           |
+| ----- | ------------------------------------ | ----------------------- | -------------------------------------------------------- |
+| VR-01 | site header for an anonymous visitor | `home-header-anonymous` | Site header with no session                              |
+| VR-02 | featured products grid               | `home-features-items`   | Featured products grid, viewport-anchored                |
+| VR-03 | footer newsletter block              | `home-subscription`     | Footer newsletter block                                  |
+| VR-17 | site header for a signed-in user     | `home-header-signed-in` | Site header showing Logout, Delete Account, and the name |
 
 ## Notes
 

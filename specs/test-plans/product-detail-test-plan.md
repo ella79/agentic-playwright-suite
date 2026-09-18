@@ -1,5 +1,14 @@
 # Product Detail Test Plan
 
+## Metadata
+
+| Field       | Value                                             |
+| ----------- | ------------------------------------------------- |
+| Page URL    | `/product_details/<id>`                           |
+| Page Title  | `Automation Exercise - Product Details`           |
+| Spec File   | `tests/product-detail/product-detail.spec.ts`     |
+| Page Object | `utils/pageObjects/products/productDetailPage.ts` |
+
 ## Scope
 
 The review form on a product's detail page. Reaching the page from the catalog is covered by TC-07 in `products-test-plan.md`.
@@ -12,9 +21,9 @@ Seed: `specs/seed.spec.ts`
 
 ## Test Cases
 
-| ID    | Type  | Scenario                                            | Expected                       |
-| ----- | ----- | --------------------------------------------------- | ------------------------------ |
-| TC-19 | happy | A visitor submits a review on a product detail page | The thank-you message is shown |
+| ID    | Name                                                   | Type  | Scenario                                            | Expected                       |
+| ----- | ------------------------------------------------------ | ----- | --------------------------------------------------- | ------------------------------ |
+| TC-19 | a product review can be submitted from the detail page | happy | A visitor submits a review on a product detail page | The thank-you message is shown |
 
 ## Locator Notes
 

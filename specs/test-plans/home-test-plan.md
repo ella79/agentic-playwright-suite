@@ -1,5 +1,14 @@
 # Home Test Plan
 
+## Metadata
+
+| Field       | Value                                |
+| ----------- | ------------------------------------ |
+| Page URL    | `/`                                  |
+| Page Title  | `Automation Exercise`                |
+| Spec File   | `tests/home/home.spec.ts`            |
+| Page Object | `utils/pageObjects/home/homePage.ts` |
+
 ## Scope
 
 The newsletter subscription in the footer, which is the only behaviour the home page offers. Its appearance, and the header and featured grid, are covered by `specs/vr-test-plans/home-vr-test-plan.md`.
@@ -12,9 +21,9 @@ Seed: `specs/seed.spec.ts`
 
 ## Test Cases
 
-| ID    | Type  | Scenario                                               | Expected                                  |
-| ----- | ----- | ------------------------------------------------------ | ----------------------------------------- |
-| TC-20 | happy | A visitor subscribes to the newsletter from the footer | The subscription success message is shown |
+| ID    | Name                                                      | Type  | Scenario                                               | Expected                                  |
+| ----- | --------------------------------------------------------- | ----- | ------------------------------------------------------ | ----------------------------------------- |
+| TC-20 | a visitor can subscribe to the newsletter from the footer | happy | A visitor subscribes to the newsletter from the footer | The subscription success message is shown |
 
 ## Locator Notes
 

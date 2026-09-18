@@ -124,7 +124,11 @@ Check the plan against this list. A plan that fails any line is not saved, it is
 - The plan is the area's only plan in its suite, extended rather than duplicated
 - No case restates coverage that already exists. Read every plan of that suite first and compare
   mechanics, not wording: the same interaction against different data is one case
-- Every case has an ID, a scenario in the user's language, and an observable expectation
+- Every case has an ID, a name, a scenario in the user's language, and an observable expectation
+- The name is the case's test title, not a summary of the scenario. The spec titles the case
+  `<ID>: <Name>`, so the plan's cell and the spec's title are one string in two places and must match
+  character for character. When the spec already exists, copy its title; when it does not, the name
+  written here is what the generator will use verbatim
 - At least one case that is not a happy path
 - Every accessible name in the plan was confirmed in the snapshot, not assumed
 - `Out of Scope` names what is uncovered and why

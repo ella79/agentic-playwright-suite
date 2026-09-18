@@ -1,5 +1,14 @@
 # Checkout Test Plan
 
+## Metadata
+
+| Field       | Value                                                                                                                                                                                                                                                                                   |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page URL    | `/checkout`, `/payment`, `/payment_done/<id>`                                                                                                                                                                                                                                           |
+| Page Title  | `Automation Exercise - Checkout`, `Automation Exercise - Payment`, `Automation Exercise - Order Placed`                                                                                                                                                                                 |
+| Spec File   | `tests/checkout/checkout.spec.ts`                                                                                                                                                                                                                                                       |
+| Page Object | `utils/pageObjects/products/productDetailPage.ts`, `utils/pageObjects/shared/addToCartModal.ts`, `utils/pageObjects/cart/cartPage.ts`, `utils/pageObjects/checkout/checkoutPage.ts`, `utils/pageObjects/checkout/paymentPage.ts`, `utils/pageObjects/checkout/orderConfirmationPage.ts` |
+
 ## Scope
 
 The full purchase journey for a registered user: cart review, address confirmation, order comment,
@@ -18,9 +27,9 @@ Seed: `specs/seed.spec.ts`
 
 ## Test Cases
 
-| ID    | Type  | Scenario                                            | Expected                                                                                                                                                                                |
-| ----- | ----- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TC-17 | happy | A signed-in user checks out a cart with one product | Delivery and billing addresses reflect the registered account, the order review lists the product, and after payment the order placed confirmation with a downloadable invoice is shown |
+| ID    | Name                                              | Type  | Scenario                                            | Expected                                                                                                                                                                                |
+| ----- | ------------------------------------------------- | ----- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-17 | a signed-in user can complete an order end to end | happy | A signed-in user checks out a cart with one product | Delivery and billing addresses reflect the registered account, the order review lists the product, and after payment the order placed confirmation with a downloadable invoice is shown |
 
 ## Steps
 

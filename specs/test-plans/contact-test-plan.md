@@ -1,5 +1,14 @@
 # Contact Test Plan
 
+## Metadata
+
+| Field       | Value                                        |
+| ----------- | -------------------------------------------- |
+| Page URL    | `/contact_us`                                |
+| Page Title  | `Automation Exercise - Contact Us`           |
+| Spec File   | `tests/contact/contact.spec.ts`              |
+| Page Object | `utils/pageObjects/contact/contactUsPage.ts` |
+
 ## Scope
 
 The contact form, including the file attachment it accepts. The page's appearance is covered by `specs/vr-test-plans/contact-vr-test-plan.md`.
@@ -12,9 +21,9 @@ Seed: `specs/seed.spec.ts`
 
 ## Test Cases
 
-| ID    | Type  | Scenario                                              | Expected                                                                 |
-| ----- | ----- | ----------------------------------------------------- | ------------------------------------------------------------------------ |
-| TC-18 | happy | A visitor submits the contact form with an attachment | The success message is shown after the native confirm dialog is accepted |
+| ID    | Name                                                  | Type  | Scenario                                              | Expected                                                                 |
+| ----- | ----------------------------------------------------- | ----- | ----------------------------------------------------- | ------------------------------------------------------------------------ |
+| TC-18 | the contact form accepts a message with an attachment | happy | A visitor submits the contact form with an attachment | The success message is shown after the native confirm dialog is accepted |
 
 ## Locator Notes
 
