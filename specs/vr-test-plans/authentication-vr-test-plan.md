@@ -1,6 +1,16 @@
 # Authentication Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/authentication.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
+Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
+
+## Metadata
+
+| Field       | Value                                                                              |
+| ----------- | ---------------------------------------------------------------------------------- |
+| Page URL    | `/login`, `/signup`                                                                |
+| Page Title  | `Automation Exercise - Signup / Login` on both routes                              |
+| Spec File   | `vr-tests/authentication.vr.spec.ts`                                               |
+| Page Object | `utils/pageObjects/auth/loginPage.ts`, `utils/pageObjects/auth/accountInfoPage.ts` |
+| Baselines   | `vr-tests/authentication.vr.spec.ts-snapshots/`                                    |
 
 ## Scope
 
@@ -10,10 +20,10 @@ rather than an authentication screen, so both of its states are captured togethe
 
 ## Cases
 
-| ID    | Screenshot                         | State captured                                            |
-| ----- | ---------------------------------- | --------------------------------------------------------- |
-| VR-14 | `authentication-login-form`        | Login form, empty                                         |
-| VR-16 | `authentication-account-info-form` | Full registration form: title, dates, address, checkboxes |
+| ID    | Name                   | Screenshot                         | State captured                                            |
+| ----- | ---------------------- | ---------------------------------- | --------------------------------------------------------- |
+| VR-14 | login form             | `authentication-login-form`        | Login form, empty                                         |
+| VR-16 | full registration form | `authentication-account-info-form` | Full registration form: title, dates, address, checkboxes |
 
 ## Notes
 

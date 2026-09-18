@@ -1,6 +1,16 @@
 # Products Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/products.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
+Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
+
+## Metadata
+
+| Field       | Value                                        |
+| ----------- | -------------------------------------------- |
+| Page URL    | `/products`                                  |
+| Page Title  | `Automation Exercise - All Products`         |
+| Spec File   | `vr-tests/products.vr.spec.ts`               |
+| Page Object | `utils/pageObjects/products/productsPage.ts` |
+| Baselines   | `vr-tests/products.vr.spec.ts-snapshots/`    |
 
 ## Scope
 
@@ -11,12 +21,12 @@ break unnoticed, nothing renders there in normal use.
 
 ## Cases
 
-| ID    | Screenshot                   | State captured                                   |
-| ----- | ---------------------------- | ------------------------------------------------ |
-| VR-04 | `products-catalog-grid`      | Catalog grid, viewport-anchored                  |
-| VR-05 | `products-card-default`      | A single product card at rest                    |
-| VR-06 | `products-category-sidebar`  | Category accordion in its collapsed state        |
-| VR-07 | `products-search-no-results` | Catalog area after a search that matches nothing |
+| ID    | Name                                        | Screenshot                   | State captured                                   |
+| ----- | ------------------------------------------- | ---------------------------- | ------------------------------------------------ |
+| VR-04 | catalog grid                                | `products-catalog-grid`      | Catalog grid, viewport-anchored                  |
+| VR-05 | single product card at rest                 | `products-card-default`      | A single product card at rest                    |
+| VR-06 | category accordion                          | `products-category-sidebar`  | Category accordion in its collapsed state        |
+| VR-07 | catalog area after a search with no matches | `products-search-no-results` | Catalog area after a search that matches nothing |
 
 ## Notes
 

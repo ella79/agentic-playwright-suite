@@ -1,5 +1,14 @@
 # Products Test Plan
 
+## Metadata
+
+| Field       | Value                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| Page URL    | `/products`, `/product_details/<id>`                                                            |
+| Page Title  | `Automation Exercise - All Products`, `Automation Exercise - Product Details`                   |
+| Spec File   | `tests/products/products.spec.ts`                                                               |
+| Page Object | `utils/pageObjects/products/productsPage.ts`, `utils/pageObjects/products/productDetailPage.ts` |
+
 ## Scope
 
 Catalog listing, product detail, search, and the two sidebar filters. Verifies that a visitor can
@@ -10,17 +19,17 @@ full catalog.
 
 Seed: `specs/seed.spec.ts`
 
-- Entry point: `/products`. No account required, the catalog is public.
+- No account required, the catalog is public.
 
 ## Test Cases
 
-| ID    | Type  | Scenario                                                          | Expected                                                                                    |
-| ----- | ----- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| TC-07 | happy | A visitor opens the catalog and views a product                   | The catalog renders product cards and the detail page shows name, price, availability       |
-| TC-08 | happy | A visitor searches for a term matching several products           | The searched products heading appears and every returned card matches the term              |
-| TC-09 | error | A visitor searches for a term with no matches                     | The searched products heading appears with zero cards, the catalog is not silently returned |
-| TC-10 | happy | A visitor filters by a category                                   | The heading names the category and at least one product is listed                           |
-| TC-11 | happy | A visitor scrolls down the catalog and uses the scroll-up control | The page returns to the top and the catalog heading is back in view                         |
+| ID    | Name                                                     | Type  | Scenario                                                          | Expected                                                                                    |
+| ----- | -------------------------------------------------------- | ----- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| TC-07 | the catalog lists products and one opens its detail page | happy | A visitor opens the catalog and views a product                   | The catalog renders product cards and the detail page shows name, price, availability       |
+| TC-08 | search returns only products matching the term           | happy | A visitor searches for a term matching several products           | The searched products heading appears and every returned card matches the term              |
+| TC-09 | a search with no matches returns an empty result set     | error | A visitor searches for a term with no matches                     | The searched products heading appears with zero cards, the catalog is not silently returned |
+| TC-10 | filtering by category lists that category's products     | happy | A visitor filters by a category                                   | The heading names the category and at least one product is listed                           |
+| TC-11 | the scroll-up control returns the visitor to the top     | happy | A visitor scrolls down the catalog and uses the scroll-up control | The page returns to the top and the catalog heading is back in view                         |
 
 ## Locator Notes
 

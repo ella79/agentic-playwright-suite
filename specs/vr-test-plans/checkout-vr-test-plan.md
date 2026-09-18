@@ -1,6 +1,16 @@
 # Checkout Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/checkout.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
+Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
+
+## Metadata
+
+| Field       | Value                                                                                                                                                                                                                            |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page URL    | `/checkout`, `/payment`                                                                                                                                                                                                          |
+| Page Title  | `Automation Exercise - Checkout`, `Automation Exercise - Payment`                                                                                                                                                                |
+| Spec File   | `vr-tests/checkout.vr.spec.ts`                                                                                                                                                                                                   |
+| Page Object | `utils/pageObjects/products/productDetailPage.ts`, `utils/pageObjects/shared/addToCartModal.ts`, `utils/pageObjects/cart/cartPage.ts`, `utils/pageObjects/checkout/checkoutPage.ts`, `utils/pageObjects/checkout/paymentPage.ts` |
+| Baselines   | `vr-tests/checkout.vr.spec.ts-snapshots/`                                                                                                                                                                                        |
 
 ## Scope
 
@@ -10,10 +20,10 @@ cover it: a layout regression here reaches a user at the point where they are pa
 
 ## Cases
 
-| ID    | Screenshot                 | State captured                              |
-| ----- | -------------------------- | ------------------------------------------- |
-| VR-19 | `checkout-address-details` | Delivery address block on the checkout step |
-| VR-20 | `checkout-payment-form`    | Card entry form                             |
+| ID    | Name                   | Screenshot                 | State captured                              |
+| ----- | ---------------------- | -------------------------- | ------------------------------------------- |
+| VR-19 | delivery address block | `checkout-address-details` | Delivery address block on the checkout step |
+| VR-20 | card entry form        | `checkout-payment-form`    | Card entry form                             |
 
 ## Notes
 

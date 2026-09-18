@@ -1,6 +1,16 @@
 # Contact Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/contact.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
+Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
+
+## Metadata
+
+| Field       | Value                                        |
+| ----------- | -------------------------------------------- |
+| Page URL    | `/contact_us`                                |
+| Page Title  | `Automation Exercise - Contact Us`           |
+| Spec File   | `vr-tests/contact.vr.spec.ts`                |
+| Page Object | `utils/pageObjects/contact/contactUsPage.ts` |
+| Baselines   | `vr-tests/contact.vr.spec.ts-snapshots/`     |
 
 ## Scope
 
@@ -11,10 +21,10 @@ is the page's other layout and is not reachable from the empty one by CSS alone.
 
 ## Cases
 
-| ID    | Screenshot        | State captured                                         |
-| ----- | ----------------- | ------------------------------------------------------ |
-| VR-18 | `contact-form`    | Contact form, empty, including the file selector       |
-| VR-21 | `contact-success` | Success banner after submitting, the form column alone |
+| ID    | Name                  | Screenshot        | State captured                                         |
+| ----- | --------------------- | ----------------- | ------------------------------------------------------ |
+| VR-18 | contact form          | `contact-form`    | Contact form, empty, including the file selector       |
+| VR-21 | contact success state | `contact-success` | Success banner after submitting, the form column alone |
 
 ## Notes
 

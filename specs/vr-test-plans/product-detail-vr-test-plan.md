@@ -1,6 +1,16 @@
 # Product Detail Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/product-detail.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
+Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
+
+## Metadata
+
+| Field       | Value                                             |
+| ----------- | ------------------------------------------------- |
+| Page URL    | `/product_details/<id>`                           |
+| Page Title  | `Automation Exercise - Product Details`           |
+| Spec File   | `vr-tests/product-detail.vr.spec.ts`              |
+| Page Object | `utils/pageObjects/products/productDetailPage.ts` |
+| Baselines   | `vr-tests/product-detail.vr.spec.ts-snapshots/`   |
 
 ## Scope
 
@@ -12,10 +22,10 @@ Both captures use a fixed product so the content is stable between runs.
 
 ## Cases
 
-| ID    | Screenshot                   | State captured                                       |
-| ----- | ---------------------------- | ---------------------------------------------------- |
-| VR-08 | `product-detail-information` | Information panel: image, price, availability, brand |
-| VR-09 | `product-detail-review-form` | Write-a-review form in its empty state               |
+| ID    | Name                      | Screenshot                   | State captured                                       |
+| ----- | ------------------------- | ---------------------------- | ---------------------------------------------------- |
+| VR-08 | product information panel | `product-detail-information` | Information panel: image, price, availability, brand |
+| VR-09 | write-a-review form       | `product-detail-review-form` | Write-a-review form in its empty state               |
 
 ## Notes
 

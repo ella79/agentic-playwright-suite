@@ -36,8 +36,10 @@ assertions are held to a stricter bar: anything beyond reaching the state is a f
       Locator Notes, Out of Scope; a visual plan carries the header line, Scope, Cases, Notes, Out of
       Scope
 - [ ] `Seed:` line present, naming `specs/seed.spec.ts`
-- [ ] Table columns exactly `ID | Type | Scenario | Expected`, or `ID | Screenshot | State captured`
-      for a visual plan
+- [ ] Table columns exactly `ID | Name | Type | Scenario | Expected`, or
+      `ID | Name | Screenshot | State captured` for a visual plan
+- [ ] `Name` is the case's test title, not a summary of the scenario: the spec titles the case
+      `<ID>: <Name>`, and the plan's cell matches the text after that prefix character for character
 - [ ] `Type` is one of `happy`, `edge`, `error`, and at least one case is not happy
 - [ ] IDs continue the suite, none reused, none renumbered
 - [ ] No case duplicates one already covered in that suite, judged on the interaction it exercises

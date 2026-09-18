@@ -1,6 +1,16 @@
 # Cart Visual Regression Test Plan
 
-Shared conventions: [`README.md`](README.md). Spec file: `vr-tests/cart.vr.spec.ts`. Seed: `specs/seed.spec.ts`.
+Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
+
+## Metadata
+
+| Field       | Value                                                                                                                                                                                   |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page URL    | `/view_cart`, `/product_details/<id>`                                                                                                                                                   |
+| Page Title  | `Automation Exercise - Checkout`, `Automation Exercise - Product Details`                                                                                                               |
+| Spec File   | `vr-tests/cart.vr.spec.ts`                                                                                                                                                              |
+| Page Object | `utils/pageObjects/cart/cartPage.ts`, `utils/pageObjects/products/productDetailPage.ts`, `utils/pageObjects/shared/addToCartModal.ts`, `utils/pageObjects/shared/checkoutGuardModal.ts` |
+| Baselines   | `vr-tests/cart.vr.spec.ts-snapshots/`                                                                                                                                                   |
 
 ## Scope
 
@@ -11,12 +21,12 @@ rendered halfway off-screen and still pass.
 
 ## Cases
 
-| ID    | Screenshot                  | State captured                                           |
-| ----- | --------------------------- | -------------------------------------------------------- |
-| VR-10 | `cart-empty`                | Empty cart state                                         |
-| VR-11 | `cart-single-item`          | Cart table holding one product                           |
-| VR-12 | `cart-added-modal`          | Add-to-cart confirmation modal                           |
-| VR-13 | `cart-checkout-guard-modal` | Account guard shown when an anonymous visitor checks out |
+| ID    | Name                                      | Screenshot                  | State captured                                           |
+| ----- | ----------------------------------------- | --------------------------- | -------------------------------------------------------- |
+| VR-10 | empty cart state                          | `cart-empty`                | Empty cart state                                         |
+| VR-11 | cart table holding one product            | `cart-single-item`          | Cart table holding one product                           |
+| VR-12 | add-to-cart confirmation modal            | `cart-added-modal`          | Add-to-cart confirmation modal                           |
+| VR-13 | account guard shown to anonymous visitors | `cart-checkout-guard-modal` | Account guard shown when an anonymous visitor checks out |
 
 ## Notes
 

@@ -126,9 +126,10 @@ A page object grows from either side: a locator only a capture needs belongs her
 rest. This file is the only place their standard lives; the visual skill covers what is specific to
 a screenshot.
 
-One chain has to hold, because the published dashboard reads it: the plan ID becomes the test title,
-the spec carries the `// spec:` header pointing at that plan, `STATUS.md` counts the case, and a
-visual case matches its baseline name. Break a link and a result stops tracing back to its plan.
+One chain has to hold, because the published dashboard reads it: the plan row supplies the whole
+test title, `<ID>: <Name>`, with both halves copied from the row character for character, the spec
+carries the `// spec:` header pointing at that plan, `STATUS.md` counts the case, and a visual case
+matches its baseline name. Break a link and a result stops tracing back to its plan.
 
 ## Spec Structure
 
