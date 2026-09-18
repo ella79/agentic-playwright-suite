@@ -24,6 +24,12 @@
     "description": "The public demo host shed the request. Infrastructure noise, not a product regression."
   },
   {
+    "name": "Page did not load",
+    "traceRegex": "(?s).*\\sat \\w+\\.goto(\\w*Page)? \\(.*",
+    "matchedStatuses": ["failed", "broken"],
+    "description": "Failed inside a page object's navigation, before any of the test's own steps: the page the test asked for never arrived. In practice this is the public demo host shedding load or serving an empty page; a landing heading the application changed would land here too, which is why the name says what happened rather than guessing the cause."
+  },
+  {
     "name": "Timed out waiting for state",
     "messageRegex": ".*(Timeout .* exceeded|Test timeout of).*",
     "matchedStatuses": ["failed", "broken"],
