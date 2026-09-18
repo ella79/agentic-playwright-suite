@@ -189,7 +189,7 @@ jobs:
         with:
           name: allure-results-${{ matrix.project }}
           path: allure-results
-          retention-days: 7
+          retention-days: 30
 
       # Blob is the format merge-reports consumes, so the published HTML report
       # carries the traces for every engine, not only the canonical one.
@@ -199,7 +199,7 @@ jobs:
         with:
           name: blob-report-${{ matrix.project }}
           path: blob-report
-          retention-days: 7
+          retention-days: 30
 
       # Playwright's JSON report is the only one that states flaky as an
       # outcome, so it is what the suite health page is built from.
@@ -209,7 +209,7 @@ jobs:
         with:
           name: results-json-${{ matrix.project }}
           path: reports/results.json
-          retention-days: 7
+          retention-days: 30
 
       - name: Upload failure artifacts
         if: failure()
@@ -217,7 +217,7 @@ jobs:
         with:
           name: ${{ matrix.project }}-traces
           path: test-results
-          retention-days: 7
+          retention-days: 30
 
   visual-regression:
     name: visual-regression
@@ -259,7 +259,7 @@ jobs:
         with:
           name: allure-results-vr
           path: allure-results
-          retention-days: 7
+          retention-days: 30
 
       - name: Upload blob report
         if: always()
@@ -267,7 +267,7 @@ jobs:
         with:
           name: blob-report-vr
           path: blob-report
-          retention-days: 7
+          retention-days: 30
 
       - name: Upload JSON report
         if: always()
@@ -275,7 +275,7 @@ jobs:
         with:
           name: results-json-vr
           path: reports/results.json
-          retention-days: 7
+          retention-days: 30
 
       - name: Upload visual diffs
         if: failure()
@@ -283,7 +283,7 @@ jobs:
         with:
           name: visual-diffs
           path: test-results
-          retention-days: 7
+          retention-days: 30
 
   # The single check the branch protection requires.
   #
@@ -489,6 +489,45 @@ jobs:
         run: |
           yarn playwright merge-reports --reporter html ./all-blob-reports
           mv playwright-report allure-report/playwright-report
+
+      # The root always carries the newest report, unchanged. This is what
+      # lets a CI run's own summary link to the report it produced instead of
+      # whichever run happens to publish last: the report a failure was found
+      # in stays reachable after a later run turns green, until it ages out.
+      #
+      # Kept by count, not by age, since Allure's own docs describe no other
+      # mechanism: gh-pages-tmp already holds the previously published site
+      # from the trend-history restore above, so previous runs/ folders are
+      # read from there. keep_files is deliberately left unset on the publish
+      # step below, so whatever this step does not carry forward is dropped
+      # when the branch is replaced with publish_dir's contents; the cap here
+      # is the only place retention is enforced.
+      - name: Archive this run's report and prune old ones
+        run: |
+          cp -r allure-report /tmp/this-run-report
+          mkdir -p allure-report/runs
+          mv /tmp/this-run-report "allure-report/runs/${{ github.run_number }}"
+
+          kept=1
+          if [ -d gh-pages-tmp/runs ]; then
+            for dir in $(ls -1 gh-pages-tmp/runs | sort -rn); do
+              if [ "$kept" -ge 20 ]; then
+                echo "Retention cap reached at $kept; dropping run $dir and older"
+                break
+              fi
+              if [ -d "allure-report/runs/$dir" ]; then
+                continue
+              fi
+              cp -r "gh-pages-tmp/runs/$dir" "allure-report/runs/$dir"
+              kept=$((kept + 1))
+            done
+          fi
+          echo "Kept $kept run reports, this run's included"
+
+          {
+            echo "### Report for this run"
+            echo "https://ella79.github.io/agentic-playwright-suite/runs/${{ github.run_number }}/"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # The portfolio page reads this report and publishes a contract naming
       # what it depends on. A report that no longer fits fails here, leaving the
