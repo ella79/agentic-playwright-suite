@@ -215,15 +215,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/mcp@npm:0.0.80":
-  version: 0.0.80
-  resolution: "@playwright/mcp@npm:0.0.80"
+"@playwright/mcp@npm:0.0.81":
+  version: 0.0.81
+  resolution: "@playwright/mcp@npm:0.0.81"
   dependencies:
-    playwright: "npm:1.63.0-alpha-2026-08-31"
-    playwright-core: "npm:1.63.0-alpha-2026-08-31"
+    playwright: "npm:1.64.0-alpha-2026-09-14"
+    playwright-core: "npm:1.64.0-alpha-2026-09-14"
   bin:
     playwright-mcp: cli.js
-  checksum: 10c0/d5b628948257fd008d4929796f6ae3367e1b08be8757952d37a4e6f9609e5c2b16b272baf01aa2ac930eb27dae6929694b397c71375d49bf5f79a385676d9cb2
+  checksum: 10c0/74485df316b785b1c1c9ee494274de83b235761e992eeb250c8cc0fb4cf38e85aa0bf2368afde567423b99050cb149fcd14c68721fc3ce09e8dc3cba53a27cbe
   languageName: node
   linkType: hard
 
@@ -426,7 +426,7 @@ __metadata:
   resolution: "agentic-playwright-suite@workspace:."
   dependencies:
     "@microsoft/eslint-formatter-sarif": "npm:3.1.0"
-    "@playwright/mcp": "npm:0.0.80"
+    "@playwright/mcp": "npm:0.0.81"
     "@playwright/test": "npm:1.63.0"
     "@types/node": "npm:24.13.3"
     "@typescript-eslint/eslint-plugin": "npm:8.70.0"
@@ -1318,12 +1318,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.63.0-alpha-2026-08-31":
-  version: 1.63.0-alpha-2026-08-31
-  resolution: "playwright-core@npm:1.63.0-alpha-2026-08-31"
+"playwright-core@npm:1.64.0-alpha-2026-09-14":
+  version: 1.64.0-alpha-2026-09-14
+  resolution: "playwright-core@npm:1.64.0-alpha-2026-09-14"
   bin:
     playwright-core: cli.js
-  checksum: 10c0/502654b75f156c1dad1f546b6da549c00e52ca1569b48137bd213b06584786f8fd62ca02ad7a053c6338dd602be44b1d4fe6e679fe79903f02efa6f2bd9a2f0d
+  checksum: 10c0/060e1260ffe2ee7cf2cca45be7113b5a0673ebd84ce851427c3f09ba2684e220442d062d62841c065a3f25468f32c4b69516bde04e0d9416e2fdac1f738f1314
   languageName: node
   linkType: hard
 
@@ -1338,14 +1338,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright@npm:1.63.0-alpha-2026-08-31":
-  version: 1.63.0-alpha-2026-08-31
-  resolution: "playwright@npm:1.63.0-alpha-2026-08-31"
+"playwright@npm:1.64.0-alpha-2026-09-14":
+  version: 1.64.0-alpha-2026-09-14
+  resolution: "playwright@npm:1.64.0-alpha-2026-09-14"
   dependencies:
-    playwright-core: "npm:1.63.0-alpha-2026-08-31"
+    playwright-core: "npm:1.64.0-alpha-2026-09-14"
   bin:
     playwright: cli.js
-  checksum: 10c0/c97543b9661ffa54ecc5e4bc5a69f48bd1aa46f6712700a36b706fc557cb4971299e7d00e2d4fd640fd80e7cf0e7b2aa0234c930fa1f1936b5fc1ed05b8c98c8
+  checksum: 10c0/925eea07bf161476b0ee3f0719ee7023afe8de870063615a827ea7b9571d1a00dc58f712a5f723298f19acad8fe4bcd139c0b57f70f2725f1ea27017350e2378
   languageName: node
   linkType: hard
 
