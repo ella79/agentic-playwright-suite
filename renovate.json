@@ -35,6 +35,13 @@
       "semanticCommitType": "ci"
     },
     {
+      "description": "An action's digest update merges itself once the gate is green. With every action pinned to a commit SHA, a digest update is the same tag moved to a newer commit, the smallest change a workflow dependency can make. It gets a group of its own rather than joining the one above, so a digest pull request can never carry a major version with it: Renovate's documentation does not state how automerge treats a group that mixes update types, and this rule should not depend on it.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["digest"],
+      "groupName": "github actions digests",
+      "automerge": true
+    },
+    {
       "description": "Linters and formatters merge themselves once the gate is green, on non major updates only. Renovate's automerge guidance names development dependencies, and linters and formatters in particular, as the safest category, and limits the practice to non major updates. Nothing here changes what the application does, and the pipeline still has to pass first.",
       "extends": ["packages:linters"],
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
