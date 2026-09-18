@@ -37,7 +37,7 @@
 </head>
 <body>
 <h1>Suite health</h1>
-<p class="sub">Run 170 &middot; ae917692 on main &middot; Fri, 18 Sep 2026 13:46:44 GMT</p>
+<p class="sub">Run 172 &middot; 33c41a2a on main &middot; Fri, 18 Sep 2026 14:14:51 GMT</p>
 
 <nav>
   <a href="../">Test results</a>
@@ -55,7 +55,7 @@
         stroke-dashoffset="0"><title>functional (Chromium): 20 passed of 20</title></circle><circle class="slice" cx="95" cy="95" r="78"
         stroke="#f2a541" stroke-width="34"
         stroke-dasharray="163.36 326.73"
-        stroke-dashoffset="-163.36"><title>functional (WebKit): 20 passed of 20</title></circle><circle class="slice" cx="95" cy="95" r="78"
+        stroke-dashoffset="-163.36"><title>functional (WebKit): 20 passed, 1 flaky of 20</title></circle><circle class="slice" cx="95" cy="95" r="78"
         stroke="#3fae7a" stroke-width="34"
         stroke-dasharray="163.36 326.73"
         stroke-dashoffset="-326.73"><title>visual (Chromium): 20 passed of 20</title></circle></g>
@@ -63,7 +63,7 @@
       <text x="95" y="111" class="donut-caption">results</text>
     </svg>
     <ul class="legend"><li title="functional (Chromium): 20 passed of 20"><span class="swatch" style="background:#4d7cfe"></span>
-         functional (Chromium) <b>20</b> <span class="none">33%</span></li><li title="functional (WebKit): 20 passed of 20"><span class="swatch" style="background:#f2a541"></span>
+         functional (Chromium) <b>20</b> <span class="none">33%</span></li><li title="functional (WebKit): 20 passed, 1 flaky of 20"><span class="swatch" style="background:#f2a541"></span>
          functional (WebKit) <b>20</b> <span class="none">33%</span></li><li title="visual (Chromium): 20 passed of 20"><span class="swatch" style="background:#3fae7a"></span>
          visual (Chromium) <b>20</b> <span class="none">33%</span></li></ul>
   </div>
@@ -74,25 +74,25 @@
       <td>20 / 20</td>
       <td class="good">100%</td>
       <td class="good">0%</td>
-      <td>4.9s</td>
-      <td>9.7s</td>
-      <td>120.8s</td>
+      <td>5.4s</td>
+      <td>13.5s</td>
+      <td>153.7s</td>
     </tr><tr>
       <th scope="row">functional (WebKit)</th>
       <td>20</td>
       <td class="good">100%</td>
-      <td class="good">0%</td>
-      <td>5.6s</td>
-      <td>12.6s</td>
-      <td>150.7s</td>
+      <td class="warn">5%</td>
+      <td>6.6s</td>
+      <td>19.8s</td>
+      <td>210s</td>
     </tr><tr>
       <th scope="row">visual (Chromium)</th>
       <td>20 / 20</td>
       <td class="good">100%</td>
       <td class="good">0%</td>
-      <td>4.3s</td>
-      <td>8.1s</td>
-      <td>100.1s</td>
+      <td>4.7s</td>
+      <td>10.9s</td>
+      <td>121.4s</td>
     </tr></tbody>
 </table>
 
@@ -101,23 +101,23 @@
   <thead><tr><th>Suite</th><th>Pass rate, 0 to 100</th><th>p95 duration</th></tr></thead>
   <tbody><tr>
       <th scope="row">functional (Chromium)</th>
-      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,0 8.97,0 17.93,2 26.9,0 35.86,0 44.83,0 53.79,0 62.76,0 71.72,0 80.69,0 89.66,0 98.62,0 107.59,0 116.55,0 125.52,0 134.48,0 143.45,0 152.41,40 161.38,0 170.34,0 179.31,40 188.28,0 197.24,0 206.21,0 215.17,0 224.14,0 233.1,0 242.07,0 251.03,0 260,0" /></svg></td>
-      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,38.58 8.97,38.26 17.93,0 26.9,36.93 35.86,40 44.83,38.17 53.79,32.79 62.76,38.86 71.72,39.56 80.69,35.27 89.66,39.52 98.62,39.21 107.59,39.67 116.55,38.52 125.52,39.43 134.48,38.5 143.45,37.46 152.41,33.55 161.38,39.69 170.34,39.27 179.31,32.36 188.28,37.98 197.24,39.32 206.21,39.61 215.17,39.48 224.14,39.82 233.1,39.86 242.07,38.66 251.03,36.21 260,38.89" /></svg></td>
+      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,0 8.97,2 17.93,0 26.9,0 35.86,0 44.83,0 53.79,0 62.76,0 71.72,0 80.69,0 89.66,0 98.62,0 107.59,0 116.55,0 125.52,0 134.48,0 143.45,40 152.41,0 161.38,0 170.34,40 179.31,0 188.28,0 197.24,0 206.21,0 215.17,0 224.14,0 233.1,0 242.07,0 251.03,0 260,0" /></svg></td>
+      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,38.26 8.97,0 17.93,36.93 26.9,40 35.86,38.17 44.83,32.79 53.79,38.86 62.76,39.56 71.72,35.27 80.69,39.52 89.66,39.21 98.62,39.67 107.59,38.52 116.55,39.43 125.52,38.5 134.48,37.46 143.45,33.55 152.41,39.69 161.38,39.27 170.34,32.36 179.31,37.98 188.28,39.32 197.24,39.61 206.21,39.48 215.17,39.82 224.14,39.86 233.1,38.66 242.07,36.21 251.03,38.89 260,36.53" /></svg></td>
     </tr><tr>
       <th scope="row">functional (WebKit)</th>
-      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,0 20,0 40,0 60,0 80,0 100,0 120,0 140,0 160,0 180,0 200,0 220,0 240,0 260,0" /></svg></td>
-      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,15.95 20,22.12 40,32.71 60,40 80,27.56 100,27.56 120,34.1 140,33.41 160,23.99 180,33.18 200,29.4 220,17.24 240,0 260,28.62" /></svg></td>
+      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,0 18.57,0 37.14,0 55.71,0 74.29,0 92.86,0 111.43,0 130,0 148.57,0 167.14,0 185.71,0 204.29,0 222.86,0 241.43,0 260,0" /></svg></td>
+      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,23.83 18.57,27.98 37.14,35.1 55.71,40 74.29,31.64 92.86,31.64 111.43,36.03 130,35.57 148.57,29.23 167.14,35.41 185.71,32.88 204.29,24.7 222.86,13.1 241.43,32.35 260,0" /></svg></td>
     </tr><tr>
       <th scope="row">visual (Chromium)</th>
-      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,0 8.97,0 17.93,2 26.9,0 35.86,0 44.83,0 53.79,0 62.76,0 71.72,0 80.69,0 89.66,0 98.62,0 107.59,0 116.55,0 125.52,0 134.48,0 143.45,0 152.41,40 161.38,0 170.34,0 179.31,0 188.28,0 197.24,0 206.21,0 215.17,0 224.14,0 233.1,0 242.07,0 251.03,0 260,0" /></svg></td>
-      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,38.42 8.97,39.84 17.93,0 26.9,35.57 35.86,39.75 44.83,37.65 53.79,34.73 62.76,38.49 71.72,39.43 80.69,36.25 89.66,38.15 98.62,38.81 107.59,39.01 116.55,39.08 125.52,39.8 134.48,38.49 143.45,38.11 152.41,34.19 161.38,39.52 170.34,39.33 179.31,39.01 188.28,39.01 197.24,39.27 206.21,39.51 215.17,39.07 224.14,39.63 233.1,40 242.07,38.83 251.03,36.92 260,39.23" /></svg></td>
+      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,0 8.97,2 17.93,0 26.9,0 35.86,0 44.83,0 53.79,0 62.76,0 71.72,0 80.69,0 89.66,0 98.62,0 107.59,0 116.55,0 125.52,0 134.48,0 143.45,40 152.41,0 161.38,0 170.34,0 179.31,0 188.28,0 197.24,0 206.21,0 215.17,0 224.14,0 233.1,0 242.07,0 251.03,0 260,0" /></svg></td>
+      <td class="spark"><svg viewBox="0 0 260 40" preserveAspectRatio="none" role="img"><polyline points="0,39.84 8.97,0 17.93,35.57 26.9,39.75 35.86,37.65 44.83,34.73 53.79,38.49 62.76,39.43 71.72,36.25 80.69,38.15 89.66,38.81 98.62,39.01 107.59,39.08 116.55,39.8 125.52,38.49 134.48,38.11 143.45,34.19 152.41,39.52 161.38,39.33 170.34,39.01 179.31,39.01 188.28,39.27 197.24,39.51 206.21,39.07 215.17,39.63 224.14,40 233.1,38.83 242.07,36.92 251.03,39.23 260,37.71" /></svg></td>
     </tr></tbody>
 </table>
 
 <h2>Slowest cases in this run</h2>
 <table>
   <thead><tr><th>Case</th><th>Suite</th><th>Duration</th></tr></thead>
-  <tbody><tr><th scope="row">TC-17: a signed-in user can complete an order end to end</th><td>functional (WebKit)</td><td>15.2s</td></tr><tr><th scope="row">TC-02: a registered user can sign in with valid credentials</th><td>functional (WebKit)</td><td>12.6s</td></tr><tr><th scope="row">TC-04: signing up with an already registered email is rejected</th><td>functional (WebKit)</td><td>11.6s</td></tr><tr><th scope="row">TC-06: logging out returns the visitor to the anonymous state</th><td>functional (WebKit)</td><td>11.6s</td></tr><tr><th scope="row">TC-01: a new visitor can register and lands in the signed-in state</th><td>functional (WebKit)</td><td>11.4s</td></tr></tbody>
+  <tbody><tr><th scope="row">TC-01: a new visitor can register and lands in the signed-in state</th><td>functional (WebKit)</td><td>35.5s</td></tr><tr><th scope="row">TC-02: a registered user can sign in with valid credentials</th><td>functional (Chromium)</td><td>21.8s</td></tr><tr><th scope="row">TC-02: a registered user can sign in with valid credentials</th><td>functional (WebKit)</td><td>19.8s</td></tr><tr><th scope="row">TC-17: a signed-in user can complete an order end to end</th><td>functional (WebKit)</td><td>19.2s</td></tr><tr><th scope="row">VR-19: delivery address block</th><td>visual (Chromium)</td><td>16.7s</td></tr></tbody>
 </table>
 
 <h2>Repeat offenders</h2>
