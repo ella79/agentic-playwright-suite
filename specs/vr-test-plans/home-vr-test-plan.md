@@ -25,10 +25,10 @@ would split one component across two baseline directories.
 
 | ID    | Name                                 | Screenshot              | State captured                                           |
 | ----- | ------------------------------------ | ----------------------- | -------------------------------------------------------- |
-| VR-01 | site header for an anonymous visitor | `home-header-anonymous` | Site header with no session                              |
-| VR-02 | featured products grid               | `home-features-items`   | Featured products grid, viewport-anchored                |
-| VR-03 | footer newsletter block              | `home-subscription`     | Footer newsletter block                                  |
-| VR-17 | site header for a signed-in user     | `home-header-signed-in` | Site header showing Logout, Delete Account, and the name |
+| VR-01 | Site header for an anonymous visitor | `home-header-anonymous` | Site header with no session                              |
+| VR-02 | Featured products grid               | `home-features-items`   | Featured products grid, viewport-anchored                |
+| VR-03 | Footer newsletter block              | `home-subscription`     | Footer newsletter block                                  |
+| VR-17 | Site header for a signed-in user     | `home-header-signed-in` | Site header showing Logout, Delete Account, and the name |
 
 ## Notes
 

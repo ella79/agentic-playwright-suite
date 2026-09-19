@@ -23,7 +23,7 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                                  | Type  | Scenario                                              | Expected                                                                 |
 | ----- | ----------------------------------------------------- | ----- | ----------------------------------------------------- | ------------------------------------------------------------------------ |
-| TC-18 | the contact form accepts a message with an attachment | happy | A visitor submits the contact form with an attachment | The success message is shown after the native confirm dialog is accepted |
+| TC-18 | The contact form accepts a message with an attachment | happy | A visitor submits the contact form with an attachment | The success message is shown after the native confirm dialog is accepted |
 
 ## Locator Notes
 

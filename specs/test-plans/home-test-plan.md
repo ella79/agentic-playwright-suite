@@ -23,7 +23,7 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                                      | Type  | Scenario                                               | Expected                                  |
 | ----- | --------------------------------------------------------- | ----- | ------------------------------------------------------ | ----------------------------------------- |
-| TC-20 | a visitor can subscribe to the newsletter from the footer | happy | A visitor subscribes to the newsletter from the footer | The subscription success message is shown |
+| TC-20 | A visitor can subscribe to the newsletter from the footer | happy | A visitor subscribes to the newsletter from the footer | The subscription success message is shown |
 
 ## Locator Notes
 

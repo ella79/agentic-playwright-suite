@@ -3,8 +3,8 @@
 import { expect, test } from "../../utils/fixtures/testFixtures";
 import { buildAccount } from "../../utils/testData";
 
-test.describe("Home", () => {
-  test("TC-20: a visitor can subscribe to the newsletter from the footer", async ({
+test.describe("Home Page", () => {
+  test("TC-20: A visitor can subscribe to the newsletter from the footer", async ({
     homePage,
   }) => {
     const subscriber = buildAccount();

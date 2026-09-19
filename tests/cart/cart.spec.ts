@@ -4,8 +4,8 @@ import { expect, test } from "../../utils/fixtures/testFixtures";
 import { products } from "../../utils/testData";
 import { url } from "../../utils/url";
 
-test.describe("Cart", () => {
-  test("TC-12: a product added from its detail page appears in the cart", async ({
+test.describe("Cart Page", () => {
+  test("TC-12: A product added from its detail page appears in the cart", async ({
     productDetailPage,
     cartPage,
   }) => {
@@ -25,7 +25,7 @@ test.describe("Cart", () => {
     });
   });
 
-  test("TC-13: a product added from the catalog listing appears in the cart", async ({
+  test("TC-13: A product added from the catalog listing appears in the cart", async ({
     productsPage,
     cartPage,
   }) => {
@@ -43,7 +43,7 @@ test.describe("Cart", () => {
     });
   });
 
-  test("TC-14: the quantity set before adding is the quantity in the cart", async ({
+  test("TC-14: The quantity set before adding is the quantity in the cart", async ({
     productDetailPage,
     cartPage,
   }) => {
@@ -61,7 +61,7 @@ test.describe("Cart", () => {
     });
   });
 
-  test("TC-15: removing the only product empties the cart", async ({
+  test("TC-15: Removing the only product empties the cart", async ({
     productDetailPage,
     cartPage,
   }) => {
@@ -80,7 +80,7 @@ test.describe("Cart", () => {
     });
   });
 
-  test("TC-16: an anonymous visitor cannot reach checkout", async ({
+  test("TC-16: An anonymous visitor cannot reach checkout", async ({
     page,
     productDetailPage,
     cartPage,

@@ -3,8 +3,8 @@
 import { expect, test } from "../../utils/fixtures/testFixtures";
 import { buildAccount, products } from "../../utils/testData";
 
-test.describe("Product detail", () => {
-  test("TC-19: a product review can be submitted from the detail page", async ({
+test.describe("Product Detail Page", () => {
+  test("TC-19: A product review can be submitted from the detail page", async ({
     productDetailPage,
   }) => {
     const reviewer = buildAccount();

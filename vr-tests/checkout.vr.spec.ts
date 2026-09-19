@@ -3,7 +3,7 @@
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { products } from "../utils/testData";
 
-test.describe("Visual regression - checkout", () => {
+test.describe("Visual regression - Checkout Page", () => {
   // uniqueAccount is requested for its side effect: checkout is only reachable
   // once an account exists and is signed in.
   test.beforeEach(
@@ -15,7 +15,7 @@ test.describe("Visual regression - checkout", () => {
     },
   );
 
-  test("VR-19: delivery address block", async ({ checkoutPage }) => {
+  test("VR-19: Delivery address block", async ({ checkoutPage }) => {
     await expect(checkoutPage.addressDetailsHeading).toBeVisible();
 
     await expect(checkoutPage.deliveryAddress).toHaveScreenshot(
@@ -26,7 +26,7 @@ test.describe("Visual regression - checkout", () => {
     );
   });
 
-  test("VR-20: card entry form", async ({ checkoutPage, paymentPage }) => {
+  test("VR-20: Card entry form", async ({ checkoutPage, paymentPage }) => {
     await checkoutPage.placeOrder();
     await expect(paymentPage.payButton).toBeVisible();
 

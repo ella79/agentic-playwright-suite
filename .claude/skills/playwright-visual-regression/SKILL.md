@@ -63,12 +63,12 @@ and do persist, which is the opposite of what most people assume.
 // seed: specs/seed.spec.ts
 import { expect, test } from "../utils/fixtures/testFixtures";
 
-test.describe("Visual regression - cart", () => {
+test.describe("Visual regression - Cart Page", () => {
   test.beforeEach(async ({ cartPage }) => {
     await cartPage.gotoCartPage();
   });
 
-  test("VR-10: empty cart state", async ({ cartPage }) => {
+  test("VR-10: Empty cart state", async ({ cartPage }) => {
     await expect(cartPage.emptyCartMessage).toBeVisible();
 
     await expect(cartPage.cartItemsSection).toHaveScreenshot("cart-empty.png");
@@ -76,9 +76,13 @@ test.describe("Visual regression - cart", () => {
 });
 ```
 
-Headers, fixtures and the rest of the coding standard are in
-`.claude/skills/playwright-pageobject-testing/SKILL.md`. What follows here is only what is specific
-to a screenshot.
+Headers, fixtures and the rest of the coding standard, Sentence case for a case's `Name` included,
+are in `.claude/skills/playwright-pageobject-testing/SKILL.md`. What follows here is only what is
+specific to a screenshot.
+
+One difference from the functional side: `test.describe` here carries the `Visual regression -`
+prefix ahead of the same `<Feature> Page` name, so a reader can tell which suite a describe block
+belongs to without opening the file: `Visual regression - Cart Page`.
 
 ## What To Screenshot
 

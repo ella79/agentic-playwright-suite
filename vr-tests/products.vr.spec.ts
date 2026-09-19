@@ -3,14 +3,14 @@
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { products, searchTerms } from "../utils/testData";
 
-test.describe("Visual regression - products", () => {
+test.describe("Visual regression - Products Page", () => {
   test.beforeEach(async ({ productsPage }) => {
     await productsPage.gotoProductsPage();
     await expect(productsPage.allProductsHeading).toBeVisible();
   });
 
   // Same reason as VR-02: the grid holds the whole catalog.
-  test("VR-04: catalog grid", async ({ page, productsPage }) => {
+  test("VR-04: Catalog grid", async ({ page, productsPage }) => {
     await expect(productsPage.productCards.first()).toBeVisible();
     await productsPage.scrollToTop(productsPage.allProductsHeading);
     await productsPage.waitForImagesLoaded(productsPage.productGrid);
@@ -21,7 +21,7 @@ test.describe("Visual regression - products", () => {
     );
   });
 
-  test("VR-05: single product card at rest", async ({ productsPage }) => {
+  test("VR-05: Single product card at rest", async ({ productsPage }) => {
     const card = productsPage.getProductCard(products.blueTop.name);
 
     await card.scrollIntoViewIfNeeded();
@@ -33,7 +33,7 @@ test.describe("Visual regression - products", () => {
     });
   });
 
-  test("VR-06: category accordion", async ({ productsPage }) => {
+  test("VR-06: Category accordion", async ({ productsPage }) => {
     await expect(productsPage.categorySidebar).toBeVisible();
 
     await expect(productsPage.categorySidebar).toHaveScreenshot(
@@ -41,7 +41,7 @@ test.describe("Visual regression - products", () => {
     );
   });
 
-  test("VR-07: catalog area after a search with no matches", async ({
+  test("VR-07: Catalog area after a search with no matches", async ({
     productsPage,
   }) => {
     await productsPage.searchFor(searchTerms.nonExistent);

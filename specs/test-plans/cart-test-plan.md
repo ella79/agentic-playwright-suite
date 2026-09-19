@@ -25,11 +25,11 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                                         | Type  | Scenario                                                       | Expected                                                                                    |
 | ----- | ------------------------------------------------------------ | ----- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| TC-12 | a product added from its detail page appears in the cart     | happy | A visitor adds a product from its detail page                  | The confirmation modal appears and the cart row shows the product at its listed price       |
-| TC-13 | a product added from the catalog listing appears in the cart | happy | A visitor adds a product from the catalog listing              | The cart contains exactly that product                                                      |
-| TC-14 | the quantity set before adding is the quantity in the cart   | happy | A visitor sets quantity to 3 on the detail page before adding  | The cart row records quantity 3                                                             |
-| TC-15 | removing the only product empties the cart                   | edge  | A visitor removes the only product in the cart                 | The cart shows its empty state and no rows remain                                           |
-| TC-16 | an anonymous visitor cannot reach checkout                   | error | An anonymous visitor with items in the cart tries to check out | The account guard modal appears offering Register / Login; the checkout page is not reached |
+| TC-12 | A product added from its detail page appears in the cart     | happy | A visitor adds a product from its detail page                  | The confirmation modal appears and the cart row shows the product at its listed price       |
+| TC-13 | A product added from the catalog listing appears in the cart | happy | A visitor adds a product from the catalog listing              | The cart contains exactly that product                                                      |
+| TC-14 | The quantity set before adding is the quantity in the cart   | happy | A visitor sets quantity to 3 on the detail page before adding  | The cart row records quantity 3                                                             |
+| TC-15 | Removing the only product empties the cart                   | edge  | A visitor removes the only product in the cart                 | The cart shows its empty state and no rows remain                                           |
+| TC-16 | An anonymous visitor cannot reach checkout                   | error | An anonymous visitor with items in the cart tries to check out | The account guard modal appears offering Register / Login; the checkout page is not reached |
 
 ## Locator Notes
 

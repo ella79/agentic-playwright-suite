@@ -23,8 +23,8 @@ is the page's other layout and is not reachable from the empty one by CSS alone.
 
 | ID    | Name                  | Screenshot        | State captured                                         |
 | ----- | --------------------- | ----------------- | ------------------------------------------------------ |
-| VR-18 | contact form          | `contact-form`    | Contact form, empty, including the file selector       |
-| VR-21 | contact success state | `contact-success` | Success banner after submitting, the form column alone |
+| VR-18 | Contact form          | `contact-form`    | Contact form, empty, including the file selector       |
+| VR-21 | Contact success state | `contact-success` | Success banner after submitting, the form column alone |
 
 ## Notes
 

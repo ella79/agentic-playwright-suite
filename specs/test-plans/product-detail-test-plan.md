@@ -23,7 +23,7 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                                   | Type  | Scenario                                            | Expected                       |
 | ----- | ------------------------------------------------------ | ----- | --------------------------------------------------- | ------------------------------ |
-| TC-19 | a product review can be submitted from the detail page | happy | A visitor submits a review on a product detail page | The thank-you message is shown |
+| TC-19 | A product review can be submitted from the detail page | happy | A visitor submits a review on a product detail page | The thank-you message is shown |
 
 ## Locator Notes
 

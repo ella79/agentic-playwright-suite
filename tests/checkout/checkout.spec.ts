@@ -4,8 +4,8 @@ import { expect, test } from "../../utils/fixtures/testFixtures";
 import { paymentCard, products } from "../../utils/testData";
 import { urlPattern } from "../../utils/url";
 
-test.describe("Checkout", () => {
-  test("TC-17: a signed-in user can complete an order end to end", async ({
+test.describe("Checkout Page", () => {
+  test("TC-17: A signed-in user can complete an order end to end", async ({
     page,
     uniqueAccount,
     productDetailPage,

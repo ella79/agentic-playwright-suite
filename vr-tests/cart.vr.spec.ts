@@ -3,15 +3,15 @@
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { products } from "../utils/testData";
 
-test.describe("Visual regression - cart", () => {
-  test("VR-10: empty cart state", async ({ cartPage }) => {
+test.describe("Visual regression - Cart Page", () => {
+  test("VR-10: Empty cart state", async ({ cartPage }) => {
     await cartPage.gotoCartPage();
     await expect(cartPage.emptyCartMessage).toBeVisible();
 
     await expect(cartPage.cartItemsSection).toHaveScreenshot("cart-empty.png");
   });
 
-  test("VR-11: cart table holding one product", async ({
+  test("VR-11: Cart table holding one product", async ({
     productDetailPage,
     cartPage,
   }) => {
@@ -27,7 +27,7 @@ test.describe("Visual regression - cart", () => {
     });
   });
 
-  test("VR-12: add-to-cart confirmation modal", async ({
+  test("VR-12: Add-to-cart confirmation modal", async ({
     productDetailPage,
   }) => {
     await productDetailPage.gotoProductDetailPage(products.blueTop.id);
@@ -37,7 +37,7 @@ test.describe("Visual regression - cart", () => {
     await expect(modal.root).toHaveScreenshot("cart-added-modal.png");
   });
 
-  test("VR-13: account guard shown to anonymous visitors", async ({
+  test("VR-13: Account guard shown to anonymous visitors", async ({
     productDetailPage,
     cartPage,
   }) => {

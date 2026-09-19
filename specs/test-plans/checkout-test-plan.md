@@ -29,7 +29,7 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                              | Type  | Scenario                                            | Expected                                                                                                                                                                                |
 | ----- | ------------------------------------------------- | ----- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TC-17 | a signed-in user can complete an order end to end | happy | A signed-in user checks out a cart with one product | Delivery and billing addresses reflect the registered account, the order review lists the product, and after payment the order placed confirmation with a downloadable invoice is shown |
+| TC-17 | A signed-in user can complete an order end to end | happy | A signed-in user checks out a cart with one product | Delivery and billing addresses reflect the registered account, the order review lists the product, and after payment the order placed confirmation with a downloadable invoice is shown |
 
 ## Steps
 

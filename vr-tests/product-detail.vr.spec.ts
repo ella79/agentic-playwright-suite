@@ -3,12 +3,12 @@
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { products } from "../utils/testData";
 
-test.describe("Visual regression - product detail", () => {
+test.describe("Visual regression - Product Detail Page", () => {
   test.beforeEach(async ({ productDetailPage }) => {
     await productDetailPage.gotoProductDetailPage(products.blueTop.id);
   });
 
-  test("VR-08: product information panel", async ({ productDetailPage }) => {
+  test("VR-08: Product information panel", async ({ productDetailPage }) => {
     await expect(productDetailPage.productName).toBeVisible();
     await productDetailPage.waitForImagesLoaded(
       productDetailPage.productInformation,
@@ -20,7 +20,7 @@ test.describe("Visual regression - product detail", () => {
     );
   });
 
-  test("VR-09: write-a-review form", async ({ productDetailPage }) => {
+  test("VR-09: Write-a-review form", async ({ productDetailPage }) => {
     await productDetailPage.reviewSection.scrollIntoViewIfNeeded();
     await expect(productDetailPage.reviewTextarea).toBeVisible();
 
