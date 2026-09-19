@@ -36,13 +36,15 @@ const CAPS = { functional: 20, visual: 20 };
 
 /**
  * Display names only. The keys are the history keys, so they stay: renaming one
- * orphans every run recorded against it. The label names the engine, because
- * "functional" alone no longer says which of the two runs it is.
+ * orphans every run recorded against it. The values match the `parentSuite`
+ * labels Allure itself shows (see `utils/fixtures/allureLabels.ts`), so a
+ * suite reads the same name on this page, in the Allure report and on the
+ * portfolio's replay.
  */
 const DISPLAY = {
-  functional: "functional (Chromium)",
-  "functional-webkit": "functional (WebKit)",
-  visual: "visual (Chromium)",
+  functional: "Functional E2E · Chromium",
+  "functional-webkit": "Functional E2E · WebKit",
+  visual: "Visual Regression · Chromium",
 };
 const label = (name) => DISPLAY[name] ?? name;
 

@@ -28,7 +28,7 @@ const VISUAL_PROJECT = "vr";
 const PROJECTS: Record<string, { parent: string; engine: string }> = {
   "e2e-chromium": { parent: "Functional E2E", engine: "Chromium" },
   "e2e-webkit": { parent: "Functional E2E", engine: "WebKit" },
-  [VISUAL_PROJECT]: { parent: "Visual regression", engine: "Chromium" },
+  [VISUAL_PROJECT]: { parent: "Visual Regression", engine: "Chromium" },
   seed: { parent: "Functional E2E", engine: "Chromium" },
 };
 

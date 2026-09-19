@@ -49,8 +49,14 @@ surface as an open alert.
 
 ## The Published Report
 
-Playwright project names match the CI job names, so a reader moves from a box in the pipeline graph
-to a branch in the report without a lookup table.
+For the functional engines, the Playwright project name and the CI job name are the same string
+(`e2e-chromium`, `e2e-webkit`), so a reader moves from a box in the pipeline graph to a branch in the
+report without a lookup table. The visual suite is the exception: its Playwright project is `vr`, its
+CI job is `visual-regression`, and neither is what the report shows. The branch there reads
+`Visual Regression` because that string is written by hand in `allureLabels.ts`, not derived from
+either name. It does not borrow the `E2E` that the functional suite carries, either: this repository's
+own VR / E2E boundary (see the `playwright-visual-regression` skill) treats E2E as naming the
+functional suite specifically, and a screenshot comparison is a different kind of check.
 
 Allure results are labelled by an automatic fixture rather than by hand, because a label applied
 only where someone remembered is one the report cannot rely on. Each result carries:
