@@ -19,17 +19,17 @@ const allureReporter: ReporterDescription = [
   {
     resultsDir: "allure-results",
     environmentInfo: {
-      base_url: BASE_URL,
+      "Base URL": BASE_URL,
       // What actually ran. The WebKit job overrides these, because a report
       // saying Chromium while it holds WebKit results is worse than one that
       // says nothing.
-      browser: process.env.E2E_BROWSERS || "Chromium",
-      viewport: process.env.E2E_VIEWPORT || "1920x1080",
-      node: process.version,
-      os: `${process.platform} ${process.arch}`,
-      ci: process.env.CI ? "GitHub Actions" : "local",
-      commit: process.env.GITHUB_SHA?.slice(0, 8) ?? "working tree",
-      branch: process.env.GITHUB_REF_NAME ?? "local",
+      Browser: process.env.E2E_BROWSERS || "Chromium",
+      Viewport: process.env.E2E_VIEWPORT || "1920x1080",
+      Node: process.version,
+      OS: `${process.platform} ${process.arch}`,
+      CI: process.env.CI ? "GitHub Actions" : "local",
+      Commit: process.env.GITHUB_SHA?.slice(0, 8) ?? "working tree",
+      Branch: process.env.GITHUB_REF_NAME ?? "local",
     },
   },
 ];
