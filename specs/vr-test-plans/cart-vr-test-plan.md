@@ -23,10 +23,10 @@ rendered halfway off-screen and still pass.
 
 | ID    | Name                                      | Screenshot                  | State captured                                           |
 | ----- | ----------------------------------------- | --------------------------- | -------------------------------------------------------- |
-| VR-10 | empty cart state                          | `cart-empty`                | Empty cart state                                         |
-| VR-11 | cart table holding one product            | `cart-single-item`          | Cart table holding one product                           |
-| VR-12 | add-to-cart confirmation modal            | `cart-added-modal`          | Add-to-cart confirmation modal                           |
-| VR-13 | account guard shown to anonymous visitors | `cart-checkout-guard-modal` | Account guard shown when an anonymous visitor checks out |
+| VR-10 | Empty cart state                          | `cart-empty`                | Empty cart state                                         |
+| VR-11 | Cart table holding one product            | `cart-single-item`          | Cart table holding one product                           |
+| VR-12 | Add-to-cart confirmation modal            | `cart-added-modal`          | Add-to-cart confirmation modal                           |
+| VR-13 | Account guard shown to anonymous visitors | `cart-checkout-guard-modal` | Account guard shown when an anonymous visitor checks out |
 
 ## Notes
 

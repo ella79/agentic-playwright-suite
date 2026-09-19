@@ -9,8 +9,8 @@ const ATTACHMENT = path.resolve(
   "../../utils/fixtures/files/sample-attachment.txt",
 );
 
-test.describe("Contact", () => {
-  test("TC-18: the contact form accepts a message with an attachment", async ({
+test.describe("Contact Page", () => {
+  test("TC-18: The contact form accepts a message with an attachment", async ({
     contactUsPage,
   }) => {
     const visitor = buildAccount();

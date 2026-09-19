@@ -22,8 +22,8 @@ rather than an authentication screen, so both of its states are captured togethe
 
 | ID    | Name                   | Screenshot                         | State captured                                            |
 | ----- | ---------------------- | ---------------------------------- | --------------------------------------------------------- |
-| VR-14 | login form             | `authentication-login-form`        | Login form, empty                                         |
-| VR-16 | full registration form | `authentication-account-info-form` | Full registration form: title, dates, address, checkboxes |
+| VR-14 | Login form             | `authentication-login-form`        | Login form, empty                                         |
+| VR-16 | Full registration form | `authentication-account-info-form` | Full registration form: title, dates, address, checkboxes |
 
 ## Notes
 

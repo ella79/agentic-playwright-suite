@@ -26,7 +26,7 @@ notices.
 
 | ID    | Name                           | Screenshot       | State captured         |
 | ----- | ------------------------------ | ---------------- | ---------------------- |
-| VR-nn | add-to-cart confirmation modal | `<area>-<state>` | The state, in one line |
+| VR-nn | Add-to-cart confirmation modal | `<area>-<state>` | The state, in one line |
 
 ## Notes
 

@@ -30,7 +30,7 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                                     | Type  | Scenario                                   | Expected                                  |
 | ----- | -------------------------------------------------------- | ----- | ------------------------------------------ | ----------------------------------------- |
-| TC-nn | a product added from its detail page appears in the cart | happy | What the user does, in the user's language | The observable outcome, not the mechanism |
+| TC-nn | A product added from its detail page appears in the cart | happy | What the user does, in the user's language | The observable outcome, not the mechanism |
 
 ## Locator Notes
 

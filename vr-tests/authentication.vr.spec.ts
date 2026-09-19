@@ -3,8 +3,8 @@
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { buildAccount } from "../utils/testData";
 
-test.describe("Visual regression - authentication", () => {
-  test("VR-14: login form", async ({ loginPage }) => {
+test.describe("Visual regression - Authentication Page", () => {
+  test("VR-14: Login form", async ({ loginPage }) => {
     await loginPage.gotoLoginPage();
     await expect(loginPage.loginButton).toBeVisible();
 
@@ -13,7 +13,7 @@ test.describe("Visual regression - authentication", () => {
     );
   });
 
-  test("VR-16: full registration form", async ({
+  test("VR-16: Full registration form", async ({
     loginPage,
     accountInfoPage,
   }) => {

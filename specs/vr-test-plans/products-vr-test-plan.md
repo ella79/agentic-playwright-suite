@@ -23,10 +23,10 @@ break unnoticed, nothing renders there in normal use.
 
 | ID    | Name                                        | Screenshot                   | State captured                                   |
 | ----- | ------------------------------------------- | ---------------------------- | ------------------------------------------------ |
-| VR-04 | catalog grid                                | `products-catalog-grid`      | Catalog grid, viewport-anchored                  |
-| VR-05 | single product card at rest                 | `products-card-default`      | A single product card at rest                    |
-| VR-06 | category accordion                          | `products-category-sidebar`  | Category accordion in its collapsed state        |
-| VR-07 | catalog area after a search with no matches | `products-search-no-results` | Catalog area after a search that matches nothing |
+| VR-04 | Catalog grid                                | `products-catalog-grid`      | Catalog grid, viewport-anchored                  |
+| VR-05 | Single product card at rest                 | `products-card-default`      | A single product card at rest                    |
+| VR-06 | Category accordion                          | `products-category-sidebar`  | Category accordion in its collapsed state        |
+| VR-07 | Catalog area after a search with no matches | `products-search-no-results` | Catalog area after a search that matches nothing |
 
 ## Notes
 

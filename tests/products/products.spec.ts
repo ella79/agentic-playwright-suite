@@ -3,8 +3,8 @@
 import { expect, test } from "../../utils/fixtures/testFixtures";
 import { products, searchTerms } from "../../utils/testData";
 
-test.describe("Products", () => {
-  test("TC-07: the catalog lists products and one opens its detail page", async ({
+test.describe("Products Page", () => {
+  test("TC-07: The catalog lists products and one opens its detail page", async ({
     productsPage,
     productDetailPage,
   }) => {
@@ -27,7 +27,7 @@ test.describe("Products", () => {
     });
   });
 
-  test("TC-08: search returns only products matching the term", async ({
+  test("TC-08: Search returns only products matching the term", async ({
     productsPage,
   }) => {
     await productsPage.gotoProductsPage();
@@ -42,7 +42,7 @@ test.describe("Products", () => {
     }
   });
 
-  test("TC-09: a search with no matches returns an empty result set", async ({
+  test("TC-09: A search with no matches returns an empty result set", async ({
     productsPage,
   }) => {
     await productsPage.gotoProductsPage();
@@ -53,7 +53,7 @@ test.describe("Products", () => {
     await expect(productsPage.productCards).toHaveCount(0);
   });
 
-  test("TC-10: filtering by category lists that category's products", async ({
+  test("TC-10: Filtering by category lists that category's products", async ({
     productsPage,
   }) => {
     await productsPage.gotoProductsPage();
@@ -65,7 +65,7 @@ test.describe("Products", () => {
     await expect(productsPage.productCards.first()).toBeVisible();
   });
 
-  test("TC-11: the scroll-up control returns the visitor to the top", async ({
+  test("TC-11: The scroll-up control returns the visitor to the top", async ({
     productsPage,
   }) => {
     await productsPage.gotoProductsPage();

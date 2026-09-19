@@ -24,8 +24,8 @@ Both captures use a fixed product so the content is stable between runs.
 
 | ID    | Name                      | Screenshot                   | State captured                                       |
 | ----- | ------------------------- | ---------------------------- | ---------------------------------------------------- |
-| VR-08 | product information panel | `product-detail-information` | Information panel: image, price, availability, brand |
-| VR-09 | write-a-review form       | `product-detail-review-form` | Write-a-review form in its empty state               |
+| VR-08 | Product information panel | `product-detail-information` | Information panel: image, price, availability, brand |
+| VR-09 | Write-a-review form       | `product-detail-review-form` | Write-a-review form in its empty state               |
 
 ## Notes
 

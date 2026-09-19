@@ -3,12 +3,12 @@
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { buildAccount } from "../utils/testData";
 
-test.describe("Visual regression - contact", () => {
+test.describe("Visual regression - Contact Page", () => {
   test.beforeEach(async ({ contactUsPage }) => {
     await contactUsPage.gotoContactUsPage();
   });
 
-  test("VR-18: contact form", async ({ contactUsPage }) => {
+  test("VR-18: Contact form", async ({ contactUsPage }) => {
     await expect(contactUsPage.submitButton).toBeVisible();
 
     await expect(contactUsPage.contactForm).toHaveScreenshot(
@@ -16,7 +16,7 @@ test.describe("Visual regression - contact", () => {
     );
   });
 
-  test("VR-21: contact success state", async ({ contactUsPage }) => {
+  test("VR-21: Contact success state", async ({ contactUsPage }) => {
     const visitor = buildAccount();
 
     // No attachment: the rendered success state is identical either way, and

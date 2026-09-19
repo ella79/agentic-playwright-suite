@@ -138,8 +138,8 @@ matches its baseline name. Break a link and a result stops tracing back to its p
 // seed: specs/seed.spec.ts
 import { expect, test } from "../../utils/fixtures/testFixtures";
 
-test.describe("Cart", () => {
-  test("TC-05: adding a product from the detail page puts it in the cart", async ({
+test.describe("Cart Page", () => {
+  test("TC-05: Adding a product from the detail page puts it in the cart", async ({
     productDetailPage,
     cartPage,
   }) => {
@@ -165,8 +165,13 @@ test.describe("Cart", () => {
   reader guessing which phase broke, typically an arrange phase followed by the behaviour under
   test. A scenario that is one action and its verification takes no steps: the step title would
   only repeat the test title in the report.
-- Test titles state the behaviour being verified, in the user's language. `TC-05: cart shows the
-added product`, not `TC-05: test cart`.
+- Test titles state the behaviour being verified, in the user's language. `TC-05: Cart shows the
+added product`, not `TC-05: Test cart`. Sentence case: the first letter capitalised, the rest as a
+  sentence would read. The plan's `Name` cell carries the same string, so this is one decision made
+  once, not two.
+- `test.describe` names the feature the file covers, as `<Feature> Page`: `Cart Page`,
+  `Product Detail Page`. Every functional spec in this suite follows it; a spec that does not is the
+  finding.
 
 ## Fixtures
 

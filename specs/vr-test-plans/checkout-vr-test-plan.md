@@ -22,8 +22,8 @@ cover it: a layout regression here reaches a user at the point where they are pa
 
 | ID    | Name                   | Screenshot                 | State captured                              |
 | ----- | ---------------------- | -------------------------- | ------------------------------------------- |
-| VR-19 | delivery address block | `checkout-address-details` | Delivery address block on the checkout step |
-| VR-20 | card entry form        | `checkout-payment-form`    | Card entry form                             |
+| VR-19 | Delivery address block | `checkout-address-details` | Delivery address block on the checkout step |
+| VR-20 | Card entry form        | `checkout-payment-form`    | Card entry form                             |
 
 ## Notes
 

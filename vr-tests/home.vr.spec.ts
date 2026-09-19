@@ -2,12 +2,12 @@
 // seed: specs/seed.spec.ts
 import { expect, test } from "../utils/fixtures/testFixtures";
 
-test.describe("Visual regression - home", () => {
+test.describe("Visual regression - Home Page", () => {
   test.beforeEach(async ({ homePage }) => {
     await homePage.gotoHomePage();
   });
 
-  test("VR-01: site header for an anonymous visitor", async ({ homePage }) => {
+  test("VR-01: Site header for an anonymous visitor", async ({ homePage }) => {
     await expect(homePage.signupLoginLink).toBeVisible();
 
     await expect(homePage.header).toHaveScreenshot("home-header-anonymous.png");
@@ -15,7 +15,7 @@ test.describe("Visual regression - home", () => {
 
   // The section holds the whole catalog and is 13k px tall. The viewport
   // anchored to its heading is the only framing a reviewer can read a diff in.
-  test("VR-02: featured products grid", async ({ page, homePage }) => {
+  test("VR-02: Featured products grid", async ({ page, homePage }) => {
     await expect(homePage.featuresItemsHeading).toBeVisible();
     await homePage.scrollToTop(homePage.featuresItemsHeading);
     await homePage.waitForImagesLoaded(homePage.featuredProductsGrid);
@@ -26,14 +26,14 @@ test.describe("Visual regression - home", () => {
     );
   });
 
-  test("VR-03: footer newsletter block", async ({ homePage }) => {
+  test("VR-03: Footer newsletter block", async ({ homePage }) => {
     await homePage.subscriptionHeading.scrollIntoViewIfNeeded();
     await expect(homePage.subscriptionEmailInput).toBeVisible();
 
     await expect(homePage.footer).toHaveScreenshot("home-subscription.png");
   });
 
-  test("VR-17: site header for a signed-in user", async ({
+  test("VR-17: Site header for a signed-in user", async ({
     homePage,
     uniqueAccount,
   }) => {
