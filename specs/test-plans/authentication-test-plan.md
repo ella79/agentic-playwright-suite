@@ -2,12 +2,12 @@
 
 ## Metadata
 
-| Field       | Value                                                                                                                                                                  |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page URL    | `/login`, `/signup`                                                                                                                                                    |
-| Page Title  | `Automation Exercise - Signup / Login` on both routes                                                                                                                  |
-| Spec File   | `tests/authentication/authentication.spec.ts`                                                                                                                          |
-| Page Object | `utils/pageObjects/auth/loginPage.ts`, `utils/pageObjects/auth/accountInfoPage.ts`, `utils/pageObjects/auth/confirmationPage.ts`, `utils/pageObjects/home/homePage.ts` |
+| Field       | Value                                                                                                                                                                                                |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page URL    | `/login`, `/signup`                                                                                                                                                                                  |
+| Page Title  | `Automation Exercise - Signup / Login` on both routes                                                                                                                                                |
+| Spec File   | `tests/authentication/authentication.spec.ts`                                                                                                                                                        |
+| Page Object | `utils/pageObjects/authentication/loginPage.ts`, `utils/pageObjects/authentication/accountInfoPage.ts`, `utils/pageObjects/authentication/confirmationPage.ts`, `utils/pageObjects/home/homePage.ts` |
 
 ## Scope
 

@@ -4,13 +4,13 @@ Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
 
 ## Metadata
 
-| Field       | Value                                                                              |
-| ----------- | ---------------------------------------------------------------------------------- |
-| Page URL    | `/login`, `/signup`                                                                |
-| Page Title  | `Automation Exercise - Signup / Login` on both routes                              |
-| Spec File   | `vr-tests/authentication.vr.spec.ts`                                               |
-| Page Object | `utils/pageObjects/auth/loginPage.ts`, `utils/pageObjects/auth/accountInfoPage.ts` |
-| Baselines   | `vr-tests/authentication.vr.spec.ts-snapshots/`                                    |
+| Field       | Value                                                                                                  |
+| ----------- | ------------------------------------------------------------------------------------------------------ |
+| Page URL    | `/login`, `/signup`                                                                                    |
+| Page Title  | `Automation Exercise - Signup / Login` on both routes                                                  |
+| Spec File   | `vr-tests/authentication.vr.spec.ts`                                                                   |
+| Page Object | `utils/pageObjects/authentication/loginPage.ts`, `utils/pageObjects/authentication/accountInfoPage.ts` |
+| Baselines   | `vr-tests/authentication.vr.spec.ts-snapshots/`                                                        |
 
 ## Scope
 

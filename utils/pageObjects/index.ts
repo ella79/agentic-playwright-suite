@@ -5,9 +5,9 @@ export * from "./home/homePage";
 export * from "./products/productsPage";
 export * from "./products/productDetailPage";
 
-export * from "./auth/loginPage";
-export * from "./auth/accountInfoPage";
-export * from "./auth/confirmationPage";
+export * from "./authentication/loginPage";
+export * from "./authentication/accountInfoPage";
+export * from "./authentication/confirmationPage";
 
 export * from "./cart/cartPage";
 
