@@ -402,6 +402,7 @@ const html = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Suite health</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%230d1117' stroke='%231a7f37' stroke-width='2'/><path d='M9 17l4 4 10-11' fill='none' stroke='%231a7f37' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <style>
   :root { color-scheme: light dark; --line:#8884; --good:#1a7f37; --warn:#9a6700; --bad:#cf222e; }
   body { font: 15px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; margin: 0 auto; padding: 2rem 1.25rem 4rem; max-width: 60rem; }
