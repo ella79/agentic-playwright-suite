@@ -40,9 +40,9 @@ const CAPS = { functional: 20, visual: 20 };
  * "functional" alone no longer says which of the two runs it is.
  */
 const DISPLAY = {
-  functional: "functional (Chromium)",
-  "functional-webkit": "functional (WebKit)",
-  visual: "visual (Chromium)",
+  functional: "Functional (Chromium)",
+  "functional-webkit": "Functional (WebKit)",
+  visual: "Visual (Chromium)",
 };
 const label = (name) => DISPLAY[name] ?? name;
 
