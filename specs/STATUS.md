@@ -71,6 +71,13 @@ around silently.
    success state, which an earlier reading of this finding had wrongly excluded.
 4. `/delete_account` deletes on GET, with no confirmation step. The account fixture relies on it for
    teardown and asserts the outcome.
+5. `/checkout`, `/payment` and `/payment_done/<id>` all answer 200 to an anonymous GET, verified
+   directly against the routes. The application enforces nothing server-side; the checkout guard
+   TC-16 tests is a client-side redirect. TC-16 covers the behaviour a visitor actually meets, so the
+   gap is recorded rather than closed by a case against a route nobody reaches this way.
+6. `/view_cart` and `/checkout` share the exact page title, `Automation Exercise - Checkout`,
+   verified against both routes. A `toHaveTitle` assertion cannot distinguish the two; every case
+   here asserts on a heading or the URL instead.
 
 ## Open Questions
 
