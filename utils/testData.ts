@@ -26,17 +26,17 @@ export function buildAccount(
   const unique = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
   return {
-    name: "QA Portfolio",
-    email: `qa.portfolio.${unique}@example.com`,
+    name: "QA Test",
+    email: `qa.test.${unique}@example.com`,
     password: "Str0ngPassw0rd!",
-    firstName: "Emanuela",
-    lastName: "Tester",
-    company: "Portfolio QA",
-    address: "12 Test Drive",
-    state: "Timis",
-    city: "Timisoara",
-    zipcode: "300001",
-    mobileNumber: "0700000000",
+    firstName: "QA",
+    lastName: "Test",
+    company: "Test Company",
+    address: "1 Example Street",
+    state: "Test State",
+    city: "Test City",
+    zipcode: "00000",
+    mobileNumber: "1234567890",
     birthDay: "9",
     birthMonth: "June",
     birthYear: "1990",
@@ -46,7 +46,7 @@ export function buildAccount(
 }
 
 export const paymentCard = {
-  nameOnCard: "Emanuela Tester",
+  nameOnCard: "QA Test",
   cardNumber: "4111111111111111",
   cvc: "311",
   expiryMonth: "12",
