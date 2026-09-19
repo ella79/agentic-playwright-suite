@@ -391,7 +391,7 @@ const offenderRows = topOffenders.length
   ? topOffenders
       .map(
         (o) =>
-          `<tr><th scope="row">${escape(o.title)}</th><td>${escape(o.suite)}</td><td>${o.count} of ${window.length}</td></tr>`,
+          `<tr><th scope="row">${escape(o.title)}</th><td>${escape(label(o.suite))}</td><td>${o.count} of ${window.length}</td></tr>`,
       )
       .join("")
   : `<tr><td colspan="3" class="none">No case failed or retried in the last ${window.length} runs.</td></tr>`;
