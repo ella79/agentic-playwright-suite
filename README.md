@@ -8,10 +8,10 @@ MCP, and published from a containerised CI pipeline.
 
 | Live                                                                                                                                                |                                                                                 |
 | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| [Suite health](https://ella79.github.io/agentic-playwright-suite/metrics/)                                                                          | Pass rate, flaky rate, p50 and p95, repeat offenders, against stated thresholds |
-| [Test results](https://ella79.github.io/agentic-playwright-suite/)                                                                                  | Both suites, Chromium and WebKit split under the functional one                 |
-| [Functional](https://ella79.github.io/agentic-playwright-suite/functional/) and [visual](https://ella79.github.io/agentic-playwright-suite/visual/) | Each suite with its own trend                                                   |
-| [Trace viewer](https://ella79.github.io/agentic-playwright-suite/playwright-report/)                                                                | Every step of every case, replayable                                            |
+| [Suite Health](https://ella79.github.io/agentic-playwright-suite/metrics/)                                                                          | Pass rate, flaky rate, p50 and p95, repeat offenders, against stated thresholds |
+| [Test Results](https://ella79.github.io/agentic-playwright-suite/)                                                                                  | Both suites, Chromium and WebKit split under the functional one                 |
+| [Functional](https://ella79.github.io/agentic-playwright-suite/functional/) and [Visual](https://ella79.github.io/agentic-playwright-suite/visual/) | Each suite with its own trend                                                   |
+| [Trace Viewer](https://ella79.github.io/agentic-playwright-suite/playwright-report/)                                                                | Every step of every case, replayable                                            |
 
 **20 functional cases and 20 visual cases, both capped.** The functional cases are replayed on
 WebKit, so the same coverage is proven on the engine behind Safari. Visual baselines stay Chromium
