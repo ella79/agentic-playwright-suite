@@ -26,17 +26,17 @@ export function buildAccount(
   const unique = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
   return {
-    name: "QA Test",
+    name: "Jon Doe",
     email: `qa.test.${unique}@example.com`,
     password: "Str0ngPassw0rd!",
-    firstName: "QA",
-    lastName: "Test",
-    company: "Test Company",
-    address: "1 Example Street",
-    state: "Test State",
-    city: "Test City",
-    zipcode: "00000",
-    mobileNumber: "1234567890",
+    firstName: "Jon",
+    lastName: "Doe",
+    company: "Acme Inc.",
+    address: "123 Main Street",
+    state: "Ontario",
+    city: "Springfield",
+    zipcode: "A1A 1A1",
+    mobileNumber: "416-555-0123",
     birthDay: "9",
     birthMonth: "June",
     birthYear: "1990",
@@ -46,7 +46,7 @@ export function buildAccount(
 }
 
 export const paymentCard = {
-  nameOnCard: "QA Test",
+  nameOnCard: "Jon Doe",
   cardNumber: "4111111111111111",
   cvc: "311",
   expiryMonth: "12",
