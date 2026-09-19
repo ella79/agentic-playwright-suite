@@ -403,7 +403,7 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Suite health</title>
+<title>Suite Health</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%230d1117' stroke='%231a7f37' stroke-width='2'/><path d='M9 17l4 4 10-11' fill='none' stroke='%231a7f37' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <style>
   :root { color-scheme: light dark; --line:#8884; --good:#1a7f37; --warn:#9a6700; --bad:#cf222e; }
@@ -437,13 +437,13 @@ const html = `<!doctype html>
 </style>
 </head>
 <body>
-<h1>Suite health</h1>
+<h1>Suite Health</h1>
 <p class="sub">Run ${entry.run} &middot; ${entry.commit} on ${escape(entry.branch)} &middot; ${new Date(entry.date).toUTCString()}</p>
 
 <nav>
-  <a href="../">Test results</a>
-  <a href="../functional/">Functional report</a>
-  <a href="../visual/">Visual report</a>
+  <a href="../">Test Results</a>
+  <a href="../functional/">Functional Report</a>
+  <a href="../visual/">Visual Report</a>
   <a href="https://github.com/ella79/agentic-playwright-suite">Repository</a>
 </nav>
 
