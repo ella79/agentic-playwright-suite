@@ -408,7 +408,7 @@ jobs:
 
           write_meta results/combined "Agentic Playwright Suite" ""
           write_meta results/functional "Functional E2E" "functional/"
-          write_meta results/visual "Visual regression" "visual/"
+          write_meta results/visual "Visual Regression" "visual/"
 
           node utils/scripts/group-allure-packages.mjs             results/combined results/functional results/visual
 
@@ -542,7 +542,7 @@ jobs:
           node env/contract/verify-contract.mjs \
             --contract env/contract/allure-report.contract.json \
             --base ./allure-report \
-            --expect-version 3
+            --expect-version 4
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
