@@ -1,4 +1,9 @@
-import { test as setup, expect } from "@playwright/test";
+// The shared `test`, not Playwright's bare one: without its `allureLabels`
+// auto-fixture, this project's one test carried no `parentSuite` label, so
+// Allure gave it its own top-level suite named "setup" — invisible until the
+// first real run of the consumer contract's `exact: true` check rejected it
+// outright as an unannounced suite. Verified live, in that run's own logs.
+import { test as setup, expect } from "../fixtures/testFixtures";
 import { HomePage, LoginPage } from "../pageObjects";
 import { buildAccount } from "../testData";
 
