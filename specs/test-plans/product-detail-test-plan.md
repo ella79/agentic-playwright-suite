@@ -12,28 +12,31 @@
 
 ## Scope
 
-The review form on a product's detail page. Reaching the page from the catalog is covered by TC-07 in `products-test-plan.md`.
+The product's own information display and its review form. Reaching the page from a search result
+is covered by TC-14 in `products-test-plan.md`.
 
 ## Preconditions
 
 Seed: `specs/seed.spec.ts`
 
-- Precondition: Login (shared account). Nothing here interacts with the account; it is simply
-  whatever state the shared session leaves it in.
+- The shared account signs in automatically via `login.setup.ts`; every case here starts already
+  signed in.
 
 ## Test Cases
 
-| ID    | Name                                                   | Type  | Scenario                                            | Expected                       |
-| ----- | ------------------------------------------------------ | ----- | --------------------------------------------------- | ------------------------------ |
-| TC-19 | A product review can be submitted from the detail page | happy | A visitor submits a review on a product detail page | The thank-you message is shown |
+| ID    | Name                                                       | Type  | Scenario                                            | Expected                                                                                                                       |
+| ----- | ------------------------------------------------------------- | ----- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| TC-16 | The product detail page shows the product's full information | happy | A visitor opens a product's detail page directly    | The name, category (Men > Tshirts), price, quantity selector, availability (In Stock), condition (New) and brand (H&M) are all visible |
+| TC-17 | A product review can be submitted from the detail page      | happy | A visitor fills and submits the review form          | The thank-you message is shown                                                                                                    |
 
 ## Locator Notes
 
 - `#reviews` is a zero-height tab wrapper; the form inside it is what renders, so the page object
   scopes to `#review-form`.
-- All three fields are `required`, so an empty submit is blocked by the browser rather than the
-  application. Verified live on 2026-09-10.
+- All three review fields are `required`, so an empty submit is blocked by the browser rather than
+  the application. Verified live on 2026-09-10.
 
 ## Out of Scope
 
 - The list of existing reviews: the application does not render one.
+- Reaching this page from search: covered by `products-test-plan.md`.
