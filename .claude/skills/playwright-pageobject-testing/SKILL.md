@@ -4,8 +4,10 @@ description: Coding standard for tests and page objects in this repository, loca
 paths:
   - tests/**
   - vr-tests/**
+  - api-tests/**
   - utils/**
   - specs/test-plans/**
+  - specs/api-test-plans/**
 ---
 
 # Page Object Testing Skill
@@ -107,17 +109,20 @@ Rules:
 One stem names every artefact a feature owns. Each suite owns its plan and its spec; everything
 under `utils/` is shared by both.
 
-| Artefact         | Owner            | Path                                         | Shape                                                                |
-| ---------------- | ---------------- | -------------------------------------------- | -------------------------------------------------------------------- |
-| Functional plan  | Functional suite | `specs/test-plans/<area>-test-plan.md`       | [references/test-plan-template.md](references/test-plan-template.md) |
-| Functional spec  | Functional suite | `tests/<area>/<name>.spec.ts`                | Below, under Spec Structure                                          |
-| Visual plan      | Visual suite     | `specs/vr-test-plans/<area>-vr-test-plan.md` | The visual skill                                                     |
-| Visual spec      | Visual suite     | `vr-tests/<area>.vr.spec.ts`                 | The visual skill                                                     |
-| Baselines        | Visual suite     | Next to the visual spec                      | Chromium on Linux                                                    |
-| Page object      | **Both**         | `utils/pageObjects/<area>/<name>Page.ts`     | Above, under Page Object Structure                                   |
-| Component object | **Both**         | `utils/pageObjects/shared/<name>Modal.ts`    | Root-scoped, `BaseComponentPage`                                     |
-| Fixture          | **Both**         | `utils/fixtures/testFixtures.ts`             | One per page object                                                  |
-| Status           | Both             | `specs/STATUS.md`                            | Counts, findings, open decisions                                     |
+| Artefact         | Owner            | Path                                           | Shape                                                                                     |
+| ---------------- | ---------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Functional plan  | Functional suite | `specs/test-plans/<area>-test-plan.md`         | [references/test-plan-template.md](references/test-plan-template.md)                      |
+| Functional spec  | Functional suite | `tests/<area>/<name>.spec.ts`                  | Below, under Spec Structure                                                               |
+| Visual plan      | Visual suite     | `specs/vr-test-plans/<area>-vr-test-plan.md`   | The visual skill                                                                          |
+| Visual spec      | Visual suite     | `vr-tests/<area>.vr.spec.ts`                   | The visual skill                                                                          |
+| Baselines        | Visual suite     | Next to the visual spec                        | Chromium on Linux                                                                         |
+| API plan         | API suite        | `specs/api-test-plans/<area>-api-test-plan.md` | Same shape as a functional plan, `Method + Endpoint` in place of `Page URL`/`Page Object` |
+| API spec         | API suite        | `api-tests/<area>.api.spec.ts`                 | No `page`, no `setup` dependency — the `request` fixture only                             |
+| API client       | API suite        | `utils/apiClients/<area>ApiClient.ts`          | One class per resource area, wraps `request`, mirrors a page object's shape               |
+| Page object      | **Both**         | `utils/pageObjects/<area>/<name>Page.ts`       | Above, under Page Object Structure                                                        |
+| Component object | **Both**         | `utils/pageObjects/shared/<name>Modal.ts`      | Root-scoped, `BaseComponentPage`                                                          |
+| Fixture          | **Both**         | `utils/fixtures/testFixtures.ts`               | One per page object                                                                       |
+| Status           | Both             | `specs/STATUS.md`                              | Counts, findings, open decisions                                                          |
 
 The file is camelCase, the class PascalCase with the same stem: `cartPage.ts` exports `CartPage`. A
 modal one area uses may live in that area's folder; `shared/` is for the ones two areas reach.
@@ -177,20 +182,63 @@ added product`, not `TC-05: Test cart`. Sentence case: the first letter capitali
 
 Everything a test needs arrives through `utils/fixtures/testFixtures.ts`.
 
-| Fixture                              | Provides                                                       |
-| ------------------------------------ | -------------------------------------------------------------- |
-| `homePage`, `cartPage`, and the rest | One page object per surface, built for the tests that name it  |
-| `uniqueAccount`                      | A throwaway registered account, deleted afterwards             |
-| `page`                               | Playwright's page with ad, analytics and consent hosts aborted |
+| Fixture                              | Provides                                                                             |
+| ------------------------------------ | ------------------------------------------------------------------------------------ |
+| `homePage`, `cartPage`, and the rest | One page object per surface, built for the tests that name it                        |
+| `uniqueAccount`                      | A throwaway account, registered through its own signup, deleted afterwards           |
+| `page`                               | Playwright's page with ad, analytics and consent hosts aborted                       |
+| `request`                            | Playwright's own API request context, base-URL'd the same as `page` — API specs only |
 
 A new page object gets a fixture in the same commit that adds the class. Fixtures are on demand, so
 an unused one costs nothing.
 
-Tests needing a logged-in user take the `uniqueAccount` fixture. It signs up a throwaway account
-before the test and deletes it afterwards, so no test depends on data another test left behind and
-parallel workers never contend for one account.
+### Login and Guest: two ways to be signed in
 
-A test that deletes its own account sets `account.deleted = true` so teardown does not try again.
+Every functional and visual project depends on `setup` (`utils/setup/login.setup.ts`) and starts
+already signed in as a shared account. That project runs once per suite run: it registers the
+account through `POST /api/createAccount` if it does not already exist (tolerant of "already
+exists", so it never needs provisioning by hand), signs in through the real login form — the only
+way to get a session at all, since the login API answers no `Set-Cookie` — and saves the result as
+`storageState`. A case that only needs "some logged-in user" as a precondition inherits it for free.
+
+That default is wrong for exactly one kind of case: one that proves something about the boundary
+between signed-in and not, where starting already authenticated either breaks the case outright
+(`uniqueAccount`'s own signup navigates to the login page, which a live session redirects away from)
+or defeats the point of it (a guard test that only means something if it starts unguarded). A case
+where the _whole file_ needs Guest opts out with:
+
+```typescript
+test.use({ storageState: { cookies: [], origins: [] } });
+```
+
+at the top of the file. A case that needs _both_ identities at once — comparing what a guest sees
+against what a signed-in visitor sees, in one test — cannot use `test.use()` for that, since it sets
+the one context the whole test runs in; instead it opens a second, anonymous context directly:
+
+```typescript
+const guestContext = await browser.newContext({
+  storageState: { cookies: [], origins: [] },
+});
+const guestHome = new HomePage(await guestContext.newPage());
+// ...assert against guestHome, then:
+await guestContext.close();
+```
+
+`uniqueAccount` still does its own registration and its own teardown; what changed is that it is no
+longer the only way to reach a signed-in state, only the way to reach a signed-in state that a test
+itself proves the creation of. A test that deletes its own account sets `account.deleted = true` so
+teardown does not try again.
+
+Every plan states which of the two its cases assume, in its Metadata table's `Precondition` row:
+`Login` for the shared signed-in default, `Guest` for a plan (or a single case inside one) that opts
+back out. `login-test-plan.md` and `signup-test-plan.md` are Guest for the whole file; `TC-02` in
+`home-test-plan.md` and `TC-19` in `cart-test-plan.md` open the second-context form for their
+guest half. Everything else is Login.
+
+The cart belongs to that same shared, persistent account, so a case in `cart-test-plan.md`,
+`checkout-test-plan.md`, `payment-test-plan.md` or `confirmation-test-plan.md` that needs a known
+cart state calls `cartPage.clearCart()` first, rather than assuming another file in the group left it
+that way — those files can run in different parallel workers over the same account's cart.
 
 **Cleanup belongs to the fixture, never to a trailing step.** A `test.step` at the end of a case
 that removes what the case created does not run when an earlier step fails: Playwright skips the

@@ -147,6 +147,39 @@ await expect(page).toHaveScreenshot("checkout-guard-modal.png", {
 });
 ```
 
+## Two Site-Specific Gotchas, Verified Live
+
+Both recur across this application rather than in one page, so check for them before trusting a
+locator's own bounding box.
+
+**Zero-height Bootstrap rows.** This site pairs Bootstrap 3 CSS with markup that assumes a clearfix
+it does not have: a `.row` or `.form-row` whose children are floated collapses to its own zero
+height, even while its content paints real, visible pixels on the page. An element screenshot of
+that row itself captures nothing — Playwright treats it as not visible, or crops to an empty box.
+Confirmed on the hero carousel's active slide, the product showcase row, the review success banner's
+row, and the newsletter success banner's row. The fix is never to wait longer: find the nearest
+ancestor with a real, non-collapsed height (verify with `locator.boundingBox()` before trusting it)
+and capture that instead, or fall back to a full-page capture when no such ancestor exists.
+
+**A heading that is a sibling, not a parent.** A section's title and its content are often two
+separate elements next to each other, not one wrapping the other — unlike this suite's own Brands
+sidebar, where the heading genuinely is the first child of the container. Screenshotting the content
+locator alone then omits the title, which reads as an incomplete capture even though nothing is
+technically wrong with it. `BaseAppPage.unionBoundingBox(locators)` computes the smallest rectangle
+covering several locators' own boxes for exactly this case:
+
+```typescript
+const clip = await homePage.unionBoundingBox([
+  homePage.categoryHeading,
+  homePage.categorySidebar,
+]);
+await expect(page).toHaveScreenshot("home-category-sidebar.png", { clip });
+```
+
+Reach for this only when no existing element already wraps both — check the live DOM first, since
+sometimes it does (Brands' own `<h2>`, the review form's `.category-tab.shop-details-tab` wrapper).
+A locator change that fixes the frame is always preferable to a clip that works around it.
+
 ## Thresholds
 
 | Content                        | `maxDiffPixelRatio` | Why                                 |

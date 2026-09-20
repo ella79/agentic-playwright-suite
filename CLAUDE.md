@@ -82,7 +82,9 @@ GitHub Actions (`.github/workflows/ci.yml`), stages `build` → `check` → `end
 1. `prepare-playwright-image` — builds the execution image and pushes it to ghcr.io; every later job
    runs inside it. The tag hashes `package.json` plus `yarn.lock`
 2. `static-checks` — typecheck, lint, format; gates everything after it
-3. `e2e-chromium`, `e2e-webkit`, `visual-regression` — in parallel; WebKit is skipped on pull requests
+3. `e2e-chromium`, `e2e-webkit`, `visual-regression`, `api` — in parallel; WebKit is skipped on pull
+   requests, and `api` has no shared-account setup dependency since every case provisions its own
+   throwaway account
 4. `publish-dashboard` — merges the reports and deploys to Pages, `main` only
 5. `ci-gate` — reads every other job's result; the only check branch protection requires
 

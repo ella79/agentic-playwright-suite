@@ -49,7 +49,7 @@ a standard that erodes.
 
 ## The Loop
 
-The agents are not six ways to ask for a test. They are one chain, and each link hands the next
+The agents are not five ways to ask for a test. They are one chain, and each link hands the next
 something narrower than it received.
 
 1. **Explore.** The planner opens the application through MCP and reads the accessibility tree, so

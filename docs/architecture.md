@@ -25,6 +25,7 @@ yarn test:e2e
 | `yarn test:vr`                      | Run the visual suite against the committed baselines    |
 | `yarn docker:vr`                    | Run the visual suite in the same Linux image CI uses    |
 | `yarn docker:vr:update`             | Regenerate baselines with rendering identical to CI     |
+| `yarn test:api`                     | Run the API suite                                       |
 | `yarn test:seed`                    | Run the environment seed the agents generate tests from |
 | `yarn test:e2e:report`              | Open the last HTML report                               |
 | `yarn typecheck`                    | TypeScript, no emit                                     |
@@ -33,13 +34,19 @@ yarn test:e2e
 
 ## Environment Variables
 
-None are required. The suite runs against the public demo site with no credentials, because every
-test that needs an account registers its own and deletes it afterwards.
+`E2E_LOGIN_EMAIL` and `E2E_LOGIN_PASSWORD` are required for the functional and visual suites: the
+`setup` project signs that account into the application once per run, and every functional and
+visual project depends on it. Locally, put them in a gitignored `.env` (copy `.env.example`);
+`playwright.config.ts` loads it with Node's built-in `process.loadEnvFile()`. In CI they are GitHub
+Actions secrets, never a value in a file. The API suite needs neither: every case there provisions
+its own throwaway account directly against the API.
 
-| Variable       | Effect                                                                                  |
-| -------------- | --------------------------------------------------------------------------------------- |
-| `E2E_BASE_URL` | Point the suite at a different host. Defaults to `https://automationexercise.com`       |
-| `CI`           | Set by the pipeline. Switches reporters to blob, enables one retry, caps workers at two |
+| Variable             | Effect                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `E2E_LOGIN_EMAIL`    | Email of the shared account `utils/setup/login.setup.ts` signs in as                    |
+| `E2E_LOGIN_PASSWORD` | Its password. Never logged, never traced: see the Design section below                  |
+| `E2E_BASE_URL`       | Point the suite at a different host. Defaults to `https://automationexercise.com`       |
+| `CI`                 | Set by the pipeline. Switches reporters to blob, enables one retry, caps workers at two |
 
 ## The Standards Behind This
 
@@ -72,9 +79,42 @@ alternatives seen in the wild: constructing page objects in every test, which re
 lines everywhere, and a `let` at describe level assigned in `beforeEach`, which shares mutable state
 between tests and has no teardown.
 
-The account is the fixture that carries real lifecycle: it registers a throwaway user, yields it,
-and removes it afterwards while asserting the removal actually happened. No shared account, no
-shared storage state, nothing for parallel workers to contend over.
+**Two ways to be signed in, chosen by what the case actually proves.** `uniqueAccount` is the fixture
+that carries real lifecycle: it registers a throwaway user through the UI, yields it, and removes it
+afterwards while asserting the removal actually happened. It exists for the handful of cases that
+prove something about signup, login or account deletion themselves — `login.spec.ts` and
+`signup.spec.ts`, in full — where a fresh, disposable account is the point.
+
+Everything else defaults to a shared, persistent account instead: `utils/setup/login.setup.ts` runs
+as its own project once per suite run, registers that account through the API if it does not already
+exist (`POST /api/createAccount`, tolerant of "already exists"), signs in through the real login
+form — the only way to get a session a browser can use, since the login API answers no `Set-Cookie`
+at all — and saves the result as `storageState`. Every functional and visual project depends on it
+and starts already signed in, so a case that only needs "some logged-in user" as a precondition never
+pays for a signup it has no reason to prove. `login.spec.ts` and `signup.spec.ts` opt back out with
+`test.use({ storageState: { cookies: [], origins: [] } })` at the top of the file; `home.spec.ts`'s
+TC-02 and `cart.spec.ts`'s TC-19 open a second, anonymous `browser.newContext()` instead, since
+those two compare a guest and a signed-in visitor within one case rather than running the whole case
+as one or the other.
+
+Every plan states which of the two its cases assume, in its Metadata table's `Precondition` row:
+`Login` for the shared signed-in default, `Guest` for a plan (or a single case inside one) that opts
+back out. A reader should never have to open the spec to find out which user a case runs as.
+
+The setup project's own trace, video and screenshot are off. `fill()` records what it typed into a
+trace's action log verbatim, uncensored by CI's own secret redaction, which only covers log output;
+a credential written into a trace that this suite publishes would be public. Nothing about the login
+step needs debugging from a trace anyway: it is one page, one form, and a failure there fails loudly
+with its own error rather than a silent wrong turn a trace would be needed to diagnose.
+
+**The cart is shared state too, since it belongs to the same persistent account.** Every case in
+`cart.spec.ts`, `checkout.spec.ts`, `payment.spec.ts` and `confirmation.spec.ts` that needs a
+known cart calls `cartPage.clearCart()` first, rather than assuming another file in the group left it
+empty — the four files can run in different workers over the same account's cart.
+
+**API tests use their own throwaway accounts, never the shared one.** `api-tests/` calls the public
+API directly through Playwright's `request` fixture, wrapped by a small client per resource area in
+`utils/apiClients/`. Nothing there depends on `setup` or on a browser at all.
 
 **Two headers on every spec.** `// spec:` points at the plan the cases come from, which is how the
 dashboard links a result back to its justification. `// seed:` names the seed spec the environment
@@ -101,22 +141,37 @@ committed rather than writing its own and reporting success.
 
 ```
 tests/                                 Functional specs, <feature>/<feature>.spec.ts
-├── authentication/                    TC-01 to TC-06
-├── cart/                              TC-12 to TC-16
-├── checkout/                          TC-17
-├── contact/                           TC-18
-├── home/                              TC-20
-├── product-detail/                    TC-19
-└── products/                          TC-07 to TC-11
+├── home/                              TC-01 to TC-06 · Login, except TC-02's guest half
+├── login/                             TC-07 to TC-10 · Guest, whole file
+├── signup/                            TC-11 to TC-12 · Guest, whole file
+├── products/                          TC-13 to TC-15 · Login
+├── product-detail/                    TC-16 to TC-17 · Login
+├── cart/                              TC-18 to TC-19 · Login, except TC-19's guest half
+├── checkout/                          TC-20 · Login
+├── payment/                           TC-21 · Login
+└── confirmation/                      TC-22 · Login
+
+api-tests/                             API specs, <area>.api.spec.ts — no browser, no shared account
+├── account.api.spec.ts                API-01 to API-08, API-16 to API-19
+└── catalog.api.spec.ts                API-09 to API-15
 
 vr-tests/                              Visual specs and their committed baselines
-├── *.vr.spec.ts                       VR-01 to VR-21, less the retired VR-15
+├── home.vr.spec.ts                    VR-01 to VR-10 · Login
+├── login.vr.spec.ts                   VR-11 to VR-12 · Guest, whole file
+├── signup.vr.spec.ts                  VR-13 to VR-17 · Guest, whole file
+├── products.vr.spec.ts                VR-18 to VR-20 · Login
+├── product-detail.vr.spec.ts          VR-21 to VR-24 · Login
+├── cart.vr.spec.ts                    VR-25 to VR-27 · Login, except VR-27's guest half
+├── checkout.vr.spec.ts                VR-28 to VR-29 · Login
+├── payment.vr.spec.ts                 VR-30 to VR-32 · Login
+├── confirmation.vr.spec.ts            VR-33 · Login
 └── *.vr.spec.ts-snapshots/            Chromium on Linux, 1920x1080
 
 specs/
 ├── STATUS.md                          Test status report: coverage, findings, open decisions
 ├── seed.spec.ts                       Environment seed the agents start generated tests from
 ├── test-plans/                        One plan per functional area
+├── api-test-plans/                    One plan per API resource area
 └── vr-test-plans/                     One plan per visual area, plus shared conventions
 
 utils/
@@ -124,10 +179,13 @@ utils/
 │   ├── baseAppPage.ts                 Base for URL addressable pages
 │   ├── baseComponentPage.ts           Base for modals, root scoped
 │   ├── shared/                        Modals reached from more than one page
-│   ├── auth/ cart/ checkout/ ...      One directory per area
+│   ├── authentication/ cart/ checkout/ home/ products/
 │   └── index.ts                       Barrel export
+├── apiClients/                        One client per API resource area, wraps `request`
+├── setup/
+│   └── login.setup.ts                 Signs the shared account in once; produces `.auth/user.json`
 ├── fixtures/
-│   ├── testFixtures.ts                Account lifecycle, third party blocking, report labels
+│   ├── testFixtures.ts                Page objects, account lifecycle, third party blocking
 │   └── allureLabels.ts                Labels applied to every result
 ├── testData.ts                        Generated accounts, fixed products, card details
 └── url.ts                             Route constants and patterns
