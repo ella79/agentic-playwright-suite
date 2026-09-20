@@ -2,12 +2,13 @@
 
 ## Metadata
 
-| Field       | Value                                             |
-| ----------- | ------------------------------------------------- |
-| Page URL    | `/product_details/<id>`                           |
-| Page Title  | `Automation Exercise - Product Details`           |
-| Spec File   | `tests/product-detail/product-detail.spec.ts`     |
-| Page Object | `utils/pageObjects/products/productDetailPage.ts` |
+| Field        | Value                                             |
+| ------------ | -------------------------------------------------- |
+| Page URL     | `/product_details/<id>`                           |
+| Page Title   | `Automation Exercise - Product Details`           |
+| Spec File    | `tests/product-detail/product-detail.spec.ts`     |
+| Page Object  | `utils/pageObjects/products/productDetailPage.ts` |
+| Precondition | Login (shared account)                            |
 
 ## Scope
 
@@ -17,7 +18,8 @@ The review form on a product's detail page. Reaching the page from the catalog i
 
 Seed: `specs/seed.spec.ts`
 
-- No account required.
+- Precondition: Login (shared account). Nothing here interacts with the account; it is simply
+  whatever state the shared session leaves it in.
 
 ## Test Cases
 

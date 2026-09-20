@@ -2,12 +2,13 @@
 
 ## Metadata
 
-| Field       | Value                                        |
-| ----------- | -------------------------------------------- |
-| Page URL    | `/contact_us`                                |
-| Page Title  | `Automation Exercise - Contact Us`           |
-| Spec File   | `tests/contact/contact.spec.ts`              |
-| Page Object | `utils/pageObjects/contact/contactUsPage.ts` |
+| Field        | Value                                        |
+| ------------ | --------------------------------------------- |
+| Page URL     | `/contact_us`                                |
+| Page Title   | `Automation Exercise - Contact Us`           |
+| Spec File    | `tests/contact/contact.spec.ts`              |
+| Page Object  | `utils/pageObjects/contact/contactUsPage.ts` |
+| Precondition | Login (shared account)                       |
 
 ## Scope
 
@@ -17,7 +18,8 @@ The contact form, including the file attachment it accepts. The page's appearanc
 
 Seed: `specs/seed.spec.ts`
 
-- No account required.
+- Precondition: Login (shared account). Nothing here interacts with the account; it is simply
+  whatever state the shared session leaves it in.
 
 ## Test Cases
 
