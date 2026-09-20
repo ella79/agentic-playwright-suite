@@ -1,11 +1,15 @@
 {
   "name": "portfolio-qa-suite-page",
-  "version": 4,
+  "version": 5,
   "consumer": "https://ella79.github.io/portfolio/qa-suite.html",
   "provider": "https://ella79.github.io/agentic-playwright-suite/",
   "providerRepository": "https://github.com/ella79/agentic-playwright-suite",
   "description": "What the portfolio's QA suite page reads out of the published Allure report. It is deliberately narrow: everything the page does not touch is free to change without warning. The provider verifies this file against a freshly generated report before publishing, and the consumer runs it on a schedule against the published one.",
   "changelog": [
+    {
+      "version": 5,
+      "note": "The API suite joined the published report as a third top-level suite, \"API\", after `publish-dashboard` started depending on the `api` job and merging its results in. It carries no engine suffix: every case runs the same way regardless of host, so \"API\" needs no \" · <engine>\" split the way Functional E2E and Visual Regression do. suiteNames.expect gained the new name; engineSuffix, exact and everything else about the check are unchanged. A fourth published report, api/, is added to links alongside functional/ and visual/."
+    },
     {
       "version": 4,
       "note": "The visual suite's display name changed from \"Visual regression\" to \"Visual Regression\", capitalising the second word for consistency with title-cased labels elsewhere in the report. It is not renamed to \"Visual Regression E2E\": this suite's own conventions (see the playwright-visual-regression skill's VR / E2E Boundary) treat E2E as naming the functional suite specifically, not screenshot comparisons, so the two suites stay visibly different kinds of check rather than looking like siblings. The top level now holds \"Functional E2E · Chromium\", \"Functional E2E · WebKit\" and \"Visual Regression · Chromium\". suiteNames.expect is updated to match; engineSuffix and the exact-match behaviour are unchanged. \"Functional E2E\" is untouched."
@@ -39,7 +43,7 @@
       "required": true,
       "usedFor": "the suite column, the replay, the engines, the per area split, the distinct case count and the slowest tests",
       "checks": [
-        { "kind": "suiteNames", "expect": ["Functional E2E", "Visual Regression"], "exact": true, "engineSuffix": " · " },
+        { "kind": "suiteNames", "expect": ["Functional E2E", "Visual Regression", "API"], "exact": true, "engineSuffix": " · " },
         { "kind": "leaves", "minCount": 1, "require": ["status", "time.duration", "time.start", "name"] },
         { "kind": "engineIsConsistent", "separator": " · " }
       ]
@@ -79,6 +83,7 @@
     { "path": "", "usedFor": "the report embedded at the bottom of the page, and the results dashboard link" },
     { "path": "functional/", "usedFor": "published link" },
     { "path": "visual/", "usedFor": "published link" },
+    { "path": "api/", "usedFor": "published link" },
     { "path": "playwright-report/", "usedFor": "published link, and the trace viewer offered when a run is not clean" },
     { "path": "metrics/", "usedFor": "published link" }
   ]
