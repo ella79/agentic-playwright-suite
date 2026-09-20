@@ -26,7 +26,7 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                                       | Type  | Scenario                                            | Expected                                                                                                                       |
 | ----- | ------------------------------------------------------------- | ----- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| TC-17 | The product detail page shows the product's full information | happy | A visitor opens a product's detail page directly    | The name, category (Men > Tshirts), price, quantity selector, availability (In Stock), condition (New) and brand (H&M) are all visible |
+| TC-17 | The product detail page shows the product's full information | happy | A visitor opens a product's detail page directly    | The name, category (Men > Tshirts), price, quantity selector, availability (In Stock), condition (New), brand (H&M) and the Write Your Review section are all visible |
 | TC-18 | A product review can be submitted from the detail page      | happy | A visitor fills and submits the review form          | The thank-you message is shown                                                                                                    |
 
 ## Locator Notes
