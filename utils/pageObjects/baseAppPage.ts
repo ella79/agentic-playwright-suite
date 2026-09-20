@@ -9,9 +9,14 @@ const consentHandled = new WeakSet<Page>();
 export abstract class BaseAppPage {
   readonly page: Page;
   readonly header: Locator;
+  readonly homeLink: Locator;
+  readonly productsLink: Locator;
   readonly cartLink: Locator;
   readonly signupLoginLink: Locator;
+  readonly testCasesLink: Locator;
+  readonly apiTestingLink: Locator;
   readonly contactUsLink: Locator;
+  readonly videoTutorialsLink: Locator;
   readonly logoutLink: Locator;
   readonly deleteAccountLink: Locator;
   readonly loggedInAs: Locator;
@@ -21,11 +26,30 @@ export abstract class BaseAppPage {
   constructor(page: Page) {
     this.page = page;
     this.header = page.getByRole("banner");
-    this.cartLink = page.getByRole("link", { name: "Cart", exact: true });
-    this.signupLoginLink = page.getByRole("link", { name: "Signup / Login" });
-    this.contactUsLink = page.getByRole("link", { name: "Contact us" });
-    this.logoutLink = page.getByRole("link", { name: "Logout" });
-    this.deleteAccountLink = page.getByRole("link", { name: "Delete Account" });
+    // Every nav link is scoped to the header rather than matched page-wide:
+    // "Cart"'s accessible name carries a leading space from its icon markup,
+    // which exact matching does not trim, and several of these names are also
+    // used elsewhere on the page (the hero's own "Test Cases" button, the
+    // add-to-cart modal's "View Cart" link) that an unscoped match would also
+    // resolve to. Verified live.
+    this.homeLink = this.header.getByRole("link", { name: "Home" });
+    this.productsLink = this.header.getByRole("link", { name: "Products" });
+    this.cartLink = this.header.getByRole("link", { name: "Cart" });
+    this.signupLoginLink = this.header.getByRole("link", {
+      name: "Signup / Login",
+    });
+    this.testCasesLink = this.header.getByRole("link", { name: "Test Cases" });
+    this.apiTestingLink = this.header.getByRole("link", {
+      name: "API Testing",
+    });
+    this.contactUsLink = this.header.getByRole("link", { name: "Contact us" });
+    this.videoTutorialsLink = this.header.getByRole("link", {
+      name: "Video Tutorials",
+    });
+    this.logoutLink = this.header.getByRole("link", { name: "Logout" });
+    this.deleteAccountLink = this.header.getByRole("link", {
+      name: "Delete Account",
+    });
     this.loggedInAs = page.getByText("Logged in as");
     this.consentButton = page.getByRole("button", { name: "Consent" });
     // No text and no role: a decorative anchor the scrollUp plugin injects.
@@ -96,6 +120,26 @@ export abstract class BaseAppPage {
     await target.evaluate((element: Element) =>
       element.scrollIntoView({ block: "start", behavior: "instant" }),
     );
+  }
+
+  /**
+   * The smallest rectangle enclosing every given locator's own box, for a
+   * `page.screenshot({ clip })` capture spanning elements with no single
+   * existing container tight enough to scope to directly, such as a heading
+   * and the block it titles when the two are rendered as plain siblings.
+   */
+  async unionBoundingBox(
+    locators: Locator[],
+  ): Promise<{ x: number; y: number; width: number; height: number }> {
+    const boxes = await Promise.all(
+      locators.map((locator) => locator.boundingBox()),
+    );
+    const resolved = boxes.filter((box) => box !== null);
+    const left = Math.min(...resolved.map((box) => box.x));
+    const top = Math.min(...resolved.map((box) => box.y));
+    const right = Math.max(...resolved.map((box) => box.x + box.width));
+    const bottom = Math.max(...resolved.map((box) => box.y + box.height));
+    return { x: left, y: top, width: right - left, height: bottom - top };
   }
 
   /**

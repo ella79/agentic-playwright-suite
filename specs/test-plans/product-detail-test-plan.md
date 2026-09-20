@@ -3,7 +3,7 @@
 ## Metadata
 
 | Field        | Value                                             |
-| ------------ | -------------------------------------------------- |
+| ------------ | ------------------------------------------------- |
 | Page URL     | `/product_details/<id>`                           |
 | Page Title   | `Automation Exercise - Product Details`           |
 | Spec File    | `tests/product-detail/product-detail.spec.ts`     |
@@ -13,7 +13,7 @@
 ## Scope
 
 The product's own information display and its review form. Reaching the page from a search result
-is covered by TC-15 in `products-test-plan.md`.
+is covered by TC-14 in `products-test-plan.md`.
 
 ## Preconditions
 
@@ -24,10 +24,10 @@ Seed: `specs/seed.spec.ts`
 
 ## Test Cases
 
-| ID    | Name                                                       | Type  | Scenario                                            | Expected                                                                                                                       |
-| ----- | ------------------------------------------------------------- | ----- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| TC-17 | The product detail page shows the product's full information | happy | A visitor opens a product's detail page directly    | The name, category (Men > Tshirts), price, quantity selector, availability (In Stock), condition (New), brand (H&M) and the Write Your Review section are all visible |
-| TC-18 | A product review can be submitted from the detail page      | happy | A visitor fills and submits the review form          | The thank-you message is shown                                                                                                    |
+| ID    | Name                                                         | Type  | Scenario                                                         | Expected                                                                                                                                                                              |
+| ----- | ------------------------------------------------------------ | ----- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-16 | The product detail page shows the product's full information | happy | A visitor opens a product's detail page directly                 | The image, name, category (Men > Tshirts), price, quantity (defaulting to 1), availability (In Stock), condition (New), brand (H&M) and the Write Your Review section are all visible |
+| TC-17 | A product review can be submitted from the detail page       | happy | A visitor finds the review form empty, then fills and submits it | The name, email and review fields start empty; submitting them shows the thank-you message                                                                                            |
 
 ## Locator Notes
 

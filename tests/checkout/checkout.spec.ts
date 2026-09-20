@@ -1,51 +1,47 @@
 // spec: specs/test-plans/checkout-test-plan.md
 // seed: specs/seed.spec.ts
 import { expect, test } from "../../utils/fixtures/testFixtures";
-import { paymentCard, products } from "../../utils/testData";
-import { urlPattern } from "../../utils/url";
+import { buildAccount, products } from "../../utils/testData";
+import { url } from "../../utils/url";
 
 test.describe("Checkout Page", () => {
-  test("TC-17: A signed-in user can complete an order end to end", async ({
+  test("TC-20: The checkout page shows the order it will place, ready to proceed", async ({
     page,
-    uniqueAccount,
-    productDetailPage,
     cartPage,
+    productDetailPage,
     checkoutPage,
-    paymentPage,
-    orderConfirmationPage,
   }) => {
-    await test.step("add a product to the cart", async () => {
+    // Defaults match the shared account's profile: login.setup.ts registers
+    // it with no overrides beyond email and password.
+    const account = buildAccount();
+
+    await test.step("add a product and proceed to checkout", async () => {
+      await cartPage.clearCart();
       await productDetailPage.gotoProductDetailPage(products.blueTop.id);
       const modal = await productDetailPage.addToCart();
       await modal.viewCart();
-      await expect(cartPage.getRow(products.blueTop.name)).toBeVisible();
+
+      await cartPage.proceedToCheckout();
+      await expect(page).toHaveURL(new RegExp(`${url.checkout}$`));
     });
 
-    await test.step("review the order against the registered address", async () => {
-      await cartPage.proceedToCheckout();
+    await test.step("the order is ready: addresses, order and comment field", async () => {
       await expect(checkoutPage.addressDetailsHeading).toBeVisible();
-      await expect(checkoutPage.deliveryAddress).toContainText(
-        uniqueAccount.address,
-      );
-      await expect(checkoutPage.deliveryAddress).toContainText(
-        uniqueAccount.city,
-      );
+      await expect(checkoutPage.deliveryAddress).toContainText(account.address);
+      await expect(checkoutPage.deliveryAddress).toContainText(account.city);
+      await expect(checkoutPage.billingAddress).toContainText(account.address);
+      await expect(checkoutPage.billingAddress).toContainText(account.city);
+      await expect(checkoutPage.orderRows).toHaveCount(1);
       await expect(checkoutPage.orderRows.first()).toContainText(
         products.blueTop.name,
       );
+      await expect(checkoutPage.commentTextarea).toBeVisible();
+      await expect(checkoutPage.commentTextarea).toHaveValue("");
     });
 
-    await test.step("place the order and pay", async () => {
-      await checkoutPage.addOrderComment("Portfolio suite end-to-end run.");
+    await test.step("Place Order reaches payment", async () => {
       await checkoutPage.placeOrder();
-      await expect(paymentPage.payButton).toBeVisible();
-      await paymentPage.payAndConfirmOrder(paymentCard);
-    });
-
-    await test.step("confirm the order was placed", async () => {
-      await expect(page).toHaveURL(urlPattern.orderPlaced);
-      await expect(orderConfirmationPage.orderPlacedBanner).toBeVisible();
-      await expect(orderConfirmationPage.downloadInvoiceLink).toBeVisible();
+      await expect(page).toHaveURL(new RegExp(`${url.payment}$`));
     });
   });
 });

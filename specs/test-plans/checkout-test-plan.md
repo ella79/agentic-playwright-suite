@@ -2,54 +2,50 @@
 
 ## Metadata
 
-| Field       | Value                                                                                                                                                                                                                                                                                   |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page URL    | `/checkout`, `/payment`, `/payment_done/<id>`                                                                                                                                                                                                                                           |
-| Page Title  | `Automation Exercise - Checkout`, `Automation Exercise - Payment`, `Automation Exercise - Order Placed`                                                                                                                                                                                 |
-| Spec File   | `tests/checkout/checkout.spec.ts`                                                                                                                                                                                                                                                       |
-| Page Object | `utils/pageObjects/products/productDetailPage.ts`, `utils/pageObjects/shared/addToCartModal.ts`, `utils/pageObjects/cart/cartPage.ts`, `utils/pageObjects/checkout/checkoutPage.ts`, `utils/pageObjects/checkout/paymentPage.ts`, `utils/pageObjects/checkout/orderConfirmationPage.ts` |
+| Field        | Value                                        |
+| ------------ | -------------------------------------------- |
+| Page URL     | `/checkout`                                  |
+| Page Title   | `Automation Exercise - Checkout`             |
+| Spec File    | `tests/checkout/checkout.spec.ts`            |
+| Page Object  | `utils/pageObjects/checkout/checkoutPage.ts` |
+| Precondition | Login (shared account)                       |
 
 ## Scope
 
-The full purchase journey for a registered user: cart review, address confirmation, order comment,
-payment, and order confirmation.
-
-This is the suite's one long end-to-end scenario. Every other test is deliberately narrower ,
-this one exists to prove the flow holds together, not to cover each step's variations.
+The checkout page a signed-in visitor reaches from the cart: the delivery and billing address
+blocks, the order review, and the comment field, ending on Place Order. What Proceed to Checkout
+does for a guest is covered by TC-19 in `cart-test-plan.md`. What Place Order opens is covered
+by `payment-test-plan.md`.
 
 ## Preconditions
 
 Seed: `specs/seed.spec.ts`
 
-- A registered, signed-in user. Provided by the `uniqueAccount` fixture, which registers the
-  account before the test and deletes it afterwards.
-- At least one product in the cart.
+- The shared account signs in automatically via `login.setup.ts`.
+- The case clears the cart with `cartPage.clearCart()` first, since it belongs to the same shared
+  account every other file in this group uses, then arranges its own precondition: a product added
+  to the cart, then Proceed to Checkout pressed, before any assertion in this plan runs.
 
 ## Test Cases
 
-| ID    | Name                                              | Type  | Scenario                                            | Expected                                                                                                                                                                                |
-| ----- | ------------------------------------------------- | ----- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TC-17 | A signed-in user can complete an order end to end | happy | A signed-in user checks out a cart with one product | Delivery and billing addresses reflect the registered account, the order review lists the product, and after payment the order placed confirmation with a downloadable invoice is shown |
-
-## Steps
-
-1. Register through the fixture; the user is signed in.
-2. Add a known product to the cart from its detail page.
-3. Proceed to checkout.
-4. Confirm the delivery address carries the registered account's details.
-5. Add an order comment.
-6. Place the order and submit card details.
-7. Assert the order placed confirmation and the invoice link.
+| ID    | Name                                                              | Type  | Scenario                                                        | Expected                                                                                                                                                                                                                       |
+| ----- | ----------------------------------------------------------------- | ----- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| TC-20 | The checkout page shows the order it will place, ready to proceed | happy | A signed-in visitor with a product in the cart reaches checkout | Address Details shows a non-empty delivery address and a non-empty billing address; Review Your Order lists the one product in the cart; the order comment field is present and empty; pressing Place Order reaches `/payment` |
 
 ## Locator Notes
 
-- The address blocks are `#address_delivery` and `#address_invoice`; neither has a role.
-- The order comment textarea has neither a label nor a placeholder.
-- `Place Order` is a real anchor with `href="/payment"`, so it carries a link role.
-- Payment fields all expose `data-qa`. Confirmation lands on `/payment_done/<id>`.
+- `deliveryAddressValues` masks every line except the block heading when this page is captured
+  visually, since the values are per-run generated data; the functional assertion here checks the
+  block is non-empty, not its exact text.
+- `CheckoutPage` needs a `billingAddress` locator alongside the existing `deliveryAddress`: verified
+  live that both "YOUR DELIVERY ADDRESS" and "YOUR BILLING ADDRESS" blocks render, populated from the
+  same account data.
+- `/view_cart` and `/checkout` share the exact page title, `Automation Exercise - Checkout` —
+  recorded in `STATUS.md`. Every assertion here targets a heading or the URL, never the title.
 
 ## Out of Scope
 
-- Payment rejection paths: the application accepts any card input, so a declined-payment test
-  would assert application behaviour that does not exist.
-- Invoice file contents: the download is asserted as available, not parsed.
+- The checkout guard a guest meets: covered by TC-19 in `cart-test-plan.md`.
+- The payment form Place Order opens: covered by `payment-test-plan.md`.
+- No dedicated error case exists for this page: every input on it is either read-only account data
+  or an optional comment field with nothing to reject.

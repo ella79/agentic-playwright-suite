@@ -2,12 +2,12 @@
 
 ## Metadata
 
-| Field        | Value                                                                                       |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| Page URL     | `/login`, `/signup`                                                                           |
-| Page Title   | `Automation Exercise - Signup / Login`, `Automation Exercise - Signup`                        |
-| Spec File    | `tests/signup/signup.spec.ts`                                                                |
-| Page Object  | `utils/pageObjects/authentication/loginPage.ts`, `accountInfoPage.ts`, `confirmationPage.ts` |
+| Field        | Value                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Page URL     | `/login`, `/signup`                                                                                                                                                                  |
+| Page Title   | `Automation Exercise - Signup / Login`, `Automation Exercise - Signup`                                                                                                               |
+| Spec File    | `tests/signup/signup.spec.ts`                                                                                                                                                        |
+| Page Object  | `utils/pageObjects/authentication/loginPage.ts`, `accountInfoPage.ts`, `confirmationPage.ts`                                                                                         |
 | Precondition | Guest, for the whole file: creating an account starts from `/login`'s quick form, which the shared logged-in session every other functional spec depends on would redirect away from |
 
 ## Scope
@@ -24,22 +24,25 @@ Seed: `specs/seed.spec.ts`
   signup navigates to the login page's quick form, which the shared logged-in session every other
   spec depends on would redirect away from.
 - Both cases build their own account data with `buildAccount()`, since they test the creation and
-  rejection of an account, not a precondition an existing one would satisfy. TC-13 additionally
+  rejection of an account, not a precondition an existing one would satisfy. TC-12 additionally
   needs the `uniqueAccount` fixture, to have an already-registered email to collide with.
 
 ## Test Cases
 
-| ID    | Name                                                             | Type  | Scenario                                                                                              | Expected                                                                                                                                            |
-| ----- | ------------------------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TC-12 | A new visitor completes signup end to end and lands signed in   | happy | A visitor starts signup with a name and email from the login page, completes the Account and Address Information forms on `/signup`, and submits | Account Created! and the congratulations message are shown; continuing lands back on the home page, signed in, with Logged in as \<name\> visible      |
-| TC-13 | Signing up with an already registered email is rejected         | error | A visitor starts signup with the email of an account that already exists                              | An inline error says the email already exists; the visitor never reaches the Account Information form                                                |
+| ID    | Name                                                          | Type  | Scenario                                                                                                                                                                   | Expected                                                                                                                                                                                                       |
+| ----- | ------------------------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-11 | A new visitor completes signup end to end and lands signed in | happy | A visitor starts signup with a name and email from the login page, sees the Account Information and Address Information sections, completes both on `/signup`, and submits | Account Created! and the congratulations message are shown; continuing lands back on the home page, signed in, with Logged in as \<name\> visible; `GET /api/getUserDetailByEmail` confirms the account exists |
+| TC-12 | Signing up with an already registered email is rejected       | error | A visitor starts signup with the email of an account that already exists                                                                                                   | An inline error says the email already exists; the visitor never reaches the Account Information form                                                                                                          |
 
 ## Locator Notes
 
-- `/login` and `/signup` share no page title distinct enough to assert on alone in every case; TC-12
+- `/login` and `/signup` share no page title distinct enough to assert on alone in every case; TC-11
   asserts on the Account Information heading instead, which is unique to that step.
 - The subscription form is shared markup with the home page: the same locator on `HomePage` (or a
   shared component) resolves on both, so it is not duplicated here.
+- TC-11 cross-validates the account the UI created against `GET /api/getUserDetailByEmail`
+  (`AccountApiClient`), since that endpoint exists and the signup flow has nothing else to prove
+  beyond what the UI already shows.
 
 ## Out of Scope
 

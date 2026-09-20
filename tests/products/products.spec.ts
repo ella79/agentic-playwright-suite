@@ -1,48 +1,75 @@
 // spec: specs/test-plans/products-test-plan.md
 // seed: specs/seed.spec.ts
 import { expect, test } from "../../utils/fixtures/testFixtures";
+import {
+  CatalogApiClient,
+  type SearchProductBody,
+} from "../../utils/apiClients/catalogApiClient";
 import { products, searchTerms } from "../../utils/testData";
+import { url } from "../../utils/url";
 
 test.describe("Products Page", () => {
-  test("TC-07: The catalog lists products and one opens its detail page", async ({
-    productsPage,
-    productDetailPage,
-  }) => {
-    await test.step("the catalog page lists products", async () => {
-      await productsPage.gotoProductsPage();
-      await expect(productsPage.allProductsHeading).toBeVisible();
-      await expect(productsPage.productCards.first()).toBeVisible();
-    });
-
-    await test.step("opening one shows its name, price and availability", async () => {
-      await productsPage.openProductDetail(products.blueTop.name);
-
-      await expect(productDetailPage.productName).toHaveText(
-        products.blueTop.name,
-      );
-      await expect(productDetailPage.productPrice).toHaveText(
-        products.blueTop.price,
-      );
-      await expect(productDetailPage.availability).toContainText("In Stock");
-    });
-  });
-
-  test("TC-08: Search returns only products matching the term", async ({
+  test("TC-13: The products page renders its catalog and special offer banner", async ({
+    request,
     productsPage,
   }) => {
     await productsPage.gotoProductsPage();
-    await productsPage.searchFor(searchTerms.matching);
 
-    await expect(productsPage.searchedProductsHeading).toBeVisible();
-    const names = await productsPage.productNames();
+    await expect(productsPage.productGrid).toBeVisible();
+    await expect(productsPage.productCards.first()).toBeVisible();
+    await expect(productsPage.specialOfferBanner).toBeVisible();
+    await expect(productsPage.searchInput).toBeVisible();
+    await expect(productsPage.searchButton).toBeVisible();
 
-    expect(names.length).toBeGreaterThan(0);
-    for (const name of names) {
-      expect(name.toLowerCase()).toContain(searchTerms.matching);
-    }
+    await test.step("the rendered grid holds exactly the API's catalog", async () => {
+      const catalog = await new CatalogApiClient(request).getProductsList();
+      await expect(productsPage.productCards).toHaveCount(
+        catalog.products.length,
+      );
+    });
   });
 
-  test("TC-09: A search with no matches returns an empty result set", async ({
+  test("TC-14: Searching for a product shows only matching results, and opening one reaches its detail page", async ({
+    page,
+    request,
+    productsPage,
+    productDetailPage,
+  }) => {
+    await test.step("search returns only matching results", async () => {
+      await productsPage.gotoProductsPage();
+      await productsPage.searchFor(products.menTshirt.name);
+
+      await expect(productsPage.searchedProductsHeading).toBeVisible();
+      await expect(
+        productsPage.getProductCard(products.menTshirt.name),
+      ).toBeVisible();
+    });
+
+    await test.step("the rendered results match the API's search response", async () => {
+      const body = await new CatalogApiClient(request).searchProduct(
+        products.menTshirt.name,
+      );
+      expect(body.responseCode).toBe(200);
+      // Asserted above; narrows the union so `products` type-checks below.
+      const found = body as Extract<SearchProductBody, { responseCode: 200 }>;
+      await expect(productsPage.productCards).toHaveCount(
+        found.products.length,
+      );
+    });
+
+    await test.step("opening the result reaches its detail page", async () => {
+      await productsPage.openProductDetail(products.menTshirt.name);
+
+      await expect(page).toHaveURL(
+        new RegExp(`${url.productDetail(products.menTshirt.id)}$`),
+      );
+      await expect(productDetailPage.productName).toHaveText(
+        products.menTshirt.name,
+      );
+    });
+  });
+
+  test("TC-15: A search with no matches returns an empty result set", async ({
     productsPage,
   }) => {
     await productsPage.gotoProductsPage();
@@ -51,28 +78,5 @@ test.describe("Products Page", () => {
     await expect(productsPage.searchedProductsHeading).toBeVisible();
     // The catalog must not be silently returned when nothing matches.
     await expect(productsPage.productCards).toHaveCount(0);
-  });
-
-  test("TC-10: Filtering by category lists that category's products", async ({
-    productsPage,
-  }) => {
-    await productsPage.gotoProductsPage();
-    await productsPage.openCategory("Women", "Tops");
-
-    await expect(
-      productsPage.getCategoryResultsHeading("Women", "Tops"),
-    ).toBeVisible();
-    await expect(productsPage.productCards.first()).toBeVisible();
-  });
-
-  test("TC-11: The scroll-up control returns the visitor to the top", async ({
-    productsPage,
-  }) => {
-    await productsPage.gotoProductsPage();
-    await expect(productsPage.productCards.first()).toBeVisible();
-
-    await productsPage.scrollDownAndReturnToTop();
-
-    await expect(productsPage.allProductsHeading).toBeInViewport();
   });
 });

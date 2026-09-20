@@ -4,45 +4,33 @@ Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
 
 ## Metadata
 
-| Field       | Value                                                                                                                                                                                   |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page URL    | `/view_cart`, `/product_details/<id>`                                                                                                                                                   |
-| Page Title  | `Automation Exercise - Checkout`, `Automation Exercise - Product Details`                                                                                                               |
-| Spec File   | `vr-tests/cart.vr.spec.ts`                                                                                                                                                              |
-| Page Object | `utils/pageObjects/cart/cartPage.ts`, `utils/pageObjects/products/productDetailPage.ts`, `utils/pageObjects/shared/addToCartModal.ts`, `utils/pageObjects/shared/checkoutGuardModal.ts` |
-| Baselines   | `vr-tests/cart.vr.spec.ts-snapshots/`                                                                                                                                                   |
+| Field       | Value                                 |
+| ----------- | ------------------------------------- |
+| Page URL    | `/view_cart`                          |
+| Page Title  | `Automation Exercise - Checkout`      |
+| Spec File   | `vr-tests/cart.vr.spec.ts`            |
+| Page Object | `utils/pageObjects/cart/cartPage.ts`  |
+| Baselines   | `vr-tests/cart.vr.spec.ts-snapshots/` |
 
 ## Scope
 
-The cart has the widest set of visually distinct states in the application, and two of them are
-modals, the highest-value visual targets in any suite, because a modal's positioning and overlay
-break in ways functional assertions never notice. A test can click a button inside a modal that has
-rendered halfway off-screen and still pass.
+The cart page's own two states, empty and holding a product, plus the guard a guest meets trying to
+check out.
 
 ## Cases
 
-| ID    | Name                                      | Screenshot                  | State captured                                           |
-| ----- | ----------------------------------------- | --------------------------- | -------------------------------------------------------- |
-| VR-10 | Empty cart state                          | `cart-empty`                | Empty cart state                                         |
-| VR-11 | Cart table holding one product            | `cart-single-item`          | Cart table holding one product                           |
-| VR-12 | Add-to-cart confirmation modal            | `cart-added-modal`          | Add-to-cart confirmation modal                           |
-| VR-13 | Account guard shown to anonymous visitors | `cart-checkout-guard-modal` | Account guard shown when an anonymous visitor checks out |
+| ID    | Name                 | Screenshot            | State captured                                       |
+| ----- | -------------------- | --------------------- | ---------------------------------------------------- |
+| VR-25 | Cart, empty          | `cart-empty`          | The "Cart is empty!" message                         |
+| VR-26 | Cart, with a product | `cart-with-item`      | One row, its price, quantity and Proceed to Checkout |
+| VR-27 | Checkout guard modal | `cart-checkout-guard` | The guest guard modal open over the cart page        |
 
 ## Notes
 
-**VR-11 waits for the product thumbnail to decode** before capturing, and holds the default
-threshold: the row is mostly text and a small image, so the compression variance that forces `0.05`
-elsewhere is not large enough here.
-
-**VR-12 and VR-13 capture the modal root**, not the page. Scoping to the modal keeps the page
-content behind it out of the comparison, so a change anywhere else on the page cannot produce a
-false diff in a modal baseline.
-
-**VR-13 requires an anonymous session.** The guard only appears to visitors without an account, so
-this case must not request the `uniqueAccount` fixture.
+- VR-27 captures the full page rather than the modal alone, since the modal is a Bootstrap overlay
+  whose backdrop is part of what a regression could break.
 
 ## Out of Scope
 
-- The cart after a removal: the resulting state is the empty cart, already covered by VR-10.
-- Multiple rows: the row component is covered by VR-11, and a second row adds no new visual
-  information while doubling the setup.
+- The add-to-cart confirmation modal that leads here: captured once, in `home-vr-test-plan.md`'s
+  VR-10, since it is the same component regardless of which page opened it.

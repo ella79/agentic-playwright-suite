@@ -54,7 +54,12 @@ export default [
   {
     // Spec files only. Page objects legitimately use APIs that are
     // anti-patterns inside a test, such as scoping with first().
-    files: ["tests/**/*.ts", "vr-tests/**/*.ts", "specs/**/*.ts"],
+    files: [
+      "tests/**/*.ts",
+      "vr-tests/**/*.ts",
+      "api-tests/**/*.ts",
+      "specs/**/*.ts",
+    ],
     plugins: { playwright },
     rules: {
       ...playwright.configs["flat/recommended"].rules,
@@ -72,7 +77,9 @@ export default [
   {
     ignores: [
       "node_modules/**",
-      "playwright-report/**",
+      // `playwright.config.ts` suffixes this per suite (`-vr`, `-api`), matching
+      // the same variants `.gitignore` already lists.
+      "playwright-report*/**",
       "test-results/**",
       "reports/**",
       "allure-results/**",

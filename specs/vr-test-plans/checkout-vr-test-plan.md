@@ -4,47 +4,36 @@ Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
 
 ## Metadata
 
-| Field       | Value                                                                                                                                                                                                                            |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page URL    | `/checkout`, `/payment`                                                                                                                                                                                                          |
-| Page Title  | `Automation Exercise - Checkout`, `Automation Exercise - Payment`                                                                                                                                                                |
-| Spec File   | `vr-tests/checkout.vr.spec.ts`                                                                                                                                                                                                   |
-| Page Object | `utils/pageObjects/products/productDetailPage.ts`, `utils/pageObjects/shared/addToCartModal.ts`, `utils/pageObjects/cart/cartPage.ts`, `utils/pageObjects/checkout/checkoutPage.ts`, `utils/pageObjects/checkout/paymentPage.ts` |
-| Baselines   | `vr-tests/checkout.vr.spec.ts-snapshots/`                                                                                                                                                                                        |
+| Field       | Value                                        |
+| ----------- | -------------------------------------------- |
+| Page URL    | `/checkout`                                  |
+| Page Title  | `Automation Exercise - Checkout`             |
+| Spec File   | `vr-tests/checkout.vr.spec.ts`               |
+| Page Object | `utils/pageObjects/checkout/checkoutPage.ts` |
+| Baselines   | `vr-tests/checkout.vr.spec.ts-snapshots/`    |
 
 ## Scope
 
-The two screens between a full cart and a placed order. Both are behind registration and a populated
-cart, so this area's setup is the most expensive in the visual suite, which is itself the reason to
-cover it: a layout regression here reaches a user at the point where they are paying.
+The two blocks a signed-in visitor sees before placing an order: the address details and the order
+review.
 
 ## Cases
 
-| ID    | Name                   | Screenshot                 | State captured                              |
-| ----- | ---------------------- | -------------------------- | ------------------------------------------- |
-| VR-19 | Delivery address block | `checkout-address-details` | Delivery address block on the checkout step |
-| VR-20 | Card entry form        | `checkout-payment-form`    | Card entry form                             |
+| ID    | Name               | Screenshot                 | State captured                                                                            |
+| ----- | ------------------ | -------------------------- | ----------------------------------------------------------------------------------------- |
+| VR-28 | Address details    | `checkout-address-details` | "Address Details" with both "Your delivery address" and "Your billing address", populated |
+| VR-29 | Order review block | `checkout-order-review`    | The order table, including its Total Amount row                                           |
 
 ## Notes
 
-**VR-19 masks the address values, not the block.** The address comes from the account the fixture
-generates, so the values differ every run while the layout does not. Masking only the generated
-lines keeps the heading, the block's borders and its spacing under comparison, masking the whole
-block would leave the case asserting nothing, which is how a visual test quietly stops testing.
-
-**VR-20 documents a real defect rather than hiding it.** The payment form ships Bootstrap 4 row
-markup against Bootstrap 3 CSS, so every `.form-row` and the `<form>` element itself collapse to
-zero height; the page only looks correct because the parent grid column is floated. The capture is
-therefore scoped to the container that actually has dimensions. The finding is recorded in
-`STATUS.md`: the baseline reflects what the application really renders, and the workaround is
-documented at the capture instead of being silently absorbed.
-
-**Setup.** Both cases request `uniqueAccount` for its side effect: registration is what makes the
-checkout reachable at all.
+- VR-28 captures a clip spanning the "Address Details" heading and both address blocks together,
+  not either block on its own: the two are read together on the real page. No masking is used: the
+  address values are the shared account's own fixed literal defaults from `buildAccount()` in
+  `utils/testData.ts`, not per-run data, so there is nothing unstable to hide.
 
 ## Out of Scope
 
-- The order confirmation page: it carries a generated order id, so the only stable region is text
-  the functional suite asserts.
-- The review-your-order table on the checkout step: its content is the cart table, already covered
-  by VR-11.
+- The checkout guard a guest meets: covered by `cart-vr-test-plan.md`.
+- The payment form Place Order opens: covered by `payment-vr-test-plan.md`.
+- The comment field's empty state: a functional concern already checked by `checkout-test-plan.md`'s
+  TC-20, not a rendering difference from the table above it.

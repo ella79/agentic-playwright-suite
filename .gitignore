@@ -2,6 +2,7 @@ node_modules/
 test-results/
 playwright-report/
 playwright-report-vr/
+playwright-report-api/
 blob-report/
 reports/
 allure-results/

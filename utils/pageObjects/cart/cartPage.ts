@@ -8,6 +8,7 @@ export class CartPage extends BaseAppPage {
   readonly cartTable: Locator;
   readonly cartRows: Locator;
   readonly emptyCartMessage: Locator;
+  readonly homeBreadcrumbLink: Locator;
   readonly proceedToCheckoutButton: Locator;
 
   constructor(page: Page) {
@@ -15,7 +16,15 @@ export class CartPage extends BaseAppPage {
     this.cartItemsSection = page.locator("#cart_items");
     this.cartTable = page.locator("#cart_info");
     this.cartRows = page.locator("#cart_info tbody tr");
-    this.emptyCartMessage = page.getByText("Cart is empty!");
+    this.emptyCartMessage = page.getByText(
+      "Cart is empty! Click here to buy products.",
+    );
+    // Scoped to the breadcrumb, not the header: both carry a "Home" link, and
+    // this one's accessible name has no leading icon space, unlike the
+    // header's. Verified live.
+    this.homeBreadcrumbLink = page
+      .locator(".breadcrumb")
+      .getByRole("link", { name: "Home" });
     // Rendered as an anchor without href, so it carries no link role.
     this.proceedToCheckoutButton = page.getByText("Proceed To Checkout");
   }
@@ -44,6 +53,22 @@ export class CartPage extends BaseAppPage {
 
   async proceedToCheckout(): Promise<void> {
     await this.proceedToCheckoutButton.click();
+  }
+
+  /**
+   * The cart belongs to one shared, persistent account, so a case that needs
+   * a known starting state clears it first rather than assuming another
+   * file's test left it that way.
+   */
+  async clearCart(): Promise<void> {
+    await this.gotoCartPage();
+    let remaining = await this.cartRows.count();
+
+    while (remaining > 0) {
+      await this.cartRows.first().locator(".cart_quantity_delete").click();
+      await expect(this.cartRows).toHaveCount(remaining - 1);
+      remaining -= 1;
+    }
   }
 
   /**

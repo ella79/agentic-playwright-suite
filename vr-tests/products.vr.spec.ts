@@ -6,51 +6,35 @@ import { products, searchTerms } from "../utils/testData";
 test.describe("Visual regression - Products Page", () => {
   test.beforeEach(async ({ productsPage }) => {
     await productsPage.gotoProductsPage();
-    await expect(productsPage.allProductsHeading).toBeVisible();
   });
 
-  // Same reason as VR-02: the grid holds the whole catalog.
-  test("VR-04: Catalog grid", async ({ page, productsPage }) => {
-    await expect(productsPage.productCards.first()).toBeVisible();
-    await productsPage.scrollToTop(productsPage.allProductsHeading);
-    await productsPage.waitForImagesLoaded(productsPage.productGrid);
+  test("VR-18: Special offer banner", async ({ productsPage }) => {
+    await expect(productsPage.specialOfferBanner).toBeVisible();
 
-    await expect(page).toHaveScreenshot(
-      "products-catalog-grid.png",
-      { maxDiffPixelRatio: 0.05 }, // VR: product photography compresses inconsistently
+    await expect(productsPage.specialOfferBanner).toHaveScreenshot(
+      "products-special-offer.png",
     );
   });
 
-  test("VR-05: Single product card at rest", async ({ productsPage }) => {
-    const card = productsPage.getProductCard(products.blueTop.name);
+  test("VR-19: Search results, matching", async ({ page, productsPage }) => {
+    await productsPage.searchFor(products.menTshirt.name);
+    await expect(productsPage.searchedProductsHeading).toBeVisible();
+    await productsPage.waitForImagesLoaded(productsPage.productGrid);
 
-    await card.scrollIntoViewIfNeeded();
-    await expect(card).toBeVisible();
-    await productsPage.waitForImagesLoaded(card);
-
-    await expect(card).toHaveScreenshot("products-card-default.png", {
+    const clip = await productsPage.searchResultsClip();
+    await expect(page).toHaveScreenshot("products-search-results.png", {
+      clip,
       maxDiffPixelRatio: 0.05, // VR: product photography compresses inconsistently
     });
   });
 
-  test("VR-06: Category accordion", async ({ productsPage }) => {
-    await expect(productsPage.categorySidebar).toBeVisible();
-
-    await expect(productsPage.categorySidebar).toHaveScreenshot(
-      "products-category-sidebar.png",
-    );
-  });
-
-  test("VR-07: Catalog area after a search with no matches", async ({
-    productsPage,
-  }) => {
+  test("VR-20: Search results, empty", async ({ page, productsPage }) => {
     await productsPage.searchFor(searchTerms.nonExistent);
     await expect(productsPage.searchedProductsHeading).toBeVisible();
-    await expect(productsPage.productCards).toHaveCount(0);
-    await productsPage.waitForImagesLoaded(productsPage.productGrid);
 
-    await expect(productsPage.productGrid).toHaveScreenshot(
-      "products-search-no-results.png",
-    );
+    const clip = await productsPage.searchResultsClip();
+    await expect(page).toHaveScreenshot("products-search-empty.png", {
+      clip,
+    });
   });
 });

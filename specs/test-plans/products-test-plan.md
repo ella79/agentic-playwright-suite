@@ -2,13 +2,13 @@
 
 ## Metadata
 
-| Field        | Value                                             |
-| ------------ | --------------------------------------------------- |
-| Page URL     | `/products`                                         |
-| Page Title   | `Automation Exercise - All Products`                |
-| Spec File    | `tests/products/products.spec.ts`                   |
-| Page Object  | `utils/pageObjects/products/productsPage.ts`        |
-| Precondition | Login (shared account)                              |
+| Field        | Value                                        |
+| ------------ | -------------------------------------------- |
+| Page URL     | `/products`                                  |
+| Page Title   | `Automation Exercise - All Products`         |
+| Spec File    | `tests/products/products.spec.ts`            |
+| Page Object  | `utils/pageObjects/products/productsPage.ts` |
+| Precondition | Login (shared account)                       |
 
 ## Scope
 
@@ -27,22 +27,26 @@ Seed: `specs/seed.spec.ts`
 
 ## Test Cases
 
-| ID    | Name                                                                              | Type  | Scenario                                                                                                     | Expected                                                                                                                     |
-| ----- | ------------------------------------------------------------------------------------ | ----- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| TC-14 | The products page renders its catalog and special offer banner                   | happy | A visitor opens the products page                                                                            | The All Products heading and the product grid are visible; the special offer banner (`#sale_image`) is visible in the sidebar |
-| TC-15 | Searching for a product shows only matching results, and opening one reaches its detail page | happy | A visitor searches for Men Tshirt, then opens the matching product from the results                          | The Searched Products heading is shown with a card naming the product; opening it lands on `/product_details/2`             |
-| TC-16 | A search with no matches returns an empty result set                             | edge  | A visitor searches for a term no product matches                                                              | The Searched Products heading is shown; the product grid holds no cards                                                     |
+| ID    | Name                                                                                         | Type  | Scenario                                                                            | Expected                                                                                                                                                                                  |
+| ----- | -------------------------------------------------------------------------------------------- | ----- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-13 | The products page renders its catalog and special offer banner                               | happy | A visitor opens the products page                                                   | The All Products heading, the product grid, the search input and its button, and the special offer banner (`#sale_image`) are all visible; the card count matches `GET /api/productsList` |
+| TC-14 | Searching for a product shows only matching results, and opening one reaches its detail page | happy | A visitor searches for Men Tshirt, then opens the matching product from the results | The Searched Products heading is shown with a card naming the product, and a card count matching `POST /api/searchProduct` for the same term; opening it lands on `/product_details/2`    |
+| TC-15 | A search with no matches returns an empty result set                                         | edge  | A visitor searches for a term no product matches                                    | The Searched Products heading is shown; the product grid holds no cards                                                                                                                   |
 
 ## Locator Notes
 
 - `#sale_image` carries no visible text of its own (`alt="Website for practice"`); it is identified by
   its stable `id`, not by content — verified live.
-- The category and brand sidebars render identical markup here and on the home page; TC-14 does not
+- The category and brand sidebars render identical markup here and on the home page; TC-13 does not
   duplicate their assertion, which lives in `home-test-plan.md`.
+- TC-13 and TC-14 each cross-validate their card count against the matching `CatalogApiClient` call
+  (`getProductsList`, `searchProduct`) rather than asserting a hardcoded number, so the case does not
+  need updating if the demo catalog's product count ever changes.
 
 ## Out of Scope
 
 - Category and brand filtering: covered by `home-test-plan.md`.
 - The product detail page's own information display and review form: covered by
   `product-detail-test-plan.md`.
-- Adding a product to the cart from the listing: covered by `cart-test-plan.md`.
+- Adding a product to the cart from the listing: the interaction itself is covered from the home
+  page in `home-test-plan.md`; what happens to it afterwards is covered by `cart-test-plan.md`.

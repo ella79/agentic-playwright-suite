@@ -5,11 +5,16 @@ import { url } from "../../url";
 
 export class ProductDetailPage extends BaseAppPage {
   readonly productInformation: Locator;
+  readonly productImage: Locator;
   readonly productName: Locator;
   readonly productPrice: Locator;
+  readonly category: Locator;
   readonly availability: Locator;
+  readonly condition: Locator;
+  readonly brand: Locator;
   readonly quantityInput: Locator;
   readonly addToCartButton: Locator;
+  readonly writeYourReviewTab: Locator;
   readonly reviewSection: Locator;
   readonly reviewNameInput: Locator;
   readonly reviewEmailInput: Locator;
@@ -20,17 +25,36 @@ export class ProductDetailPage extends BaseAppPage {
   constructor(page: Page) {
     super(page);
     this.productInformation = page.locator(".product-information");
+    // Sibling column to .product-information, not inside it — verified live.
+    this.productImage = page.locator(".view-product img");
     this.productName = this.productInformation.getByRole("heading").first();
     this.productPrice = this.productInformation.getByText(/^Rs\. \d+/);
-    // The label sits in its own <b>; scope to the paragraph to get label + value.
+    // Each label sits in its own <b>; scope to the paragraph to get label +
+    // value. Category's paragraph also carries an unrelated ad link appended
+    // after the text, verified live, so assertions on it use `toContainText`.
+    this.category = this.productInformation.locator("p", {
+      hasText: "Category:",
+    });
     this.availability = this.productInformation.locator("p", {
       hasText: "Availability:",
     });
+    this.condition = this.productInformation.locator("p", {
+      hasText: "Condition:",
+    });
+    this.brand = this.productInformation.locator("p", { hasText: "Brand:" });
     // Number input with no label and no data-qa hook.
     this.quantityInput = page.locator("#quantity");
     this.addToCartButton = page.getByRole("button", { name: "Add to cart" });
-    // #reviews is a zero-height tab wrapper; the form inside it is what renders.
-    this.reviewSection = page.locator("#review-form");
+    this.writeYourReviewTab = page.getByRole("link", {
+      name: "Write Your Review",
+    });
+    // `.category-tab.shop-details-tab`, not `#review-form` or `#reviews`: the
+    // latter two are both zero-height tab wrappers (floated children with no
+    // clearfix, the same Bootstrap bug documented on VR-19), and neither
+    // includes the "WRITE YOUR REVIEW" tab label, which is `#reviews`'s own
+    // sibling rather than its parent. This one has a real height and holds
+    // both. Verified live.
+    this.reviewSection = page.locator(".category-tab.shop-details-tab");
     this.reviewNameInput = page.getByPlaceholder("Your Name");
     // Exact match: the footer's "Your email address" field would otherwise
     // match this placeholder as a substring.
