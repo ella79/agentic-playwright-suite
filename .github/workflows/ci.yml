@@ -179,6 +179,10 @@ jobs:
         env:
           E2E_BROWSERS: ${{ matrix.project == 'e2e-webkit' && 'WebKit' || 'Chromium' }}
           E2E_VIEWPORT: 1920x1080
+          # The project depends on setup, which signs the shared account in
+          # once and saves the session every other test starts from.
+          E2E_LOGIN_EMAIL: ${{ secrets.E2E_LOGIN_EMAIL }}
+          E2E_LOGIN_PASSWORD: ${{ secrets.E2E_LOGIN_PASSWORD }}
         # npx, not yarn: this job runs on the image node_modules through a
         # symlink and never installs, so yarn has no install state to verify.
         run: npx playwright test --project=${{ matrix.project }} --workers=1
@@ -251,6 +255,11 @@ jobs:
           fi
 
       - name: Run visual suite
+        env:
+          # The vr project depends on setup, which signs the shared account in
+          # once and saves the session every other test starts from.
+          E2E_LOGIN_EMAIL: ${{ secrets.E2E_LOGIN_EMAIL }}
+          E2E_LOGIN_PASSWORD: ${{ secrets.E2E_LOGIN_PASSWORD }}
         run: yarn test:vr --workers=1
 
       - name: Upload Allure results
@@ -285,6 +294,57 @@ jobs:
           path: test-results
           retention-days: 30
 
+  api:
+    name: api
+    needs: [prepare-playwright-image, static-checks]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+    container:
+      image: ${{ needs.prepare-playwright-image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Link dependencies from the image
+        run: ln -s /workspace/node_modules node_modules
+
+      # No dependency on setup: every case here calls the public API directly
+      # and provisions its own throwaway account, so no login credentials are
+      # needed.
+      - name: Run the API suite
+        run: yarn test:api --workers=2
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: allure-results-api
+          path: allure-results
+          retention-days: 30
+
+      # Playwright's JSON report is the only one that states flaky as an
+      # outcome, so it is what the suite health page is built from.
+      - name: Upload JSON report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: results-json-api
+          path: reports/results.json
+          retention-days: 30
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: api-traces
+          path: test-results
+          retention-days: 30
+
   # The single check the branch protection requires.
   #
   # GitHub counts a skipped job as a satisfied requirement, so requiring the
@@ -295,7 +355,7 @@ jobs:
   # later means adding it here rather than editing repository settings.
   ci-gate:
     name: ci-gate
-    needs: [static-checks, e2e, visual-regression, publish-dashboard]
+    needs: [static-checks, e2e, visual-regression, api, publish-dashboard]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -327,7 +387,7 @@ jobs:
 
   publish-dashboard:
     name: publish-dashboard
-    needs: [e2e, visual-regression]
+    needs: [e2e, visual-regression, api]
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
@@ -370,13 +430,19 @@ jobs:
           name: allure-results-e2e-webkit
           path: results/webkit
 
+      - name: Collect API results
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: allure-results-api
+          path: results/api
+
       # WebKit results join the functional ones instead of forming a report of
       # their own: the same twenty cases on a second engine belong under one
       # suite, not at a second address.
       #
-      # Three reports are still generated rather than one. Allure draws a single
+      # Four reports are still generated rather than one. Allure draws a single
       # trend line per report, so a combined report could never show the visual
-      # trend next to the functional one.
+      # or API trend next to the functional one.
       #
       # categories.json classifies failures: a screenshot diff, a host 5xx and a
       # real assertion failure are three different conversations, and an
@@ -389,6 +455,7 @@ jobs:
           mkdir -p results/combined
           cp -r results/functional/. results/combined/ 2>/dev/null || true
           cp -r results/visual/. results/combined/ 2>/dev/null || true
+          cp -r results/api/. results/combined/ 2>/dev/null || true
 
           write_meta() {
             dir=$1; label=$2; path=$3
@@ -409,8 +476,9 @@ jobs:
           write_meta results/combined "Agentic Playwright Suite" ""
           write_meta results/functional "Functional E2E" "functional/"
           write_meta results/visual "Visual Regression" "visual/"
+          write_meta results/api "API" "api/"
 
-          node utils/scripts/group-allure-packages.mjs             results/combined results/functional results/visual
+          node utils/scripts/group-allure-packages.mjs             results/combined results/functional results/visual results/api
 
       # Trend graphs only exist if the previous report's history is carried
       # forward, so each report restores its own from the published site.
@@ -425,7 +493,7 @@ jobs:
               echo "Restored suite health history"
             fi
 
-            for suite in combined functional visual; do
+            for suite in combined functional visual api; do
               case $suite in
                 combined) source=gh-pages-tmp/history ;;
                 *) source=gh-pages-tmp/$suite/history ;;
@@ -446,6 +514,7 @@ jobs:
           yarn allure generate results/combined --clean -o allure-report
           yarn allure generate results/functional --clean -o allure-report/functional
           yarn allure generate results/visual --clean -o allure-report/visual
+          yarn allure generate results/api --clean -o allure-report/api
 
       - name: Collect JSON reports
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
@@ -471,6 +540,7 @@ jobs:
             --suite functional=json-reports/results-json-e2e-chromium/results.json \
             --suite functional-webkit=json-reports/results-json-e2e-webkit/results.json \
             --suite visual=json-reports/results-json-vr/results.json \
+            --suite api=json-reports/results-json-api/results.json \
             --history previous-metrics/history.json \
             --categories env/allure/categories.json \
             --allure allure-report \
@@ -542,7 +612,7 @@ jobs:
           node env/contract/verify-contract.mjs \
             --contract env/contract/allure-report.contract.json \
             --base ./allure-report \
-            --expect-version 4
+            --expect-version 5
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4

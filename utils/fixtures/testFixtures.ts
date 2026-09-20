@@ -5,7 +5,6 @@ import {
   CartPage,
   CheckoutPage,
   ConfirmationPage,
-  ContactUsPage,
   HomePage,
   LoginPage,
   OrderConfirmationPage,
@@ -37,7 +36,6 @@ interface PageObjects {
   checkoutPage: CheckoutPage;
   paymentPage: PaymentPage;
   orderConfirmationPage: OrderConfirmationPage;
-  contactUsPage: ContactUsPage;
 }
 
 interface Fixtures extends PageObjects {
@@ -141,10 +139,6 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
 
   orderConfirmationPage: async ({ page }, use) => {
     await use(new OrderConfirmationPage(page));
-  },
-
-  contactUsPage: async ({ page }, use) => {
-    await use(new ContactUsPage(page));
   },
 
   /**

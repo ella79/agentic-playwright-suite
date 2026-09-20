@@ -8,6 +8,7 @@ import { type TestAccount } from "../../testData";
  */
 export class AccountInfoPage extends BaseAppPage {
   readonly enterAccountInfoHeading: Locator;
+  readonly addressInformationHeading: Locator;
   readonly accountForm: Locator;
   readonly titleMrsRadio: Locator;
   readonly nameInput: Locator;
@@ -32,6 +33,7 @@ export class AccountInfoPage extends BaseAppPage {
   constructor(page: Page) {
     super(page);
     this.enterAccountInfoHeading = page.getByText("Enter Account Information");
+    this.addressInformationHeading = page.getByText("Address Information");
     // CSS: the form has no accessible name, so it has no form role to
     // address. Scoped by action because the page carries more than one form.
     this.accountForm = page.locator('form[action="/signup"]');

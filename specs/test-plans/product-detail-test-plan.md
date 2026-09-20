@@ -2,36 +2,41 @@
 
 ## Metadata
 
-| Field       | Value                                             |
-| ----------- | ------------------------------------------------- |
-| Page URL    | `/product_details/<id>`                           |
-| Page Title  | `Automation Exercise - Product Details`           |
-| Spec File   | `tests/product-detail/product-detail.spec.ts`     |
-| Page Object | `utils/pageObjects/products/productDetailPage.ts` |
+| Field        | Value                                             |
+| ------------ | ------------------------------------------------- |
+| Page URL     | `/product_details/<id>`                           |
+| Page Title   | `Automation Exercise - Product Details`           |
+| Spec File    | `tests/product-detail/product-detail.spec.ts`     |
+| Page Object  | `utils/pageObjects/products/productDetailPage.ts` |
+| Precondition | Login (shared account)                            |
 
 ## Scope
 
-The review form on a product's detail page. Reaching the page from the catalog is covered by TC-07 in `products-test-plan.md`.
+The product's own information display and its review form. Reaching the page from a search result
+is covered by TC-14 in `products-test-plan.md`.
 
 ## Preconditions
 
 Seed: `specs/seed.spec.ts`
 
-- No account required.
+- The shared account signs in automatically via `login.setup.ts`; every case here starts already
+  signed in.
 
 ## Test Cases
 
-| ID    | Name                                                   | Type  | Scenario                                            | Expected                       |
-| ----- | ------------------------------------------------------ | ----- | --------------------------------------------------- | ------------------------------ |
-| TC-19 | A product review can be submitted from the detail page | happy | A visitor submits a review on a product detail page | The thank-you message is shown |
+| ID    | Name                                                         | Type  | Scenario                                                         | Expected                                                                                                                                                                              |
+| ----- | ------------------------------------------------------------ | ----- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-16 | The product detail page shows the product's full information | happy | A visitor opens a product's detail page directly                 | The image, name, category (Men > Tshirts), price, quantity (defaulting to 1), availability (In Stock), condition (New), brand (H&M) and the Write Your Review section are all visible |
+| TC-17 | A product review can be submitted from the detail page       | happy | A visitor finds the review form empty, then fills and submits it | The name, email and review fields start empty; submitting them shows the thank-you message                                                                                            |
 
 ## Locator Notes
 
 - `#reviews` is a zero-height tab wrapper; the form inside it is what renders, so the page object
   scopes to `#review-form`.
-- All three fields are `required`, so an empty submit is blocked by the browser rather than the
-  application. Verified live on 2026-09-10.
+- All three review fields are `required`, so an empty submit is blocked by the browser rather than
+  the application. Verified live on 2026-09-10.
 
 ## Out of Scope
 
 - The list of existing reviews: the application does not render one.
+- Reaching this page from search: covered by `products-test-plan.md`.

@@ -25,6 +25,7 @@
     "tests/**/*.ts",
     "specs/**/*.ts",
     "vr-tests/**/*.ts",
+    "api-tests/**/*.ts",
     "utils/**/*.ts",
     "playwright.config.ts"
   ],

@@ -14,48 +14,54 @@ Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
 
 ## Scope
 
-The landing page carries the two pieces of chrome every other page reuses, plus the featured grid.
-Header and footer are captured here rather than repeated per page: they are one component, and
-twenty baselines of the same header would be twenty things to review for one change. Both header
-states belong here for the same reason. The signed-in header is produced by authentication, but it
-is rendered on this page and it is the same component, so filing it by what produces its state
-would split one component across two baseline directories.
+The landing page broken into the sections a reader would scroll through: the hero, the two
+sidebars, one featured card, the recommended grid, the newsletter widget and the footer bar. Split
+this way because the page itself is taller than one viewport, and a single full-page capture would
+violate the size rule; splitting by section is also what keeps each baseline reviewable at a glance.
+The add-to-cart notification modal is captured here rather than repeated on every page that can
+trigger it, since its markup does not change with the page it opens from.
 
 ## Cases
 
-| ID    | Name                                 | Screenshot              | State captured                                           |
-| ----- | ------------------------------------ | ----------------------- | -------------------------------------------------------- |
-| VR-01 | Site header for an anonymous visitor | `home-header-anonymous` | Site header with no session                              |
-| VR-02 | Featured products grid               | `home-features-items`   | Featured products grid, viewport-anchored                |
-| VR-03 | Footer newsletter block              | `home-subscription`     | Footer newsletter block                                  |
-| VR-17 | Site header for a signed-in user     | `home-header-signed-in` | Site header showing Logout, Delete Account, and the name |
+| ID    | Name                            | Screenshot                       | State captured                                                      |
+| ----- | ------------------------------- | -------------------------------- | ------------------------------------------------------------------- |
+| VR-01 | Hero section                    | `home-hero`                      | Heading, subheading, description and the two hero buttons           |
+| VR-02 | Category sidebar                | `home-category-sidebar`          | The "Category" title with Women / Men / Kids, collapsed             |
+| VR-03 | Category sidebar, expanded      | `home-category-sidebar-expanded` | The title with "Women" open, showing its subcategory links          |
+| VR-04 | Brands sidebar                  | `home-brands-sidebar`            | The full brand list with counts                                     |
+| VR-05 | Featured product card           | `home-product-card`              | One card at rest: image, price, name, Add to Cart, View Product     |
+| VR-06 | Recommended items section       | `home-recommended-items`         | The three-card recommended row                                      |
+| VR-07 | Subscription widget             | `home-subscription`              | Heading, email field and submit control, unsubscribed state         |
+| VR-08 | Subscription widget, subscribed | `home-subscription-success`      | The widget with the "You have been successfully subscribed!" banner |
+| VR-09 | Footer bar                      | `home-footer`                    | The copyright line                                                  |
+| VR-10 | Add-to-cart confirmation modal  | `home-add-to-cart-modal`         | The "Added!" modal open over the page                               |
 
 ## Notes
 
-**VR-02 does not capture its element.** `.features_items` holds the whole catalog and measures
-13,347 pixels. The case anchors the section heading to the top of the viewport with `scrollToTop`
-and captures the viewport, which covers the grid layout and card design in an image a reviewer can
-actually judge. It also waits for the product images to decode first: they stream in after load, so
-the region keeps reflowing and the capture would otherwise expire on the stability check under
-parallel load.
-
-**VR-01 and VR-17 are the pair that proves the header changes by session.** They sit adjacent so a
-reviewer reads one diff against the other in one file, and a change to the header regenerates one
-baseline directory rather than two.
-
-**VR-17 needs a registered account**, so it requests `uniqueAccount`. The fixture is set up before
-the describe's `beforeEach`, so the session exists by the time the page is opened. The account name
-appears in the header and the fixture generates it per run, so the capture masks it; the name's
-width varies only within the fixed-format string the generator produces.
-
-**Threshold.** VR-02 uses `0.05` for the photography. VR-01, VR-03 and VR-17 stay at the default.
+- VR-01 scopes to `#slider-carousel` itself, not the active slide (`.item.active`): the slide's own
+  two floated columns have no clearfix, so its own box collapses to zero height, the same Bootstrap
+  bug documented on VR-21 in `product-detail-vr-test-plan.md`. The carousel wrapper has a real height
+  in the site's CSS and shows only the active slide, since the other two are `display: none`. Its own
+  auto-rotation is also stopped before the capture: `.carousel("pause")` forces any in-progress
+  transition to finish through a synthetic event rather than waiting for it, which can leave the
+  slide invisible for good, so the spec clears the plugin's own interval handle directly instead.
+  Verified live.
+- VR-02 captures a clip spanning the "Category" heading and the accordion below it, not either one's
+  own element box: the heading is the accordion's sibling, not its parent, unlike Brands below, whose
+  own `<h2>` genuinely is a child of `.brands_products`.
+- VR-03 recomputes that same clip after expanding "Women": the accordion's own height grows to fit
+  the opened panel, so the clip taken for VR-02 would cut the subcategory links off.
+- VR-05 scopes to a single card rather than the grid: the grid is 13,347px tall and both unreviewable
+  and unstable under load, per the project's own size rule.
+- VR-08 captures a clip spanning the success banner and the widget, not either one's own element box:
+  `#success-subscribe` is a sibling of `.single-widget` inside a shared `.row`, initially hidden and
+  positioned above the widget once shown, not inside it. Verified live.
+- VR-10 uses a raised threshold; see the spec for the inline reason.
 
 ## Out of Scope
 
-- The hero carousel: it advances on a timer, so any capture of it is a race against its own state.
-- The recommended-items carousel below the grid, for the same reason.
-
-## ID Numbering
-
-VR-17 keeps its original ID after moving here from the authentication plan. IDs are identities, not
-positions: renumbering it would cascade through every other plan and spec in the suite.
+- The hero's rotating background: not stable across runs.
+- The full featured-items and recommended-items grids: represented by one card each, per the size
+  rule.
+- The header's signed-in/guest states: a menu content difference, not a rendering difference — the
+  functional suite's `home-test-plan.md` TC-02 already proves it.

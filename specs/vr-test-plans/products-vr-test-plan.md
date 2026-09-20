@@ -14,36 +14,32 @@ Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
 
 ## Scope
 
-The catalog page is where a styling regression is most likely to be noticed by a user, and it holds
-three distinct things worth separate baselines: the grid, the single card that composes it, and the
-filter sidebar. The no-results state is included because an empty state is the layout most likely to
-break unnoticed, nothing renders there in normal use.
+The catalog listing's own states: the special offer banner, a search in progress, and a search that
+finds nothing. The product card itself is not repeated here: it is the same markup already captured
+in `home-vr-test-plan.md`'s VR-05.
 
 ## Cases
 
-| ID    | Name                                        | Screenshot                   | State captured                                   |
-| ----- | ------------------------------------------- | ---------------------------- | ------------------------------------------------ |
-| VR-04 | Catalog grid                                | `products-catalog-grid`      | Catalog grid, viewport-anchored                  |
-| VR-05 | Single product card at rest                 | `products-card-default`      | A single product card at rest                    |
-| VR-06 | Category accordion                          | `products-category-sidebar`  | Category accordion in its collapsed state        |
-| VR-07 | Catalog area after a search with no matches | `products-search-no-results` | Catalog area after a search that matches nothing |
+| ID    | Name                     | Screenshot                | State captured                                                                               |
+| ----- | ------------------------ | ------------------------- | -------------------------------------------------------------------------------------------- |
+| VR-18 | Special offer banner     | `products-special-offer`  | The `#sale_image` banner in the sidebar                                                      |
+| VR-19 | Search results, matching | `products-search-results` | The search bar with the typed term, and the Searched Products heading with matching cards    |
+| VR-20 | Search results, empty    | `products-search-empty`   | The search bar with the typed term, and the Searched Products heading with no cards below it |
 
 ## Notes
 
-**VR-04 captures the viewport, not the grid element**, for the same reason as VR-02: the grid is
-13,347 pixels tall. The heading is anchored to the top of the viewport first.
-
-**VR-05 exists alongside VR-04 deliberately.** The grid capture would hide a change to a single
-card's internals inside a `0.05` threshold; the card capture is tight enough to catch it. One
-proves layout, the other proves the component.
-
-**Thresholds.** VR-04 and VR-05 use `0.05` for product photography. VR-06 and VR-07 hold the
-default, since neither contains an image.
+- VR-19 and VR-20 capture a full-width clip from the search bar's own top down to the result grid's
+  bottom, not a tightened box around just the two: the bar and the grid sit in separate, unrelated
+  sections with no shared container, and the sidebar sits between them at some of the same
+  horizontal positions, so a tightened clip would slice through the sidebar rather than skip it
+  cleanly. The search input keeps the typed term as its own value after the results render, verified
+  live, so it doubles as proof of what was searched. Otherwise, every case uses the project default
+  threshold and no mask.
 
 ## Out of Scope
 
-- The card's hover overlay, which reveals a second add-to-cart control: hover states are excluded
-  suite-wide.
-- Brand filters: visually identical to the category sidebar, so a baseline would duplicate VR-06.
-- Search results for a term that matches: the grid layout is already covered, and the result set
-  depends on the demo host's data.
+- The full catalog grid: 13,347px tall, unreviewable and unstable under load. One card at rest is
+  captured once, in `home-vr-test-plan.md`'s VR-05, since the markup is identical here.
+- Category and brand filtering as a UI interaction: it lands on this same grid template, already
+  represented by VR-19's card rendering; nothing about the filtered state looks different from a
+  search result.

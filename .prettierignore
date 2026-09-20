@@ -1,5 +1,7 @@
 node_modules
-playwright-report
+# playwright.config.ts suffixes this per suite (-vr, -api), matching the same
+# variants .gitignore already lists.
+playwright-report*
 test-results
 reports
 allure-results

@@ -1,102 +1,94 @@
 // spec: specs/test-plans/cart-test-plan.md
 // seed: specs/seed.spec.ts
 import { expect, test } from "../../utils/fixtures/testFixtures";
+import { CartPage, ProductDetailPage } from "../../utils/pageObjects";
 import { products } from "../../utils/testData";
 import { url } from "../../utils/url";
 
 test.describe("Cart Page", () => {
-  test("TC-12: A product added from its detail page appears in the cart", async ({
-    productDetailPage,
+  test("TC-18: The cart starts empty, and adding products from the home page notifies for each until one is removed", async ({
+    page,
     cartPage,
+    homePage,
   }) => {
-    await test.step("add the product from its detail page", async () => {
-      await productDetailPage.gotoProductDetailPage(products.blueTop.id);
-      const modal = await productDetailPage.addToCart();
-
-      await expect(modal.heading).toBeVisible();
-      await modal.viewCart();
+    await test.step("the cart page shows the nav menu and its empty state", async () => {
+      await cartPage.clearCart();
+      await expect(homePage.homeLink).toBeVisible();
+      await expect(homePage.cartLink).toBeVisible();
+      await expect(cartPage.emptyCartMessage).toBeVisible();
     });
 
-    await test.step("the cart lists it at the catalog price", async () => {
-      await expect(cartPage.getRow(products.blueTop.name)).toBeVisible();
-      await expect(cartPage.getRowTotal(products.blueTop.name)).toHaveText(
-        products.blueTop.price,
+    await test.step("Home from the cart page's breadcrumb reaches the home page", async () => {
+      await cartPage.homeBreadcrumbLink.click();
+      await expect(page).toHaveURL(new RegExp(`${url.home}$`));
+    });
+
+    await test.step("adding Blue Top notifies, then Continue Shopping stays on the page", async () => {
+      const modal = await homePage.addProductToCartFromListing(
+        products.blueTop.id,
       );
+      await expect(modal.heading).toBeVisible();
+      await modal.continueShoppingButton.click();
     });
-  });
 
-  test("TC-13: A product added from the catalog listing appears in the cart", async ({
-    productsPage,
-    cartPage,
-  }) => {
-    await test.step("add the product from the catalog listing", async () => {
-      await productsPage.gotoProductsPage();
-      const modal = await productsPage.addProductToCartFromListing(
+    await test.step("adding Men Tshirt notifies, then View Cart reaches the cart with both products", async () => {
+      const modal = await homePage.addProductToCartFromListing(
         products.menTshirt.id,
       );
+      await expect(modal.heading).toBeVisible();
       await modal.viewCart();
+
+      await expect(cartPage.proceedToCheckoutButton).toBeVisible();
+      await expect(cartPage.getRow(products.blueTop.name)).toBeVisible();
+      await expect(cartPage.getRow(products.menTshirt.name)).toBeVisible();
     });
 
-    await test.step("the cart holds that product and nothing else", async () => {
-      await expect(cartPage.getRow(products.menTshirt.name)).toBeVisible();
+    await test.step("removing Men Tshirt leaves only Blue Top", async () => {
+      await cartPage.removeProduct(products.menTshirt.name);
+
+      await expect(cartPage.getRow(products.menTshirt.name)).toBeHidden();
+      await expect(cartPage.getRow(products.blueTop.name)).toBeVisible();
       await expect(cartPage.cartRows).toHaveCount(1);
     });
   });
 
-  test("TC-14: The quantity set before adding is the quantity in the cart", async ({
-    productDetailPage,
-    cartPage,
-  }) => {
-    await test.step("set the quantity to three before adding", async () => {
-      await productDetailPage.gotoProductDetailPage(products.menTshirt.id);
-      await productDetailPage.setQuantity(3);
-      const modal = await productDetailPage.addToCart();
-      await modal.viewCart();
-    });
-
-    await test.step("the cart carries that quantity", async () => {
-      await expect(cartPage.getRowQuantity(products.menTshirt.name)).toHaveText(
-        "3",
-      );
-    });
-  });
-
-  test("TC-15: Removing the only product empties the cart", async ({
-    productDetailPage,
-    cartPage,
-  }) => {
-    await test.step("start from a cart holding one product", async () => {
-      await productDetailPage.gotoProductDetailPage(products.blueTop.id);
-      const modal = await productDetailPage.addToCart();
-      await modal.viewCart();
-      await expect(cartPage.getRow(products.blueTop.name)).toBeVisible();
-    });
-
-    await test.step("remove it and the cart reports itself empty", async () => {
-      await cartPage.removeProduct(products.blueTop.name);
-
-      await expect(cartPage.emptyCartMessage).toBeVisible();
-      await expect(cartPage.cartRows).toHaveCount(0);
-    });
-  });
-
-  test("TC-16: An anonymous visitor cannot reach checkout", async ({
+  test("TC-19: Proceeding to checkout differs for a guest and a signed-in visitor", async ({
     page,
-    productDetailPage,
+    browser,
     cartPage,
+    productDetailPage,
   }) => {
-    await test.step("fill the cart without signing in", async () => {
-      await productDetailPage.gotoProductDetailPage(products.blueTop.id);
-      const addedModal = await productDetailPage.addToCart();
-      await addedModal.viewCart();
+    // A second, anonymous context: the case compares both identities at once,
+    // and the shared session every other spec depends on is already signed
+    // in, so the guest half cannot run on the default page.
+    await test.step("a guest is guarded and kept on the cart page", async () => {
+      const guestContext = await browser.newContext({
+        storageState: { cookies: [], origins: [] },
+      });
+      const guestPage = await guestContext.newPage();
+      const guestProductDetail = new ProductDetailPage(guestPage);
+      const guestCart = new CartPage(guestPage);
+
+      await guestProductDetail.gotoProductDetailPage(products.blueTop.id);
+      const modal = await guestProductDetail.addToCart();
+      await modal.viewCart();
+
+      const guardModal = await guestCart.proceedToCheckoutAsGuest();
+      await expect(guardModal.heading).toBeVisible();
+      await expect(guardModal.message).toBeVisible();
+      await expect(guestPage).toHaveURL(new RegExp(`${url.cart}$`));
+
+      await guestContext.close();
     });
 
-    await test.step("checkout asks for an account and keeps the visitor on the cart", async () => {
-      const guardModal = await cartPage.proceedToCheckoutAsGuest();
+    await test.step("a signed-in visitor reaches checkout", async () => {
+      await cartPage.clearCart();
+      await productDetailPage.gotoProductDetailPage(products.blueTop.id);
+      const modal = await productDetailPage.addToCart();
+      await modal.viewCart();
 
-      await expect(guardModal.message).toBeVisible();
-      await expect(guardModal.registerLoginLink).toBeVisible();
-      await expect(page).toHaveURL(new RegExp(`${url.cart}$`));
+      await cartPage.proceedToCheckout();
+      await expect(page).toHaveURL(new RegExp(`${url.checkout}$`));
     });
   });
 });

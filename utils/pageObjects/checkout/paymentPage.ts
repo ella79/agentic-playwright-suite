@@ -30,12 +30,16 @@ export class PaymentPage extends BaseAppPage {
     this.payButton = page.getByTestId("pay-button");
   }
 
-  async payAndConfirmOrder(card: typeof paymentCard): Promise<void> {
+  async fillPaymentDetails(card: typeof paymentCard): Promise<void> {
     await this.nameOnCardInput.fill(card.nameOnCard);
     await this.cardNumberInput.fill(card.cardNumber);
     await this.cvcInput.fill(card.cvc);
     await this.expiryMonthInput.fill(card.expiryMonth);
     await this.expiryYearInput.fill(card.expiryYear);
+  }
+
+  async payAndConfirmOrder(card: typeof paymentCard): Promise<void> {
+    await this.fillPaymentDetails(card);
     await this.payButton.click();
   }
 }

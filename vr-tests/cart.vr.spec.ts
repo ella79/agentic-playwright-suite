@@ -1,55 +1,55 @@
 // spec: specs/vr-test-plans/cart-vr-test-plan.md
 // seed: specs/seed.spec.ts
 import { expect, test } from "../utils/fixtures/testFixtures";
+import { CartPage, ProductDetailPage } from "../utils/pageObjects";
 import { products } from "../utils/testData";
 
 test.describe("Visual regression - Cart Page", () => {
-  test("VR-10: Empty cart state", async ({ cartPage }) => {
-    await cartPage.gotoCartPage();
+  test("VR-25: Cart, empty", async ({ cartPage }) => {
+    await cartPage.clearCart();
     await expect(cartPage.emptyCartMessage).toBeVisible();
 
     await expect(cartPage.cartItemsSection).toHaveScreenshot("cart-empty.png");
   });
 
-  test("VR-11: Cart table holding one product", async ({
-    productDetailPage,
+  test("VR-26: Cart, with a product", async ({
     cartPage,
+    productDetailPage,
   }) => {
+    await cartPage.clearCart();
     await productDetailPage.gotoProductDetailPage(products.blueTop.id);
     const modal = await productDetailPage.addToCart();
     await modal.viewCart();
     await expect(cartPage.getRow(products.blueTop.name)).toBeVisible();
-
     await cartPage.waitForImagesLoaded(cartPage.cartTable);
 
-    await expect(cartPage.cartTable).toHaveScreenshot("cart-single-item.png", {
-      maxDiffPixelRatio: 0.05, // VR: the row carries the product thumbnail
+    await expect(cartPage.cartTable).toHaveScreenshot("cart-with-item.png", {
+      maxDiffPixelRatio: 0.05, // VR: product photography compresses inconsistently
     });
   });
 
-  test("VR-12: Add-to-cart confirmation modal", async ({
-    productDetailPage,
-  }) => {
-    await productDetailPage.gotoProductDetailPage(products.blueTop.id);
-    const modal = await productDetailPage.addToCart();
-    await expect(modal.heading).toBeVisible();
+  test("VR-27: Checkout guard modal", async ({ browser }) => {
+    // A second, anonymous context: this case proves the guest guard, which
+    // the shared logged-in session every other spec depends on would never
+    // reach.
+    const guestContext = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    const guestPage = await guestContext.newPage();
+    const guestProductDetail = new ProductDetailPage(guestPage);
+    const guestCart = new CartPage(guestPage);
 
-    await expect(modal.root).toHaveScreenshot("cart-added-modal.png");
-  });
+    await guestProductDetail.gotoProductDetailPage(products.blueTop.id);
+    const modal = await guestProductDetail.addToCart();
+    await modal.viewCart();
 
-  test("VR-13: Account guard shown to anonymous visitors", async ({
-    productDetailPage,
-    cartPage,
-  }) => {
-    await productDetailPage.gotoProductDetailPage(products.blueTop.id);
-    const addedModal = await productDetailPage.addToCart();
-    await addedModal.viewCart();
+    const guardModal = await guestCart.proceedToCheckoutAsGuest();
+    await expect(guardModal.message).toBeVisible();
 
-    const guardModal = await cartPage.proceedToCheckoutAsGuest();
-    await expect(guardModal.registerLoginLink).toBeVisible();
+    await expect(guestPage).toHaveScreenshot("cart-checkout-guard.png", {
+      maxDiffPixelRatio: 0.03, // VR: full-page capture over the page's own product imagery
+    });
 
-    await expect(guardModal.root).toHaveScreenshot(
-      "cart-checkout-guard-modal.png",
-    );
+    await guestContext.close();
   });
 });

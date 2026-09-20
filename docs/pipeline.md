@@ -4,8 +4,9 @@
    build                 check                  end2end
 
                                      →  e2e-chromium       ┐
-prepare-playwright  →  static-checks  →  e2e-webkit         ┼→  publish-dashboard
-      image                           →  visual-regression  ┘
+prepare-playwright  →  static-checks  →  e2e-webkit         ┤
+      image                           →  visual-regression  ┼→  publish-dashboard
+                                     →  api                 ┘
 ```
 
 Runs on every push and pull request to `main`.
@@ -17,8 +18,13 @@ Runs on every push and pull request to `main`.
 | `e2e-chromium`             | The functional suite on Chromium, one entry of the `e2e` matrix                            |
 | `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal              |
 | `e2e-webkit`               | The same cases on WebKit, the second `e2e` entry, present on merge only                    |
+| `api`                      | The REST API suite. No `setup` dependency: every case provisions its own throwaway account |
 | `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages |
 | `ci-gate`                  | Reads every other job's result. The only check the branch protection requires              |
+
+`api` feeds `publish-dashboard` the same way the other two do: its own Allure results join the
+combined report, and it gets its own `api/` report with its own trend line, the same treatment
+`functional/` and `visual/` already had.
 
 ## Branch Protection
 
@@ -69,10 +75,10 @@ only where someone remembered is one the report cannot rely on. Each result carr
 | `severity`                 | Critical only where a failure means a user cannot buy or cannot reach their account    |
 | `link`                     | The plan that justifies the case, read from its own `// spec:` header, plus its source |
 
-Three reports are published, not one per engine. The root report holds all sixty results, forty
-distinct cases with the functional twenty counted once per engine. `functional/` and `visual/` exist
-because Allure draws a single trend line per report, so a combined one could never show a visual
-trend next to a functional one.
+Four reports are published, not one per engine. The root report holds every result, seventy-four
+distinct cases (22 functional, 33 visual, 19 API) with the functional cases counted once per engine,
+for ninety-six results in total. `functional/`, `visual/` and `api/` exist because Allure draws a
+single trend line per report, so a combined one could never show three trends at once.
 
 The engine sits in `parentSuite` rather than a level below it because Allure's Overview reads only
 the top level of the suites tree. While both engines shared a parent, the dashboard drew one bar for

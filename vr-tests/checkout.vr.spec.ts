@@ -2,36 +2,45 @@
 // seed: specs/seed.spec.ts
 import { expect, test } from "../utils/fixtures/testFixtures";
 import { products } from "../utils/testData";
+import { url } from "../utils/url";
 
 test.describe("Visual regression - Checkout Page", () => {
-  // uniqueAccount is requested for its side effect: checkout is only reachable
-  // once an account exists and is signed in.
-  test.beforeEach(
-    async ({ productDetailPage, cartPage, uniqueAccount: _uniqueAccount }) => {
-      await productDetailPage.gotoProductDetailPage(products.blueTop.id);
-      const modal = await productDetailPage.addToCart();
-      await modal.viewCart();
-      await cartPage.proceedToCheckout();
-    },
-  );
+  test.beforeEach(async ({ page, cartPage, productDetailPage }) => {
+    await cartPage.clearCart();
+    await productDetailPage.gotoProductDetailPage(products.blueTop.id);
+    const modal = await productDetailPage.addToCart();
+    await modal.viewCart();
 
-  test("VR-19: Delivery address block", async ({ checkoutPage }) => {
-    await expect(checkoutPage.addressDetailsHeading).toBeVisible();
-
-    await expect(checkoutPage.deliveryAddress).toHaveScreenshot(
-      "checkout-address-details.png",
-      // Only the generated values are masked, so the block's structure stays
-      // under comparison.
-      { mask: [checkoutPage.deliveryAddressValues] },
-    );
+    await cartPage.proceedToCheckout();
+    await expect(page).toHaveURL(new RegExp(`${url.checkout}$`));
   });
 
-  test("VR-20: Card entry form", async ({ checkoutPage, paymentPage }) => {
-    await checkoutPage.placeOrder();
-    await expect(paymentPage.payButton).toBeVisible();
+  test("VR-28: Address details", async ({ page, checkoutPage }) => {
+    await expect(checkoutPage.addressDetailsHeading).toBeVisible();
+    await expect(checkoutPage.deliveryAddress).toBeVisible();
+    await expect(checkoutPage.billingAddress).toBeVisible();
 
-    await expect(paymentPage.paymentForm).toHaveScreenshot(
-      "checkout-payment-form.png",
+    // A clip spanning the "Address Details" heading and both address blocks,
+    // not either block on its own: the two are read together on the real
+    // page, and the values are the shared account's own fixed literal
+    // defaults from `buildAccount()`, not per-run data, so nothing here needs
+    // masking.
+    const clip = await checkoutPage.unionBoundingBox([
+      checkoutPage.addressDetailsHeading,
+      checkoutPage.deliveryAddress,
+      checkoutPage.billingAddress,
+    ]);
+    await expect(page).toHaveScreenshot("checkout-address-details.png", {
+      clip,
+    });
+  });
+
+  test("VR-29: Order review block", async ({ checkoutPage }) => {
+    await expect(checkoutPage.orderRows.first()).toBeVisible();
+    await checkoutPage.orderTable.scrollIntoViewIfNeeded();
+
+    await expect(checkoutPage.orderTable).toHaveScreenshot(
+      "checkout-order-review.png",
     );
   });
 });

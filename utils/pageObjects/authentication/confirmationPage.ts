@@ -7,14 +7,26 @@ import { BaseAppPage } from "../baseAppPage";
  * uppercased in CSS, not in the markup.
  */
 export class ConfirmationPage extends BaseAppPage {
+  readonly confirmationSection: Locator;
   readonly accountCreatedBanner: Locator;
+  readonly accountCreatedMessage: Locator;
   readonly accountDeletedBanner: Locator;
+  readonly accountDeletedMessage: Locator;
   readonly continueButton: Locator;
 
   constructor(page: Page) {
     super(page);
+    // The column wrapping the banner, message and Continue button. Shared
+    // markup with the order confirmation page's own equivalent.
+    this.confirmationSection = page.locator(".col-sm-9.col-sm-offset-1");
     this.accountCreatedBanner = page.getByText(/account created/i);
+    this.accountCreatedMessage = page.getByText(
+      "Congratulations! Your new account has been successfully created!",
+    );
     this.accountDeletedBanner = page.getByText(/account deleted/i);
+    this.accountDeletedMessage = page.getByText(
+      "Your account has been permanently deleted!",
+    );
     this.continueButton = page.getByTestId("continue-button");
   }
 

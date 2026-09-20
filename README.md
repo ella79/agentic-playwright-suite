@@ -13,11 +13,12 @@ MCP, and published from a containerised CI pipeline.
 | [Functional](https://ella79.github.io/agentic-playwright-suite/functional/) and [Visual](https://ella79.github.io/agentic-playwright-suite/visual/) | Each suite with its own trend                                                   |
 | [Trace Viewer](https://ella79.github.io/agentic-playwright-suite/playwright-report/)                                                                | Every step of every case, replayable                                            |
 
-**20 functional cases and 20 visual cases, both capped.** The functional cases are replayed on
-WebKit, so the same coverage is proven on the engine behind Safari. Visual baselines stay Chromium
-on Linux, generated in the same image CI runs. New coverage replaces an existing case rather than
-growing the suite, because twenty cases that can each be justified demonstrate more than two hundred
-nobody can explain.
+**22 functional cases and 33 visual cases, each earning its place.** The functional cases are
+replayed on WebKit, so the same coverage is proven on the engine behind Safari. Visual baselines stay
+Chromium on Linux, generated in the same image CI runs. New coverage exists only because a genuine
+state on the page was found missing and verified live before it was added — a success banner, a
+validation error, an expanded panel — never to pad the count, and a case earns removal the same way,
+by no longer corresponding to anything the page does.
 
 Built with Playwright, TypeScript, Yarn, Docker, Allure, GitHub Actions and Renovate, with Claude
 Code agents reaching the browser over MCP.
@@ -94,18 +95,19 @@ yet, so the clicks landed as silent no operations. The investigation is in
 ## Structure
 
 ```
-tests/        20 functional cases, one directory per feature area
-vr-tests/     20 visual cases and their committed Linux baselines
+tests/        22 functional cases, one directory per feature area
+api-tests/    19 API cases, no browser, no shared account
+vr-tests/     33 visual cases and their committed Linux baselines
 specs/        Test plans, the status report, the agent seed
 utils/        Page objects, fixtures, test data, scripts
-.claude/      Six agents, three skills, slash commands
+.claude/      Five agents, three skills, slash commands
 env/docker/   Execution images for CI and local use
 ```
 
 ## When something looks broken
 
 **The whole functional suite fails at the same step.** Look at the other engine in that run: if
-WebKit passed the same twenty cases, the demo host was overloaded, not the suite. Three test jobs
+WebKit passed the same twenty-two cases, the demo host was overloaded, not the suite. Four test jobs
 hit it in parallel on `main`. Re-run with that hypothesis rather than editing a test.
 
 **Visual cases fail locally with no obvious diff.** Baselines are Chromium on Linux. A local run on
@@ -125,5 +127,5 @@ in the image CI uses.
 | [`specs/STATUS.md`](specs/STATUS.md)           | Coverage per area, findings raised against the application, open decisions |
 | [`docs/architecture.md`](docs/architecture.md) | Page objects, fixtures, locator policy, visual regression                  |
 | [`docs/pipeline.md`](docs/pipeline.md)         | The seven jobs, the published reports, dependency updates                  |
-| [`docs/agents.md`](docs/agents.md)             | The six agents, the two MCP servers, how the skills are enforced           |
+| [`docs/agents.md`](docs/agents.md)             | The five agents, the two MCP servers, how the skills are enforced          |
 | [`docs/decisions.md`](docs/decisions.md)       | The calls a reviewer would question, and what broke while building this    |

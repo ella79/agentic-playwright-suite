@@ -14,29 +14,38 @@ Shared conventions: [`README.md`](README.md). Seed: `specs/seed.spec.ts`.
 
 ## Scope
 
-Two regions with different failure modes: the information panel, which is a layout of image, price,
-availability and the quantity control, and the review form, which is the only form on the page a
-regression would hit.
-
-Both captures use a fixed product so the content is stable between runs.
+The product's own showcase and its review form, in its four states: empty, rejected, filled and
+submitted.
 
 ## Cases
 
-| ID    | Name                      | Screenshot                   | State captured                                       |
-| ----- | ------------------------- | ---------------------------- | ---------------------------------------------------- |
-| VR-08 | Product information panel | `product-detail-information` | Information panel: image, price, availability, brand |
-| VR-09 | Write-a-review form       | `product-detail-review-form` | Write-a-review form in its empty state               |
+| ID    | Name                               | Screenshot                         | State captured                                                                                  |
+| ----- | ---------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------- |
+| VR-21 | Product showcase                   | `product-detail-showcase`          | The product image beside its name, category, price, quantity, availability, condition and brand |
+| VR-22 | Write Your Review form, default    | `product-detail-review-form`       | The "WRITE YOUR REVIEW" tab title with name, email and review fields, empty                     |
+| VR-23 | Write Your Review form, validation | `product-detail-review-validation` | The native "Please fill out this field" bubble after an empty submit                            |
+| VR-24 | Review submitted                   | `product-detail-review-sent`       | The "Thank you for your review." success state                                                  |
 
 ## Notes
 
-**VR-08 waits for its image to decode** before capturing, and uses the `0.05` threshold, because the
-product photograph is served with varying compression.
-
-**VR-09 stays at the default threshold**: it is text and inputs, so any difference is real.
+- VR-21 captures the viewport rather than an element: the row holding the image and information
+  columns carries Bootstrap's own negative row margins with nothing to clip them, so an element
+  screenshot of it paints the sidebar sitting in the same region instead of just its own two
+  children. Verified live. The page opens scrolled to the top, so the viewport already is the
+  showcase.
+- VR-22's `reviewSection` locator scopes to `.category-tab.shop-details-tab`, not `#review-form` or
+  `#reviews`: the latter two are both zero-height tab wrappers for the same reason as the rest of
+  this page's rows, and neither includes the "WRITE YOUR REVIEW" tab label, which is `#reviews`'s own
+  sibling rather than its parent. This wrapper has a real height and holds both. Verified live.
+- VR-23 exists for the same reason as `payment-vr-test-plan.md`'s VR-32: name, email and review all
+  carry `required`, verified live, so the browser's own field validation blocks the submit.
+- VR-24 also captures the viewport rather than `reviewSection`: the success banner's own row
+  (`#review-section`, a `.form-row`) collapses to zero height for the same reason as VR-21's `.row`,
+  floated children with no clearfix, and sits exactly at the review form's own bottom edge, so an
+  element screenshot of the form clips the banner's text out entirely instead of just cropping
+  tightly around it. Verified live.
 
 ## Out of Scope
 
-- The quantity spinner's incremented state: it changes a number, not a layout, and the functional
-  suite asserts the value.
-- A submitted review's confirmation: the functional suite covers it, and the message renders in a
-  region the form capture already includes.
+- The list of existing reviews: the application does not render one.
+- Reaching this page from search: a navigation, not a rendering difference.

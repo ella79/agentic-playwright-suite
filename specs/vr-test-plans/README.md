@@ -1,17 +1,24 @@
 # Visual Regression Plans
 
-One plan per area, matching the spec files in `vr-tests/`. This file holds what applies to all of
-them, so the individual plans only carry what is specific to their area.
+One plan per area, matching the spec files in `vr-tests/` and, area for area, the functional suite's
+own folders in `tests/`. This file holds what applies to all of them, so the individual plans only
+carry what is specific to their area.
 
-| Plan                             | Spec file                            | Cases                 |
-| -------------------------------- | ------------------------------------ | --------------------- |
-| `home-vr-test-plan.md`           | `vr-tests/home.vr.spec.ts`           | VR-01 to VR-03, VR-17 |
-| `products-vr-test-plan.md`       | `vr-tests/products.vr.spec.ts`       | VR-04 to VR-07        |
-| `product-detail-vr-test-plan.md` | `vr-tests/product-detail.vr.spec.ts` | VR-08 to VR-09        |
-| `cart-vr-test-plan.md`           | `vr-tests/cart.vr.spec.ts`           | VR-10 to VR-13        |
-| `authentication-vr-test-plan.md` | `vr-tests/authentication.vr.spec.ts` | VR-14, VR-16          |
-| `contact-vr-test-plan.md`        | `vr-tests/contact.vr.spec.ts`        | VR-18, VR-21          |
-| `checkout-vr-test-plan.md`       | `vr-tests/checkout.vr.spec.ts`       | VR-19 to VR-20        |
+| Plan                             | Spec file                            | Cases          |
+| -------------------------------- | ------------------------------------ | -------------- |
+| `home-vr-test-plan.md`           | `vr-tests/home.vr.spec.ts`           | VR-01 to VR-10 |
+| `login-vr-test-plan.md`          | `vr-tests/login.vr.spec.ts`          | VR-11 to VR-12 |
+| `signup-vr-test-plan.md`         | `vr-tests/signup.vr.spec.ts`         | VR-13 to VR-17 |
+| `products-vr-test-plan.md`       | `vr-tests/products.vr.spec.ts`       | VR-18 to VR-20 |
+| `product-detail-vr-test-plan.md` | `vr-tests/product-detail.vr.spec.ts` | VR-21 to VR-24 |
+| `cart-vr-test-plan.md`           | `vr-tests/cart.vr.spec.ts`           | VR-25 to VR-27 |
+| `checkout-vr-test-plan.md`       | `vr-tests/checkout.vr.spec.ts`       | VR-28 to VR-29 |
+| `payment-vr-test-plan.md`        | `vr-tests/payment.vr.spec.ts`        | VR-30 to VR-32 |
+| `confirmation-vr-test-plan.md`   | `vr-tests/confirmation.vr.spec.ts`   | VR-33          |
+
+Rewritten from scratch alongside the functional suite: every plan and spec above is new, matching the
+same nine areas (`home` through `confirmation`) rather than the previous `authentication`/`contact`
+split. Nothing from the earlier structure was carried forward or renumbered into it.
 
 ## What These Plans Cover
 
@@ -36,13 +43,13 @@ default carries an inline `// VR:` comment naming the reason.
 
 Ad, analytics, and consent-management requests are aborted at the route level by the shared fixture,
 so none of it needs masking. This is why the visual suite imports the project fixture rather than
-Playwright's bare `test`. Masking is reserved for content this suite itself generates, such as
-per-run account details.
+Playwright's bare `test`. No case currently uses `mask` either: every account-shaped value on screen
+comes from the shared account's own fixed literal profile (`buildAccount()` in `utils/testData.ts`),
+not per-run data, so there is nothing left to hide. The mechanism stays available for a future case
+that genuinely renders per-run data.
 
 ## Out of Scope, For All Areas
 
 - Hover and focus states: cursor position and focus rings vary between runs and platforms.
-- Order confirmation: the page carries a generated order id, so its only stable region is text the
-  functional suite already asserts.
-- Responsive breakpoints: one viewport only. Adding mobile widths would double a baseline count
-  deliberately capped at twenty, and every one of those baselines needs a human to review it.
+- Responsive breakpoints: one viewport only. Adding mobile widths would double the baseline count,
+  and every one of those baselines needs a human to review it.

@@ -4,6 +4,16 @@ import {
   type ReporterDescription,
 } from "@playwright/test";
 
+// CI sets E2E_LOGIN_EMAIL/E2E_LOGIN_PASSWORD as GitHub Actions secrets, so
+// there is nothing to load there. Locally they come from a gitignored .env
+// (see .env.example); its absence before the file is ever created is
+// expected, not an error.
+try {
+  process.loadEnvFile();
+} catch {
+  // no .env file yet
+}
+
 const BASE_URL = process.env.E2E_BASE_URL || "https://automationexercise.com";
 
 /** Suffix that keeps each suite's local report in its own folder. */
@@ -78,12 +88,30 @@ export default defineConfig({
     },
   },
   projects: [
+    // Signs the shared account into the application once and saves the
+    // session, so every project below starts already logged in instead of
+    // paying for a signup on every test that has no reason to prove one. Its
+    // own trace, video and screenshot are off: fill() records what it typed
+    // into the trace's action log verbatim, and that trace is published
+    // alongside the rest of this suite's reports.
+    {
+      name: "setup",
+      testDir: "./utils/setup",
+      testMatch: /.*\.setup\.ts/,
+      use: {
+        trace: "off",
+        video: "off",
+        screenshot: "off",
+      },
+    },
     {
       name: "e2e-chromium",
       testDir: "./tests",
+      dependencies: ["setup"],
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1920, height: 1080 },
+        storageState: ".auth/user.json",
       },
     },
     // The same twenty cases replayed on the engine Chromium cannot speak for.
@@ -93,9 +121,11 @@ export default defineConfig({
     {
       name: "e2e-webkit",
       testDir: "./tests",
+      dependencies: ["setup"],
       use: {
         ...devices["Desktop Safari"],
         viewport: { width: 1920, height: 1080 },
+        storageState: ".auth/user.json",
       },
     },
     {
@@ -103,7 +133,8 @@ export default defineConfig({
       // Inside the functional project it would run as a twenty-first case, but
       // the planner still has to execute it to prove the environment
       // initialises, so it gets a project of its own. It lives in specs/ beside
-      // the plans it bootstraps, matched by name.
+      // the plans it bootstraps, matched by name. It stays a guest: the seed
+      // proves the environment initialises, not that a logged-in session does.
       name: "seed",
       testDir: "./specs",
       testMatch: /seed\.spec\.ts/,
@@ -115,10 +146,19 @@ export default defineConfig({
     {
       name: "vr",
       testDir: "./vr-tests",
+      dependencies: ["setup"],
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1920, height: 1080 },
+        storageState: ".auth/user.json",
       },
+    },
+    // No browser and no dependency on setup: every case here calls the
+    // public API directly through the `request` fixture, with its own
+    // throwaway account where one is needed.
+    {
+      name: "api",
+      testDir: "./api-tests",
     },
   ],
 });

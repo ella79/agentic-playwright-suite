@@ -29,8 +29,8 @@ when it ends, or a public site collects abandoned accounts. That is environment,
 distinction was worth arguing about in the first place.
 
 **No custom screenshot runtime.** A wrapper enforcing named capture strategies pays for itself
-across hundreds of visual tests. Across twenty it is indirection with nobody to pay for it. Native
-`toHaveScreenshot()` with documented thresholds does the same work in less code.
+across hundreds of visual tests. Across thirty-three it is indirection with nobody to pay for it.
+Native `toHaveScreenshot()` with documented thresholds does the same work in less code.
 
 **No baseline taller than the viewport.** Two captures originally targeted the element holding the
 whole catalog, which measures 13,347 pixels. They failed intermittently under load, timing out on

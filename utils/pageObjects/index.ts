@@ -15,8 +15,6 @@ export * from "./checkout/checkoutPage";
 export * from "./checkout/paymentPage";
 export * from "./checkout/orderConfirmationPage";
 
-export * from "./contact/contactUsPage";
-
 // Modals reached from more than one page.
 export * from "./shared/addToCartModal";
 export * from "./shared/checkoutGuardModal";

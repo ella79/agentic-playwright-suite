@@ -2,52 +2,51 @@
 
 ## Metadata
 
-| Field       | Value                                                                                           |
-| ----------- | ----------------------------------------------------------------------------------------------- |
-| Page URL    | `/products`, `/product_details/<id>`                                                            |
-| Page Title  | `Automation Exercise - All Products`, `Automation Exercise - Product Details`                   |
-| Spec File   | `tests/products/products.spec.ts`                                                               |
-| Page Object | `utils/pageObjects/products/productsPage.ts`, `utils/pageObjects/products/productDetailPage.ts` |
+| Field        | Value                                        |
+| ------------ | -------------------------------------------- |
+| Page URL     | `/products`                                  |
+| Page Title   | `Automation Exercise - All Products`         |
+| Spec File    | `tests/products/products.spec.ts`            |
+| Page Object  | `utils/pageObjects/products/productsPage.ts` |
+| Precondition | Login (shared account)                       |
 
 ## Scope
 
-Catalog listing, product detail, search, and the two sidebar filters. Verifies that a visitor can
-find a product and that a search with no matches produces an honest empty state rather than the
-full catalog.
+The catalog listing itself: the special offer banner, the full product grid, and search — including
+where a search result's `View Product` link leads. Category and brand filtering are covered in
+`home-test-plan.md`, since the sidebar that drives them is shared markup and the home page is the
+entry point already tested for that interaction. The detail page's own content and review form are
+covered by `product-detail-test-plan.md`.
 
 ## Preconditions
 
 Seed: `specs/seed.spec.ts`
 
-- No account required, the catalog is public.
+- The shared account signs in automatically via `login.setup.ts`; every case here starts already
+  signed in.
 
 ## Test Cases
 
-| ID    | Name                                                     | Type  | Scenario                                                          | Expected                                                                                    |
-| ----- | -------------------------------------------------------- | ----- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| TC-07 | The catalog lists products and one opens its detail page | happy | A visitor opens the catalog and views a product                   | The catalog renders product cards and the detail page shows name, price, availability       |
-| TC-08 | Search returns only products matching the term           | happy | A visitor searches for a term matching several products           | The searched products heading appears and every returned card matches the term              |
-| TC-09 | A search with no matches returns an empty result set     | error | A visitor searches for a term with no matches                     | The searched products heading appears with zero cards, the catalog is not silently returned |
-| TC-10 | Filtering by category lists that category's products     | happy | A visitor filters by a category                                   | The heading names the category and at least one product is listed                           |
-| TC-11 | The scroll-up control returns the visitor to the top     | happy | A visitor scrolls down the catalog and uses the scroll-up control | The page returns to the top and the catalog heading is back in view                         |
+| ID    | Name                                                                                         | Type  | Scenario                                                                            | Expected                                                                                                                                                                                  |
+| ----- | -------------------------------------------------------------------------------------------- | ----- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-13 | The products page renders its catalog and special offer banner                               | happy | A visitor opens the products page                                                   | The All Products heading, the product grid, the search input and its button, and the special offer banner (`#sale_image`) are all visible; the card count matches `GET /api/productsList` |
+| TC-14 | Searching for a product shows only matching results, and opening one reaches its detail page | happy | A visitor searches for Men Tshirt, then opens the matching product from the results | The Searched Products heading is shown with a card naming the product, and a card count matching `POST /api/searchProduct` for the same term; opening it lands on `/product_details/2`    |
+| TC-15 | A search with no matches returns an empty result set                                         | edge  | A visitor searches for a term no product matches                                    | The Searched Products heading is shown; the product grid holds no cards                                                                                                                   |
 
 ## Locator Notes
 
-- Search field exposes the placeholder `Search Product`; the submit control is icon-only and has no
-  accessible name, so it is reached by id with a documented CSS fallback.
-- Product cards are layout wrappers with no role. They are matched by their product name text.
-- `View Product` is a real anchor with `href`, so it carries a link role. `Add to cart` on the
-  listing is an anchor **without** `href` and therefore has no role.
-- TC-08 searches for `saree` deliberately. The application matches category names as well as product
-  names, verified on 2026-09-10: `top` returns fourteen products, two of them shirts, and `dress`
-  returns nine, two of them not dresses. `saree` is a term where both kinds of match agree, which is
-  what lets the case assert that every result carries the term. Changing the term breaks the case
-  without anything being wrong with the application.
-- The scroll-up control is `#scrollUp`, an anchor with no text and no role, so it is matched by its
-  id. It is fixed at `top: -41` until a real scroll animates it in: `window.scrollTo` leaves it off
-  screen, `mouse.wheel` brings it in. That is why TC-11 scrolls with the wheel.
+- `#sale_image` carries no visible text of its own (`alt="Website for practice"`); it is identified by
+  its stable `id`, not by content — verified live.
+- The category and brand sidebars render identical markup here and on the home page; TC-13 does not
+  duplicate their assertion, which lives in `home-test-plan.md`.
+- TC-13 and TC-14 each cross-validate their card count against the matching `CatalogApiClient` call
+  (`getProductsList`, `searchProduct`) rather than asserting a hardcoded number, so the case does not
+  need updating if the demo catalog's product count ever changes.
 
 ## Out of Scope
 
-- Pagination and sorting: the catalog renders in full on one page.
-- Product image content: covered visually by the VR suite instead.
+- Category and brand filtering: covered by `home-test-plan.md`.
+- The product detail page's own information display and review form: covered by
+  `product-detail-test-plan.md`.
+- Adding a product to the cart from the listing: the interaction itself is covered from the home
+  page in `home-test-plan.md`; what happens to it afterwards is covered by `cart-test-plan.md`.
