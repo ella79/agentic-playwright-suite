@@ -9,6 +9,7 @@
 //   node utils/scripts/build-metrics.mjs \
 //     --suite functional=reports/functional.json \
 //     --suite visual=reports/visual.json \
+//     --suite api=reports/api.json \
 //     --history previous/history.json \
 //     --categories env/allure/categories.json \
 //     --allure allure-report \
@@ -28,13 +29,6 @@ const FLAKY_RATE_ACCEPTABLE = 5;
 const WINDOW = 30;
 
 /**
- * Suites with a deliberate ceiling on case count. The WebKit run has none: it
- * is the same twenty cases on a second engine, so a cap there would be
- * meaningless.
- */
-const CAPS = { functional: 20, visual: 20 };
-
-/**
  * Display names only. The keys are the history keys, so they stay: renaming one
  * orphans every run recorded against it. The values match the `parentSuite`
  * labels Allure itself shows (see `utils/fixtures/allureLabels.ts`), so a
@@ -45,6 +39,7 @@ const DISPLAY = {
   functional: "Functional E2E · Chromium",
   "functional-webkit": "Functional E2E · WebKit",
   visual: "Visual Regression · Chromium",
+  api: "API · REST",
 };
 const label = (name) => DISPLAY[name] ?? name;
 
@@ -353,7 +348,7 @@ const suiteRows = suites
     );
     return `<tr>
       <th scope="row">${escape(label(s.name))}</th>
-      <td>${CAPS[s.name] ? `${s.total} / ${CAPS[s.name]}` : s.total}</td>
+      <td>${s.total}</td>
       <td class="${pass}">${s.passRate}%</td>
       <td class="${flake}">${s.flakyRate}%</td>
       <td>${seconds(s.p50)}</td>
@@ -444,6 +439,7 @@ const html = `<!doctype html>
   <a href="../">Test Results</a>
   <a href="../functional/">Functional Report</a>
   <a href="../visual/">Visual Report</a>
+  <a href="../api/">API Report</a>
   <a href="https://github.com/ella79/agentic-playwright-suite">Repository</a>
 </nav>
 
@@ -466,7 +462,7 @@ ${donut(
   })),
 )}
 <table>
-  <thead><tr><th>Suite</th><th>Cases, cap</th><th>Pass rate</th><th>Flaky rate</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
+  <thead><tr><th>Suite</th><th>Cases</th><th>Pass rate</th><th>Flaky rate</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
   <tbody>${suiteRows}</tbody>
 </table>
 
@@ -509,7 +505,7 @@ ${donut(
   <dt>Pass rate</dt><dd>${PASS_RATE_GOOD}% or above is healthy, ${PASS_RATE_ACCEPTABLE} to ${PASS_RATE_GOOD}% is acceptable during active development, below ${PASS_RATE_ACCEPTABLE}% means the suite has a stability problem rather than the application.</dd>
   <dt>Flaky rate</dt><dd>Below ${FLAKY_RATE_GOOD}% is the target. Past ${FLAKY_RATE_ACCEPTABLE}% the suite stops being believed, and a suite nobody believes is worse than no suite.</dd>
   <dt>Duration</dt><dd>Tracked as a trend, not a fixed limit. What matters is whether it is growing faster than coverage.</dd>
-  <dt>Coverage cap</dt><dd>Twenty cases for the functional suite and twenty for the visual one. New coverage replaces an existing case rather than adding to the count. The WebKit run has no cap of its own: it replays the same functional cases on a second engine.</dd>
+  <dt>Coverage</dt><dd>New coverage exists only because a genuine state on the page or the API was found missing and verified live before it was added, never to pad the count. The WebKit run is not a coverage number of its own: it replays the same functional cases on a second engine.</dd>
 </dl>
 
 <footer>

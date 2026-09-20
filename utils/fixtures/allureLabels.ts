@@ -21,14 +21,20 @@ const REPO_BLOB =
 /** The visual project's name in `playwright.config.ts`. */
 const VISUAL_PROJECT = "vr";
 
+/** The API project's name in `playwright.config.ts`. */
+const API_PROJECT = "api";
+
 /**
  * What each project contributes to the report tree. Visual stays on Chromium:
- * three engines would mean sixty baselines to review.
+ * three engines would mean sixty baselines to review. API has no browser at
+ * all, so its own "engine" is the protocol it actually runs over, not a
+ * placeholder browser name.
  */
 const PROJECTS: Record<string, { parent: string; engine: string }> = {
   "e2e-chromium": { parent: "Functional E2E", engine: "Chromium" },
   "e2e-webkit": { parent: "Functional E2E", engine: "WebKit" },
   [VISUAL_PROJECT]: { parent: "Visual Regression", engine: "Chromium" },
+  [API_PROJECT]: { parent: "API", engine: "REST" },
   seed: { parent: "Functional E2E", engine: "Chromium" },
 };
 
@@ -49,12 +55,13 @@ function readPlanPath(specFile: string): string | undefined {
 
 /**
  * Applies the labels the Allure report groups and filters by. Without them the
- * dashboard is a flat list of forty results that cannot be told apart; with
- * them the two suites separate, each area is its own branch, and a failing case
+ * dashboard is a flat list of results that cannot be told apart; with them the
+ * three suites separate, each area is its own branch, and a failing case
  * links to the plan that justifies its existence.
  */
 export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
   const isVisual = testInfo.project.name === VISUAL_PROJECT;
+  const isApi = testInfo.project.name === API_PROJECT;
   const project = PROJECTS[testInfo.project.name] ?? {
     parent: "Functional E2E",
     engine: "Chromium",
@@ -82,10 +89,14 @@ export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
   await feature(area);
   await story(testInfo.title);
 
-  await tag(isVisual ? "visual" : "functional");
+  await tag(isVisual ? "visual" : isApi ? "api" : "functional");
 
+  // API has nothing a user could be mid-purchase in, so it never carries
+  // critical severity regardless of area name.
   await severity(
-    CRITICAL_AREAS.has(area) && !isVisual ? Severity.CRITICAL : Severity.NORMAL,
+    CRITICAL_AREAS.has(area) && !isVisual && !isApi
+      ? Severity.CRITICAL
+      : Severity.NORMAL,
   );
 
   // Recorded as a parameter rather than only in the suite name, so Allure

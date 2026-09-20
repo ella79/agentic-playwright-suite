@@ -76,12 +76,15 @@ the same shared, signed-in account as the functional suite; `login.vr.spec.ts` a
 
 ## Open Questions
 
-- Whether the API suite's results should join the Allure dashboard as a third report category (with
-  its own trend history and suite-health entry, alongside Functional and Visual), or stay CI-only for
-  now. `static-checks` already covers `api-tests/`; only `publish-dashboard`'s Allure/metrics
-  integration is undecided.
 - Whether a second viewport justifies doubling the baseline count, given every baseline needs a human
   to review its diff.
+
+## Recently Resolved
+
+- The API suite now joins the Allure dashboard as a third report category, with its own `api/` trend
+  and a suite-health row, alongside Functional and Visual. `allureLabels.ts` previously left the `api`
+  project unmapped, so its results were silently mislabelled as Functional E2E; fixed alongside the
+  dashboard wiring.
 
 ## Decisions Needed
 
