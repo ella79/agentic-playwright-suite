@@ -13,7 +13,7 @@
 ## Scope
 
 The product's own information display and its review form. Reaching the page from a search result
-is covered by TC-14 in `products-test-plan.md`.
+is covered by TC-15 in `products-test-plan.md`.
 
 ## Preconditions
 
@@ -26,8 +26,8 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                                       | Type  | Scenario                                            | Expected                                                                                                                       |
 | ----- | ------------------------------------------------------------- | ----- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| TC-16 | The product detail page shows the product's full information | happy | A visitor opens a product's detail page directly    | The name, category (Men > Tshirts), price, quantity selector, availability (In Stock), condition (New) and brand (H&M) are all visible |
-| TC-17 | A product review can be submitted from the detail page      | happy | A visitor fills and submits the review form          | The thank-you message is shown                                                                                                    |
+| TC-17 | The product detail page shows the product's full information | happy | A visitor opens a product's detail page directly    | The name, category (Men > Tshirts), price, quantity selector, availability (In Stock), condition (New) and brand (H&M) are all visible |
+| TC-18 | A product review can be submitted from the detail page      | happy | A visitor fills and submits the review form          | The thank-you message is shown                                                                                                    |
 
 ## Locator Notes
 

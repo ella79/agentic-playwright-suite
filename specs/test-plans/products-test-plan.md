@@ -29,15 +29,15 @@ Seed: `specs/seed.spec.ts`
 
 | ID    | Name                                                                              | Type  | Scenario                                                                                                     | Expected                                                                                                                     |
 | ----- | ------------------------------------------------------------------------------------ | ----- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| TC-13 | The products page renders its catalog and special offer banner                   | happy | A visitor opens the products page                                                                            | The All Products heading and the product grid are visible; the special offer banner (`#sale_image`) is visible in the sidebar |
-| TC-14 | Searching for a product shows only matching results, and opening one reaches its detail page | happy | A visitor searches for Men Tshirt, then opens the matching product from the results                          | The Searched Products heading is shown with a card naming the product; opening it lands on `/product_details/2`             |
-| TC-15 | A search with no matches returns an empty result set                             | edge  | A visitor searches for a term no product matches                                                              | The Searched Products heading is shown; the product grid holds no cards                                                     |
+| TC-14 | The products page renders its catalog and special offer banner                   | happy | A visitor opens the products page                                                                            | The All Products heading and the product grid are visible; the special offer banner (`#sale_image`) is visible in the sidebar |
+| TC-15 | Searching for a product shows only matching results, and opening one reaches its detail page | happy | A visitor searches for Men Tshirt, then opens the matching product from the results                          | The Searched Products heading is shown with a card naming the product; opening it lands on `/product_details/2`             |
+| TC-16 | A search with no matches returns an empty result set                             | edge  | A visitor searches for a term no product matches                                                              | The Searched Products heading is shown; the product grid holds no cards                                                     |
 
 ## Locator Notes
 
 - `#sale_image` carries no visible text of its own (`alt="Website for practice"`); it is identified by
   its stable `id`, not by content — verified live.
-- The category and brand sidebars render identical markup here and on the home page; TC-13 does not
+- The category and brand sidebars render identical markup here and on the home page; TC-14 does not
   duplicate their assertion, which lives in `home-test-plan.md`.
 
 ## Out of Scope

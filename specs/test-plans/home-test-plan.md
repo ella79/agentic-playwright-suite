@@ -37,6 +37,7 @@ Seed: `specs/seed.spec.ts`
 | TC-04 | Selecting a category or a brand filters the catalog accordingly                         | happy | A visitor opens Women, then Dress, from the category sidebar; separately, a visitor selects Madame from the brands sidebar | The category path shows the heading "Women - Dress Products" at `/category_products/1`; the brand path shows the heading "Brand - Madame Products" at `/brand_products/Madame`                                                                                                        |
 | TC-05 | The main navigation reaches every page it links to                                      | happy | A visitor follows each link in the header from the home page: Products, Cart, Test Cases, API Testing, Contact us  | Each link lands on its own page, identified by URL and heading                                                                                                                                                                                                                          |
 | TC-06 | A visitor can subscribe to the newsletter from the footer                                | happy | A visitor subscribes to the newsletter from the footer                                                              | The subscription success message is shown                                                                                                                                                                                                                                               |
+| TC-07 | Adding a product to the cart from the home page shows a confirmation notification        | happy | A visitor adds Blue Top, then Men Tshirt, to the cart from the home page's featured grid                          | Each addition shows the "Added! Your product has been added to cart." notification                                                                                                                                                                                                     |
 
 ## Locator Notes
 
@@ -54,7 +55,7 @@ Seed: `specs/seed.spec.ts`
 ## Out of Scope
 
 - The hero carousel's rotating background image.
-- Adding a home-page featured item to the cart: that interaction, and the notification it produces,
-  is exercised from the cart flow in `cart-test-plan.md`, not duplicated here.
 - The product detail page a `View Product` link opens: covered by `product-detail-test-plan.md`.
 - The full products listing a category or brand filter lands on: covered by `products-test-plan.md`.
+- Viewing, changing or removing what is in the cart once something is in it: covered by
+  `view-cart-test-plan.md`.
