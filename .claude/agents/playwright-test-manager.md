@@ -106,12 +106,13 @@ to W4, because a screenshot diff is triaged before anything is touched.
 A failing test step is not automatically the healer's either. Read the shape of the failure first:
 every case failing at the same point, the other engine green in the same run, or the same commit
 passing minutes earlier all say the host, not the test. The demo application is public and shared,
-and three suites hit it in parallel on `main`. Environment goes back to the queue with a hypothesis;
+and four suites hit it in parallel on `main`. Environment goes back to the queue with a hypothesis;
 only a failure that survives that reading goes to the healer. Never re-run without one.
 
-**W6 · Existing case is wrong or obsolete.** Applies to both suites, and what "wrong" means differs
-between them: a functional case asserts the wrong thing or races the UI, a visual case captures a
-state that no longer matters or frames it badly. Two outcomes either way.
+**W6 · Existing case is wrong or obsolete.** Applies to all three suites, and what "wrong" means
+falls into two kinds: a functional or API case asserts the wrong thing, races the UI, or checks an
+endpoint that no longer behaves that way; a visual case captures a state that no longer matters or
+frames it badly. Two outcomes either way.
 
 Establish the truth before deciding anything: send the planner to explore that area again, and have
 it report what the plan claims against what the application does now. A correction written from the
