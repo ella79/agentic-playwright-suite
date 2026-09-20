@@ -16,7 +16,7 @@
     "files.eol": "\n",
     "search.exclude": {
       "**/node_modules": true,
-      "**/playwright-report": true,
+      "**/playwright-report*": true,
       "**/test-results": true,
       "**/allure-results": true,
       "**/allure-report": true,

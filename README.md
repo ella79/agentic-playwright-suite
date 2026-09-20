@@ -1,24 +1,24 @@
 # Agentic Playwright Suite
 
-End to end and visual regression tests for [Automation Exercise](https://automationexercise.com),
+End to end, API and visual regression tests for [Automation Exercise](https://automationexercise.com),
 written in Playwright and TypeScript, authored and healed through Claude Code agents over Playwright
 MCP, and published from a containerised CI pipeline.
 
 [![CI](https://github.com/ella79/agentic-playwright-suite/actions/workflows/ci.yml/badge.svg)](https://github.com/ella79/agentic-playwright-suite/actions/workflows/ci.yml)
 
-| Live                                                                                                                                                |                                                                                 |
-| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| [Suite Health](https://ella79.github.io/agentic-playwright-suite/metrics/)                                                                          | Pass rate, flaky rate, p50 and p95, repeat offenders, against stated thresholds |
-| [Test Results](https://ella79.github.io/agentic-playwright-suite/)                                                                                  | Both suites, Chromium and WebKit split under the functional one                 |
-| [Functional](https://ella79.github.io/agentic-playwright-suite/functional/) and [Visual](https://ella79.github.io/agentic-playwright-suite/visual/) | Each suite with its own trend                                                   |
-| [Trace Viewer](https://ella79.github.io/agentic-playwright-suite/playwright-report/)                                                                | Every step of every case, replayable                                            |
+| Live                                                                                                                                                                                                               |                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| [Suite Health](https://ella79.github.io/agentic-playwright-suite/metrics/)                                                                                                                                         | Pass rate, flaky rate, p50 and p95, repeat offenders, against stated thresholds |
+| [Test Results](https://ella79.github.io/agentic-playwright-suite/)                                                                                                                                                 | Three suites, Chromium and WebKit split under the functional one                |
+| [Functional](https://ella79.github.io/agentic-playwright-suite/functional/), [Visual](https://ella79.github.io/agentic-playwright-suite/visual/) and [API](https://ella79.github.io/agentic-playwright-suite/api/) | Each suite with its own trend                                                   |
+| [Trace Viewer](https://ella79.github.io/agentic-playwright-suite/playwright-report/)                                                                                                                               | Every step of every case, replayable                                            |
 
-**22 functional cases and 33 visual cases, each earning its place.** The functional cases are
-replayed on WebKit, so the same coverage is proven on the engine behind Safari. Visual baselines stay
-Chromium on Linux, generated in the same image CI runs. New coverage exists only because a genuine
-state on the page was found missing and verified live before it was added — a success banner, a
-validation error, an expanded panel — never to pad the count, and a case earns removal the same way,
-by no longer corresponding to anything the page does.
+**22 functional cases, 33 visual ones and 19 API cases, each earning its place.** The functional
+cases are replayed on WebKit, so the same coverage is proven on the engine behind Safari. Visual
+baselines stay Chromium on Linux, generated in the same image CI runs. New coverage exists only
+because a genuine state or endpoint was found missing and verified live before it was added — a
+success banner, a validation error, an expanded panel — never to pad the count, and a case earns
+removal the same way, by no longer corresponding to anything the application does.
 
 Built with Playwright, TypeScript, Yarn, Docker, Allure, GitHub Actions and Renovate, with Claude
 Code agents reaching the browser over MCP.
@@ -53,7 +53,7 @@ failure, including the expected, actual and diff images of a screenshot comparis
 
 | Trigger                  | Runs                                                                  |
 | ------------------------ | --------------------------------------------------------------------- |
-| Pull request             | Static checks, functional suite, visual suite                         |
+| Pull request             | Static checks, functional suite, visual suite, API suite              |
 | Push to `main`           | The same, then the dashboards and the suite health page are published |
 | Image or lockfile change | The execution image is rebuilt and pushed to the registry first       |
 
@@ -65,13 +65,13 @@ through a pull request, and the only check the protection requires is `ci-gate`,
 the result of all the others. A job that stops running therefore cannot quietly stop being
 enforced.
 
-The test jobs run in parallel under a worker budget: one each for the functional and visual jobs,
-two for the WebKit job. The budget is a precaution, not a measured
-limit. One run failed with six browser instances against the shared demo host, the two heaviest
-cases timing out while the same checkout passed on WebKit in that same run. Later runs passed with
-roughly twelve instances against it, so the host's capacity is variable rather than a clean
-threshold. The budget costs nothing and removes the suite as a suspect when something does time
-out.
+The test jobs run in parallel under a worker budget: one each for the functional (both engines) and
+visual jobs, two for the API job, which needs no browser and provisions its own throwaway accounts.
+The budget is a precaution, not a measured limit. One run failed with six browser instances against
+the shared demo host, the two heaviest cases timing out while the same checkout passed on WebKit in
+that same run. Later runs passed with roughly twelve instances against it, so the host's capacity is
+variable rather than a clean threshold. The budget costs nothing and removes the suite as a suspect
+when something does time out.
 
 ## When a test goes flaky
 
