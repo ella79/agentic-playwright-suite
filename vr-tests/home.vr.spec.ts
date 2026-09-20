@@ -38,9 +38,15 @@ test.describe("Visual regression - Home Page", () => {
     await homePage.getCategoryLink("Women").click();
     await expect(
       homePage.categorySidebar.locator("#Women").getByRole("link", {
-        name: "Dress",
+        name: "Saree",
       }),
     ).toBeVisible();
+    // "Saree" being visible is not enough: the panel's growing height keeps
+    // pushing "Men" and "Kids" down for a moment afterward, so a clip taken
+    // right here can still miss "Kids" entirely. Confirmed in CI, where the
+    // sidebar's own height landed between the collapsed and fully-open
+    // values. Wait for the sidebar's own box to stop changing first.
+    await homePage.waitForStableBoundingBox(homePage.categorySidebar);
 
     // A clip, not an element screenshot, and recomputed after expanding: the
     // panel's own height grows once "Women" opens, and the heading is still

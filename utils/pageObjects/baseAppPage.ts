@@ -1,4 +1,4 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 /**
  * The consent banner is stored per browser context after the first acceptance,
@@ -140,6 +140,27 @@ export abstract class BaseAppPage {
     const right = Math.max(...resolved.map((box) => box.x + box.width));
     const bottom = Math.max(...resolved.map((box) => box.y + box.height));
     return { x: left, y: top, width: right - left, height: bottom - top };
+  }
+
+  /**
+   * Waits until a locator's own bounding box stops changing between two
+   * consecutive reads, for content whose *presence* is a poor proxy for its
+   * *final size* — a Bootstrap accordion panel, for instance, keeps pushing
+   * later siblings down for a moment after the panel's own text is already
+   * visible, verified live: a `unionBoundingBox` taken right after that text
+   * appears can still miss a sibling that has not finished being pushed into
+   * place. `animations: "disabled"` does not cover this, since the sibling is
+   * being repositioned by the transitioning element's layout, not animating
+   * itself.
+   */
+  async waitForStableBoundingBox(locator: Locator): Promise<void> {
+    let previousHeight: number | null = null;
+    await expect(async () => {
+      const box = await locator.boundingBox();
+      const stable = box !== null && box.height === previousHeight;
+      previousHeight = box?.height ?? null;
+      expect(stable).toBe(true);
+    }).toPass();
   }
 
   /**
