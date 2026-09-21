@@ -41,9 +41,17 @@ const PROJECTS: Record<string, { parent: string; engine: string }> = {
 /**
  * Cases whose failure means a user cannot buy, or cannot get into their
  * account. Everything else is normal severity; marking all twenty critical
- * would say nothing.
+ * would say nothing. Named after the current per-file areas, which all carry
+ * a "Page" suffix (see `area` below) — "Authentication" split into "Login
+ * Page" and "Signup Page" when login and signup became separate specs, and
+ * this set was never updated to match, so nothing had matched it since.
  */
-const CRITICAL_AREAS = new Set(["Checkout", "Authentication", "Cart"]);
+const CRITICAL_AREAS = new Set([
+  "Checkout Page",
+  "Cart Page",
+  "Login Page",
+  "Signup Page",
+]);
 
 /** The `// spec:` header every spec file carries, so the link is never stale. */
 function readPlanPath(specFile: string): string | undefined {
