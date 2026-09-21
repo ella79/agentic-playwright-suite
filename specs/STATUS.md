@@ -76,29 +76,37 @@ the same shared, signed-in account as the functional suite; `login.vr.spec.ts` a
 
 ## Known Flakes
 
-- An intermittent `<div class="fc-dialog-overlay">` (Google Funding Choices' consent dialog)
-  occasionally intercepts a click on a real element — seen live on `productDetailPage.addToCart()`,
-  in both `tests/cart/cart.spec.ts` TC-19 and `vr-tests/cart.vr.spec.ts` VR-27, roughly 1 run in 10.
-  Three mitigations were tried and verified, in order, none of which changed the failure rate:
-  1. A stylesheet setting `pointer-events: none` on the overlay's classes — no effect, since the
-     element is (sometimes) hosted in an open shadow root a light-DOM stylesheet cannot reach.
-  2. Removing the elements on sight via a shadow-piercing `MutationObserver` (patches
-     `Element.prototype.attachShadow` to watch every shadow root as it is created). Verified working
-     against a real, fully-rendered reproduction of the dialog outside the suite — the observer
-     removed it and the click succeeded — but the failure still recurred inside full suite runs,
-     locally and in the Docker/Linux image CI uses.
+- An intermittent element from Google Funding Choices' consent dialog occasionally intercepts a click
+  on a real element — seen live on `productDetailPage.addToCart()`, in both `tests/cart/cart.spec.ts`
+  TC-19 and `vr-tests/cart.vr.spec.ts` VR-27. Several mitigations were tried, in order; the failure
+  rate dropped but was not eliminated:
+  1. A stylesheet setting `pointer-events: none` on the element's classes — no effect, since it is
+     (sometimes) hosted in an open shadow root a light-DOM stylesheet cannot reach.
+  2. Removing it on sight via a shadow-piercing `MutationObserver` — worked against a standalone
+     reproduction, but the failure still recurred inside full suite runs. Superseded by (4) below and
+     removed rather than kept alongside it.
   3. Replacing the third-party host **blocklist** with an **allowlist** (`ALLOWED_HOSTS` in
      `testFixtures.ts`: the product's own origin plus the two Google Fonts hosts it needs, everything
-     else aborted). This closes the gap a blocklist cannot: the dialog root has been captured
-     appearing without `fundingchoicesmessages.google.com` ever being requested, so no blocklist
-     entry, however precise, could have caught that case. Still, the same failure recurred (4 in 37
-     in one stress run) even under the allowlist, meaning the element is not always arriving over the
-     network this fixture can see — plausibly a browser-level cache or resource the test's own
-     network layer cannot observe.
-     The shadow-piercing observer and the allowlist both stayed, since each is a correct improvement on
-     its own terms and neither regressed anything, but neither is a confirmed fix for this specific
-     flake. `retries` in `playwright.config.ts` went from 1 to 2 in CI as a practical mitigation while
-     the actual mechanism remains unidentified.
+     else aborted). This closes a gap a blocklist cannot: the dialog has been captured appearing
+     without `fundingchoicesmessages.google.com` ever being requested, so no blocklist entry, however
+     precise, could have caught that case. Kept — a real hardening independent of this flake — but the
+     failure still recurred under it alone.
+  4. `page.addLocatorHandler()`, Playwright's own mechanism for an unpredictable blocking element,
+     registered once on `.fc-consent-root` in the shared `page` fixture. The first version targeted
+     `.fc-dialog-overlay`, the inner element actually named in the actionability error; read
+     Playwright's own source (`_performLocatorHandlersCheckpoint` in `playwright-core`) to understand
+     when the handler is checked, then verified live that removing only the inner element left
+     `.fc-consent-root`, the outer container, still intercepting the next click — the error just moved
+     from one class name to the other. Targeting the outer container instead, verified 5/5 against a
+     reliable standalone reproduction (Funding Choices unblocked, which renders the dialog on every
+     load): every click succeeded, the handler firing once each time.
+     Against the full suite, (4) lowered the failure rate but did not remove it: 5 failures in 61
+     executions in the last stress run, and in that failure the handler never fired at all — Playwright's
+     own checkpoint (`isVisibleInternal` on the handler's locator, called before each retry) evidently did
+     not see the element as visible in the instant it checked, even though the very next moment's click
+     attempt did. That gap is inside `playwright-core` itself, not this fixture, and further narrowing it
+     would mean debugging Playwright's own retry loop rather than this suite's code. `retries` in
+     `playwright.config.ts` went from 1 to 2 in CI as the practical mitigation for what remains.
 
 ## Open Questions
 

@@ -107,58 +107,33 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
 
     /**
      * Funding Choices still injects its dialog root with its own script
-     * blocked above: the container renders empty, but its overlay keeps
-     * intercepting clicks underneath it. Seen live as a real failure —
-     * Playwright's own actionability check reported `<div
-     * class="fc-dialog-overlay">…</div> intercepts pointer events` on an
-     * "Add to cart" click with nothing to do with consent. There is never
-     * content in it to dismiss, only a hitbox left behind to disarm.
+     * blocked above: the container renders empty, but it keeps intercepting
+     * clicks underneath it. Seen live as a real failure — Playwright's own
+     * actionability check reported `<div class="fc-dialog-overlay">…</div>
+     * intercepts pointer events` on an "Add to cart" click with nothing to do
+     * with consent. There is never content in it to dismiss, only a hitbox
+     * left behind to disarm.
      *
-     * A stylesheet cannot reach it: the banner attaches an open shadow root,
-     * which encapsulates its own styles from anything declared outside it.
-     * Verified live, against a shadow-hosted reproduction of the same
-     * elements, before trusting this against the real, intermittent one.
-     * Removing the elements works across that boundary regardless, so this
-     * patches `attachShadow` to watch every shadow root as it is created, an
-     * observer on `document` for the plain case, and purges on sight.
+     * `addLocatorHandler` is Playwright's own mechanism for exactly this: an
+     * unpredictable overlay that must be cleared before the action underneath
+     * it can proceed. Registered once here, it survives every navigation
+     * within the test, fires only when the element is actually blocking
+     * something, and Playwright itself re-verifies it is gone before
+     * retrying — no separate observer racing the page's own timing.
+     *
+     * The handler targets `.fc-consent-root`, the outer container, not
+     * `.fc-dialog-overlay` alone: removing only the inner overlay left the
+     * root itself still intercepting the next click, verified live against a
+     * reliable reproduction of the real element — the failure just moved from
+     * "`.fc-dialog-overlay` intercepts" to "`.fc-consent-root` intercepts".
+     * Removing the root removes the overlay along with it.
      */
-    await page.addInitScript(() => {
-      const SELECTOR = ".fc-consent-root, .fc-dialog-overlay";
-
-      function purge(root: ParentNode): void {
-        root.querySelectorAll(SELECTOR).forEach((el) => el.remove());
-      }
-
-      function observe(root: Document | ShadowRoot): void {
-        purge(root);
-        new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            Array.from(mutation.addedNodes).forEach((node) => {
-              if (!(node instanceof Element)) {
-                return;
-              }
-              if (node.matches(SELECTOR)) {
-                node.remove();
-              } else {
-                purge(node);
-              }
-            });
-          }
-        }).observe(root, { childList: true, subtree: true });
-      }
-
-      const originalAttachShadow = Element.prototype.attachShadow;
-      Element.prototype.attachShadow = function (
-        this: Element,
-        init: ShadowRootInit,
-      ) {
-        const shadow = originalAttachShadow.call(this, init);
-        observe(shadow);
-        return shadow;
-      };
-
-      observe(document);
-    });
+    await page.addLocatorHandler(
+      page.locator(".fc-consent-root"),
+      async (root) => {
+        await root.evaluate((el) => el.remove());
+      },
+    );
 
     /**
      * The demo host sporadically sheds a cart write with a 503, seen in a trace
