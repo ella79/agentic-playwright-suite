@@ -94,6 +94,10 @@ the same shared, signed-in account as the functional suite; `login.vr.spec.ts` a
   `e2e-webkit` via a `testInfo.project.name` check and an annotation, not `test.skip()` (forbidden by
   `playwright/no-skipped-test`, and it would also drop the unrelated Continue-button check in the same
   test). The Continue-button assertion still runs and still passes on WebKit.
+- `CRITICAL_AREAS` in `allureLabels.ts` checked for `"Checkout"`, `"Authentication"` and `"Cart"`, but
+  `area` is always the describe title verbatim (`"Checkout Page"`, `"Cart Page"`, ...), and
+  `"Authentication"` split into `"Login Page"`/`"Signup Page"` a while back. None of the three ever
+  matched, so no functional case has carried `Severity.CRITICAL` since. Fixed to the current names.
 
 ## Decisions Needed
 
