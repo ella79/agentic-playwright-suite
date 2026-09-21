@@ -51,11 +51,12 @@ failure, including the expected, actual and diff images of a screenshot comparis
 
 ## What runs when
 
-| Trigger                  | Runs                                                                  |
-| ------------------------ | --------------------------------------------------------------------- |
-| Pull request             | Static checks, functional suite, visual suite, API suite              |
-| Push to `main`           | The same, then the dashboards and the suite health page are published |
-| Image or lockfile change | The execution image is rebuilt and pushed to the registry first       |
+| Trigger                  | Runs                                                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Pull request             | Static checks, functional suite (Chromium only), visual suite, API suite                                                                               |
+| Push to `main`           | The same plus WebKit, then the dashboards and the suite health page publish                                                                            |
+| Merge queue entry        | Not required yet; when it is, this row runs the queue's push instead, before rather than after the merge, and the push that follows reuses its results |
+| Image or lockfile change | The execution image is rebuilt and pushed to the registry first                                                                                        |
 
 Every job runs inside an image built by the first job, so browsers and dependencies install once
 rather than four times, and a local run uses that same image.
@@ -126,6 +127,6 @@ in the image CI uses.
 | ---------------------------------------------- | -------------------------------------------------------------------------- |
 | [`specs/STATUS.md`](specs/STATUS.md)           | Coverage per area, findings raised against the application, open decisions |
 | [`docs/architecture.md`](docs/architecture.md) | Page objects, fixtures, locator policy, visual regression                  |
-| [`docs/pipeline.md`](docs/pipeline.md)         | The seven jobs, the published reports, dependency updates                  |
+| [`docs/pipeline.md`](docs/pipeline.md)         | The eight jobs, the merge queue, the published reports, dependency updates |
 | [`docs/agents.md`](docs/agents.md)             | The five agents, the two MCP servers, how the skills are enforced          |
 | [`docs/decisions.md`](docs/decisions.md)       | The calls a reviewer would question, and what broke while building this    |
