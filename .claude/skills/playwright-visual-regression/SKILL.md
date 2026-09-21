@@ -207,8 +207,9 @@ await expect(page).toHaveScreenshot("home-hero.png", {
 });
 ```
 
-Dismissing the consent banner is handled by `BaseAppPage` on every navigation, so VR specs should
-never see it. If one appears in a diff, the bug is in the base page object, not the VR test.
+The banner itself never renders: the shared fixture aborts `fundingchoicesmessages`, the host that
+serves it, so VR specs should never see it. If one appears in a diff, something is loading that
+should be blocked, not a missing dismiss step.
 
 ## Baseline Management
 
