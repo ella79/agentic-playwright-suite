@@ -35,12 +35,20 @@ test.describe("Visual regression - Checkout Page", () => {
     });
   });
 
-  test("VR-29: Order review block", async ({ checkoutPage }) => {
+  test("VR-29: Order review block", async ({ page, checkoutPage }) => {
+    await expect(checkoutPage.orderReviewHeading).toBeVisible();
     await expect(checkoutPage.orderRows.first()).toBeVisible();
     await checkoutPage.orderTable.scrollIntoViewIfNeeded();
 
-    await expect(checkoutPage.orderTable).toHaveScreenshot(
-      "checkout-order-review.png",
-    );
+    // A clip spanning the "Review Your Order" heading and the table, not the
+    // table alone: the heading is the table's own sibling, not its parent, so
+    // no single locator's own box covers both.
+    const clip = await checkoutPage.unionBoundingBox([
+      checkoutPage.orderReviewHeading,
+      checkoutPage.orderTable,
+    ]);
+    await expect(page).toHaveScreenshot("checkout-order-review.png", {
+      clip,
+    });
   });
 });
