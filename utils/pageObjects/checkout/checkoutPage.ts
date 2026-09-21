@@ -5,6 +5,7 @@ export class CheckoutPage extends BaseAppPage {
   readonly addressDetailsHeading: Locator;
   readonly deliveryAddress: Locator;
   readonly billingAddress: Locator;
+  readonly orderReviewHeading: Locator;
   readonly orderTable: Locator;
   readonly orderRows: Locator;
   readonly commentTextarea: Locator;
@@ -17,6 +18,9 @@ export class CheckoutPage extends BaseAppPage {
     });
     this.deliveryAddress = page.locator("#address_delivery");
     this.billingAddress = page.locator("#address_invoice");
+    this.orderReviewHeading = page.getByRole("heading", {
+      name: "Review Your Order",
+    });
     this.orderTable = page.locator("#cart_info");
     // The same table also renders a trailing Total Amount row with no
     // product id; scoping to `product-<id>` rows excludes it. Verified live.
