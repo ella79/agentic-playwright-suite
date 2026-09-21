@@ -137,5 +137,12 @@ the same shared, signed-in account as the functional suite; `login.vr.spec.ts` a
 
 ## Decisions Needed
 
-None open right now: `E2E_LOGIN_EMAIL` and `E2E_LOGIN_PASSWORD` are set as GitHub Actions repository
-secrets, so `e2e`, `visual-regression` and the dashboard can all run in CI.
+- Whether to actually require a merge queue on `main`. `ci.yml` already supports one -
+  `resolve-merge-group-run` and the artifact-reuse it enables in `publish-dashboard` are live - but
+  nothing in the repository's ruleset requires one yet, so every push still tests here rather than
+  reusing a `merge_group` run. Turning it on is a `merge_queue` rule added to the "protect main"
+  ruleset (`gh api repos/ella79/agentic-playwright-suite/rulesets/22575699`), not a code change; see
+  `docs/pipeline.md` under "Merge Queue" for what it closes (a pull request's now-stale merge preview,
+  and WebKit never running before a change reaches `main`) and what stays open even with it (a direct
+  admin merge or a bypass still skips straight to `push`, which is exactly the fallback path this
+  already handles no differently than today).

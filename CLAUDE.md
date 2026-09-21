@@ -79,6 +79,10 @@ Browser access goes through the two MCP servers in `.mcp.json`: `playwright-test
 
 GitHub Actions (`.github/workflows/ci.yml`), stages `build` → `check` → `end2end`:
 
+0. `resolve-merge-group-run` — on a push to `main`, looks for the `merge_group` run that already
+   tested this exact commit. Found, every job below reports `skipped` and `publish-dashboard` reads
+   that run's artifacts instead of running here; not found (true for every push today, since a merge
+   queue isn't required yet), everything runs as if this job didn't exist
 1. `prepare-playwright-image` — builds the execution image and pushes it to ghcr.io; every later job
    runs inside it. The tag hashes `package.json` plus `yarn.lock`
 2. `static-checks` — typecheck, lint, format; gates everything after it
