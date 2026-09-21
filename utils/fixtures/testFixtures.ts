@@ -43,11 +43,37 @@ interface Fixtures extends PageObjects {
 }
 
 /**
- * Ad, analytics, and consent-management traffic. None of it belongs to the
- * product under test, and all of it injects layout shifts and timing noise.
+ * Everything the product itself needs to render: its own origin, plus the two
+ * Google Fonts hosts its stylesheets reference. Everything else — ads,
+ * analytics, consent management, the Maps embed on Contact Us, which no test
+ * depends on — is third-party noise, verified against every host the site
+ * actually requests across a full run of every page.
+ *
+ * An allowlist, not a blocklist of known-bad vendors: a blocklist can only
+ * ever cover the hosts someone thought to name, and this one already missed
+ * one live. Funding Choices' own dialog root has been seen built without
+ * ever requesting `fundingchoicesmessages.google.com`, so naming that host
+ * more precisely would not have closed the gap either — verified against a
+ * real captured failure, not assumed.
  */
-const THIRD_PARTY_HOSTS =
-  /(googlesyndication|doubleclick|googletagservices|googletagmanager|google-analytics|adtrafficquality|fundingchoicesmessages)\./;
+const ALLOWED_HOSTS = new Set([
+  "automationexercise.com",
+  "fonts.googleapis.com",
+  "fonts.gstatic.com",
+]);
+
+function isAllowedRequest(rawUrl: string): boolean {
+  let requestUrl: URL;
+  try {
+    requestUrl = new URL(rawUrl);
+  } catch {
+    return true;
+  }
+  if (requestUrl.protocol !== "http:" && requestUrl.protocol !== "https:") {
+    return true;
+  }
+  return ALLOWED_HOSTS.has(requestUrl.hostname);
+}
 
 /**
  * The cart's AJAX write endpoints. Both are GETs that mutate the session cart,
@@ -74,7 +100,65 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
   ],
 
   page: async ({ page }, use) => {
-    await page.route(THIRD_PARTY_HOSTS, (route) => route.abort());
+    await page.route(
+      (url) => !isAllowedRequest(url.href),
+      (route) => route.abort(),
+    );
+
+    /**
+     * Funding Choices still injects its dialog root with its own script
+     * blocked above: the container renders empty, but its overlay keeps
+     * intercepting clicks underneath it. Seen live as a real failure —
+     * Playwright's own actionability check reported `<div
+     * class="fc-dialog-overlay">…</div> intercepts pointer events` on an
+     * "Add to cart" click with nothing to do with consent. There is never
+     * content in it to dismiss, only a hitbox left behind to disarm.
+     *
+     * A stylesheet cannot reach it: the banner attaches an open shadow root,
+     * which encapsulates its own styles from anything declared outside it.
+     * Verified live, against a shadow-hosted reproduction of the same
+     * elements, before trusting this against the real, intermittent one.
+     * Removing the elements works across that boundary regardless, so this
+     * patches `attachShadow` to watch every shadow root as it is created, an
+     * observer on `document` for the plain case, and purges on sight.
+     */
+    await page.addInitScript(() => {
+      const SELECTOR = ".fc-consent-root, .fc-dialog-overlay";
+
+      function purge(root: ParentNode): void {
+        root.querySelectorAll(SELECTOR).forEach((el) => el.remove());
+      }
+
+      function observe(root: Document | ShadowRoot): void {
+        purge(root);
+        new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            Array.from(mutation.addedNodes).forEach((node) => {
+              if (!(node instanceof Element)) {
+                return;
+              }
+              if (node.matches(SELECTOR)) {
+                node.remove();
+              } else {
+                purge(node);
+              }
+            });
+          }
+        }).observe(root, { childList: true, subtree: true });
+      }
+
+      const originalAttachShadow = Element.prototype.attachShadow;
+      Element.prototype.attachShadow = function (
+        this: Element,
+        init: ShadowRootInit,
+      ) {
+        const shadow = originalAttachShadow.call(this, init);
+        observe(shadow);
+        return shadow;
+      };
+
+      observe(document);
+    });
 
     /**
      * The demo host sporadically sheds a cart write with a 503, seen in a trace

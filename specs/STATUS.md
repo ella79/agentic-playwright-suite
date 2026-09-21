@@ -74,6 +74,32 @@ the same shared, signed-in account as the functional suite; `login.vr.spec.ts` a
 `signup.vr.spec.ts` opt out with a guest `storageState`. Baselines are Chromium on Linux at
 1920x1080, generated and verified via `yarn docker:vr:update`; counts above are from that run.
 
+## Known Flakes
+
+- An intermittent `<div class="fc-dialog-overlay">` (Google Funding Choices' consent dialog)
+  occasionally intercepts a click on a real element — seen live on `productDetailPage.addToCart()`,
+  in both `tests/cart/cart.spec.ts` TC-19 and `vr-tests/cart.vr.spec.ts` VR-27, roughly 1 run in 10.
+  Three mitigations were tried and verified, in order, none of which changed the failure rate:
+  1. A stylesheet setting `pointer-events: none` on the overlay's classes — no effect, since the
+     element is (sometimes) hosted in an open shadow root a light-DOM stylesheet cannot reach.
+  2. Removing the elements on sight via a shadow-piercing `MutationObserver` (patches
+     `Element.prototype.attachShadow` to watch every shadow root as it is created). Verified working
+     against a real, fully-rendered reproduction of the dialog outside the suite — the observer
+     removed it and the click succeeded — but the failure still recurred inside full suite runs,
+     locally and in the Docker/Linux image CI uses.
+  3. Replacing the third-party host **blocklist** with an **allowlist** (`ALLOWED_HOSTS` in
+     `testFixtures.ts`: the product's own origin plus the two Google Fonts hosts it needs, everything
+     else aborted). This closes the gap a blocklist cannot: the dialog root has been captured
+     appearing without `fundingchoicesmessages.google.com` ever being requested, so no blocklist
+     entry, however precise, could have caught that case. Still, the same failure recurred (4 in 37
+     in one stress run) even under the allowlist, meaning the element is not always arriving over the
+     network this fixture can see — plausibly a browser-level cache or resource the test's own
+     network layer cannot observe.
+     The shadow-piercing observer and the allowlist both stayed, since each is a correct improvement on
+     its own terms and neither regressed anything, but neither is a confirmed fix for this specific
+     flake. `retries` in `playwright.config.ts` went from 1 to 2 in CI as a practical mitigation while
+     the actual mechanism remains unidentified.
+
 ## Open Questions
 
 - Whether a second viewport justifies doubling the baseline count, given every baseline needs a human
