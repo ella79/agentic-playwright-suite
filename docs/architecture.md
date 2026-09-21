@@ -48,6 +48,9 @@ its own throwaway account directly against the API.
 | `E2E_BASE_URL`       | Point the suite at a different host. Defaults to `https://automationexercise.com`       |
 | `CI`                 | Set by the pipeline. Switches reporters to blob, enables one retry, caps workers at two |
 
+The pipeline itself, including the merge queue `ci.yml` already supports but does not yet require, is
+[`docs/pipeline.md`](pipeline.md).
+
 ## The Standards Behind This
 
 The conventions below are not only prose. Three skills in `.claude/skills/` hold them, agents read

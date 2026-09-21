@@ -1,30 +1,70 @@
 # Pipeline and Reporting
 
 ```
-   build                 check                  end2end
-
-                                     →  e2e-chromium       ┐
-prepare-playwright  →  static-checks  →  e2e-webkit         ┤
-      image                           →  visual-regression  ┼→  publish-dashboard
-                                     →  api                 ┘
+                              resolve-merge-group-run
+                                         │
+                                         ▼
+                             prepare-playwright-image
+                                         │
+                                         ▼
+                                   static-checks
+                                         │
+          ┌────────────────────┬────────┴─────────┬────────────────────┐
+          ▼                    ▼                   ▼                    ▼
+    e2e-chromium          e2e-webkit       visual-regression           api
+          │                    │                   │                    │
+          └────────────────────┴────────┬─────────┴────────────────────┘
+                                         │
+                                         ▼
+                                 publish-dashboard
 ```
 
-Runs on every push and pull request to `main`.
+Runs on every push and pull request to `main`, and on `merge_group` once a merge queue is required
+there (see below).
 
-| Job                        | Responsibility                                                                             |
-| -------------------------- | ------------------------------------------------------------------------------------------ |
-| `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry                  |
-| `static-checks`            | Typecheck, lint, format. Gates everything after it                                         |
-| `e2e-chromium`             | The functional suite on Chromium, one entry of the `e2e` matrix                            |
-| `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal              |
-| `e2e-webkit`               | The same cases on WebKit, the second `e2e` entry, present on merge only                    |
-| `api`                      | The REST API suite. No `setup` dependency: every case provisions its own throwaway account |
-| `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages |
-| `ci-gate`                  | Reads every other job's result. The only check the branch protection requires              |
+| Job                        | Responsibility                                                                                     |
+| -------------------------- | -------------------------------------------------------------------------------------------------- |
+| `resolve-merge-group-run`  | Looks for a `merge_group` run that already tested this exact push; see below                       |
+| `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry                          |
+| `static-checks`            | Typecheck, lint, format. Gates everything after it                                                 |
+| `e2e-chromium`             | The functional suite on Chromium, one entry of the `e2e` matrix                                    |
+| `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal                      |
+| `e2e-webkit`               | The same cases on WebKit, the second `e2e` entry, present once the change is actually being merged |
+| `api`                      | The REST API suite. No `setup` dependency: every case provisions its own throwaway account         |
+| `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages         |
+| `ci-gate`                  | Reads every other job's result. The only check the branch protection requires                      |
 
 `api` feeds `publish-dashboard` the same way the other two do: its own Allure results join the
 combined report, and it gets its own `api/` report with its own trend line, the same treatment
 `functional/` and `visual/` already had.
+
+## Merge Queue
+
+A merge queue is not required on `main` yet, but `ci.yml` already supports one: adding `merge_group`
+to a repository's ruleset (a `merge_queue` rule) needs no further workflow change to start working.
+
+Without a queue, `ci-gate` passes on a pull request's own preview of the merge, which can already be
+stale by the time it actually lands, and gates on a reduced matrix that never runs WebKit at all -
+WebKit only exists once the change reaches `main`, after the gate that was supposed to catch it. A
+required queue tests the exact commit about to land, before it lands, on the full matrix, and only
+then allows the merge - closing the staleness gap and the missing coverage at once.
+
+That still leaves one thing worth avoiding: retesting a commit the queue just tested, seconds after,
+on the `push` that follows a successful merge. `resolve-merge-group-run` is what avoids it. On a push
+to `main`, it looks for a successful `merge_group` run of this same workflow whose commit matches this
+push's exactly, and hands its run id downstream:
+
+- Found: `prepare-playwright-image`, `static-checks`, `e2e`, `visual-regression` and `api` all report
+  `skipped` rather than running again, and `publish-dashboard` reads its artifacts from that run
+  instead of this one.
+- Not found: everything runs here, exactly as it does today. This is every push while no queue is
+  configured, and stays the fallback afterward for anything that reaches `main` outside the queue.
+
+The match relies on one property of a queue configured with `merge_method: MERGE`: it fast-forwards
+`main` to the exact commit it tested, rather than creating a new one at merge time, so the push's
+commit and the `merge_group` run's are the same SHA. `publish-dashboard` still only runs on the real
+push to `main`, never on `merge_group` itself - the report is meant to reflect what is actually on
+`main`, not a queue entry that could still be superseded before it lands.
 
 ## Branch Protection
 

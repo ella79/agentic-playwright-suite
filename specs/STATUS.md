@@ -4,24 +4,13 @@ Progress of testing activities against the baseline: the plans in `specs/test-pl
 `specs/api-test-plans/` and `specs/vr-test-plans/`, and the suites in `tests/`, `api-tests/` and
 `vr-tests/`.
 
-Updated: 2026-09-20 · Source of truth for results:
+Browsers: Chromium and WebKit for functional, Chromium only for visual regression; the API suite
+runs without a browser.
+
+Updated: 2026-09-21 · Source of truth for results:
 [the published dashboard](https://ella79.github.io/agentic-playwright-suite/)
 
 ## Functional Coverage
-
-Every plan was rewritten from scratch against a fresh manual walkthrough of the application: a
-shared, persistent account signs in once via `utils/setup/login.setup.ts`, and every case defaults to
-that signed-in state (`Login`) except the two areas that specifically prove the signed-in/guest
-boundary itself (`Guest`, for the whole file). Contact was removed from the suite entirely —
-functional and visual — rather than carried forward, in both cases as a rewrite from scratch rather
-than a renumbering: the functional suite's TC-18 and the visual suite's whole ID range were reused
-outright, with nothing of Contact's left to note. `cart-test-plan.md`'s own two cases were later
-compacted into one continuous flow (empty cart → home breadcrumb → two products added with the
-notification and Continue Shopping/View Cart sequence → one removed), matching the manual walkthrough
-this suite is built from; its ID is reused rather than left as a second gap. The plan is named
-`cart-test-plan.md`, not `view-cart`, matching the header nav's own label for the page ("Cart") rather
-than its route (`/view_cart`). Counts below are from a local run against Chromium; CI runs the same
-suite against the `E2E_LOGIN_EMAIL`/`E2E_LOGIN_PASSWORD` repository secrets.
 
 | #   | Feature Plan                                                            | Functional Test                                                            | Test Cases | Implemented | Passed | Failed | Flaky | Skipped | Fixme |
 | --- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------- | ----------- | ------ | ------ | ----- | ------- | ----- |
@@ -38,15 +27,8 @@ suite against the `E2E_LOGIN_EMAIL`/`E2E_LOGIN_PASSWORD` repository secrets.
 
 ## API Coverage
 
-Two kinds of case live here, per plan: pure endpoint contract tests with no UI equivalent, and
-cross-validation asserted from inside a UI case rather than as a row of its own —
-`products.spec.ts` TC-13 and TC-14 check the rendered grid against `GET /api/productsList` and
-`POST /api/searchProduct`; `home.spec.ts` TC-01 checks the brands sidebar against
-`GET /api/brandsList`, and TC-04 checks a category's and a brand's filtered result count the same
-way, against `GET /api/productsList` twice; `signup.spec.ts` TC-11 and `login.spec.ts` TC-10 confirm
-an account the UI created or deleted against `GET /api/getUserDetailByEmail`. Together the two plans
-below cover every one of the 14 scenarios documented at `/api_list`, plus additional edge cases
-beyond that list.
+TC-01, TC-04, TC-10, TC-11, TC-13 and TC-14 in the functional suite cross-validate against the API;
+every case below is API-only, with no UI equivalent.
 
 | #   | Feature Plan                                                          | API Test                                                  | Test Cases | Implemented | Passed | Failed | Flaky | Skipped | Fixme |
 | --- | --------------------------------------------------------------------- | --------------------------------------------------------- | ---------- | ----------- | ------ | ------ | ----- | ------- | ----- |
@@ -69,73 +51,11 @@ beyond that list.
 | 9   | [`confirmation-vr-test-plan.md`](vr-test-plans/confirmation-vr-test-plan.md)     | [`confirmation.vr.spec.ts`](../vr-tests/confirmation.vr.spec.ts)     | 1          | 1           | 1      | 0      | 0     | 0       | 0     |
 |     | **Total**                                                                        |                                                                      | **33**     | **33**      | **33** | **0**  | **0** | **0**   | **0** |
 
-Rewritten from scratch alongside the functional suite, matching its nine areas (`home` through
-`confirmation`) rather than the earlier `authentication`/`checkout`/`cart` split; nothing was carried
-forward or renumbered from that structure, including Contact's retired IDs. Every case defaults to
-the same shared, signed-in account as the functional suite; `login.vr.spec.ts` and
-`signup.vr.spec.ts` opt out with a guest `storageState`. Baselines are Chromium on Linux at
-1920x1080, generated and verified via `yarn docker:vr:update`; counts above are from that run.
-
-## Known Flakes
-
-- An intermittent element from Google Funding Choices' consent dialog occasionally intercepts a click
-  on a real element — seen live on `productDetailPage.addToCart()`, in both `tests/cart/cart.spec.ts`
-  TC-19 and `vr-tests/cart.vr.spec.ts` VR-27. Several mitigations were tried, in order; the failure
-  rate dropped but was not eliminated:
-  1. A stylesheet setting `pointer-events: none` on the element's classes — no effect, since it is
-     (sometimes) hosted in an open shadow root a light-DOM stylesheet cannot reach.
-  2. Removing it on sight via a shadow-piercing `MutationObserver` — worked against a standalone
-     reproduction, but the failure still recurred inside full suite runs. Superseded by (4) below and
-     removed rather than kept alongside it.
-  3. Replacing the third-party host **blocklist** with an **allowlist** (`ALLOWED_HOSTS` in
-     `testFixtures.ts`: the product's own origin plus the two Google Fonts hosts it needs, everything
-     else aborted). This closes a gap a blocklist cannot: the dialog has been captured appearing
-     without `fundingchoicesmessages.google.com` ever being requested, so no blocklist entry, however
-     precise, could have caught that case. Kept — a real hardening independent of this flake — but the
-     failure still recurred under it alone.
-  4. `page.addLocatorHandler()`, Playwright's own mechanism for an unpredictable blocking element,
-     registered once on `.fc-consent-root` in the shared `page` fixture. The first version targeted
-     `.fc-dialog-overlay`, the inner element actually named in the actionability error; read
-     Playwright's own source (`_performLocatorHandlersCheckpoint` in `playwright-core`) to understand
-     when the handler is checked, then verified live that removing only the inner element left
-     `.fc-consent-root`, the outer container, still intercepting the next click — the error just moved
-     from one class name to the other. Targeting the outer container instead, verified 5/5 against a
-     reliable standalone reproduction (Funding Choices unblocked, which renders the dialog on every
-     load): every click succeeded, the handler firing once each time.
-     Against the full suite, (4) lowered the failure rate but did not remove it: 5 failures in 61
-     executions in the last stress run, and in that failure the handler never fired at all — Playwright's
-     own checkpoint (`isVisibleInternal` on the handler's locator, called before each retry) evidently did
-     not see the element as visible in the instant it checked, even though the very next moment's click
-     attempt did. That gap is inside `playwright-core` itself, not this fixture, and further narrowing it
-     would mean debugging Playwright's own retry loop rather than this suite's code. `retries` in
-     `playwright.config.ts` went from 1 to 2 in CI as the practical mitigation for what remains.
-
 ## Open Questions
 
 - Whether a second viewport justifies doubling the baseline count, given every baseline needs a human
   to review its diff.
 
-## Recently Resolved
-
-- The API suite now joins the Allure dashboard as a third report category, with its own `api/` trend
-  and a suite-health row, alongside Functional and Visual. `allureLabels.ts` previously left the `api`
-  project unmapped, so its results were silently mislabelled as Functional E2E; fixed alongside the
-  dashboard wiring.
-- `confirmation.spec.ts` TC-22 failed on `e2e-webkit` in CI three runs running, every time at the same
-  step: `page.waitForEvent("download")` on the invoice link. Reproduced directly rather than assumed:
-  a Windows run passed every time, and the same Linux image CI uses (`docker compose run --rm e2e`)
-  failed every time, on the identical timeout. WebKit's Linux (GTK) port does not fire Playwright's
-  native `download` event for this link; Chromium and Windows WebKit are unaffected. This is a
-  platform limitation, not a flake, so the download-verification step alone is skipped on
-  `e2e-webkit` via a `testInfo.project.name` check and an annotation, not `test.skip()` (forbidden by
-  `playwright/no-skipped-test`, and it would also drop the unrelated Continue-button check in the same
-  test). The Continue-button assertion still runs and still passes on WebKit.
-- `CRITICAL_AREAS` in `allureLabels.ts` checked for `"Checkout"`, `"Authentication"` and `"Cart"`, but
-  `area` is always the describe title verbatim (`"Checkout Page"`, `"Cart Page"`, ...), and
-  `"Authentication"` split into `"Login Page"`/`"Signup Page"` a while back. None of the three ever
-  matched, so no functional case has carried `Severity.CRITICAL` since. Fixed to the current names.
-
 ## Decisions Needed
 
-None open right now: `E2E_LOGIN_EMAIL` and `E2E_LOGIN_PASSWORD` are set as GitHub Actions repository
-secrets, so `e2e`, `visual-regression` and the dashboard can all run in CI.
+None open right now.

@@ -1,51 +1,123 @@
 # Decisions
 
-The ones a reviewer would question, with the reasoning rather than only the outcome.
+Architecture decision records for choices a reviewer would ask about. Each entry has a `Status`.
+When a decision changes, the status is updated to `Reversed` or `Superseded`; the old text is not
+rewritten to hide that it changed.
 
-**No shared authenticated storage state.** The usual optimisation is to log in once and reuse the
-session. That is right when login is an expensive OAuth redirect. Here it is a two field POST
-against an account the suite has to create in the first place. Sharing one account would mean the
-deletion test destroys the session every other test depends on, and parallel workers competing over
-one identity. Isolation is worth more than the second it saves.
+### 1. Shared authenticated storage state, except where the account's own lifecycle is the point
 
-**Page objects reach tests as fixtures. Reversed on 2026-09-10.**
+**Status:** Accepted, replacing full per-test isolation
 
-The suite originally constructed them in each test, and the reasoning was that the two mechanisms
-solve different problems: a page object is a vocabulary, wrapping
-[a page or fragment with an application specific API](https://martinfowler.com/bliki/PageObject.html),
-while a fixture exists
-[to establish the environment for each test](https://playwright.dev/docs/test-fixtures) and owns its
-teardown. Page objects here hold locators and methods and nothing else, so making each one a fixture
-looked like using an environment mechanism to do a constructor's job.
+**Context:** Every functional and visual case needs a signed-in user as a precondition. The original
+approach gave every case its own throwaway account, to avoid two problems with sharing one: the
+deletion test would destroy the session other tests depend on, and parallel workers would compete
+over one identity. That cost a signup per case, including cases unrelated to signup or login.
 
-That argument was answered by the same documentation it cited. Playwright's fixtures page recommends
-fixtures over `beforeEach` and shows page objects delivered that way, and the field agrees: a
-constructor repeated in every test is repetition, and the `let` variable that removes it shares
-mutable state between tests with no teardown at all. Neither alternative is better than a fixture
-built on demand for the tests that name it.
+**Decision:** `utils/setup/login.setup.ts` signs a shared account in once per run and saves the
+result as `storageState`. Every functional and visual project depends on it and starts already
+signed in. `login.spec.ts` and `signup.spec.ts`, the only cases that test the account's own
+lifecycle, still use the `uniqueAccount` fixture: a fresh account registered, yielded, and removed
+per test.
 
-What did not change is the account. It needs a user to exist before a test starts and to be gone
-when it ends, or a public site collects abandoned accounts. That is environment, and it is why the
-distinction was worth arguing about in the first place.
+**Consequences:** Most cases no longer run a signup they do not need. The two problems the original
+isolation avoided are now possible again, but only inside `login.spec.ts` and `signup.spec.ts`,
+where `uniqueAccount` still isolates them.
 
-**No custom screenshot runtime.** A wrapper enforcing named capture strategies pays for itself
-across hundreds of visual tests. Across thirty-three it is indirection with nobody to pay for it.
-Native `toHaveScreenshot()` with documented thresholds does the same work in less code.
+**Verified:** `utils/setup/login.setup.ts` signs the shared account in and saves `storageState`;
+read directly, 2026-09-21.
 
-**No baseline taller than the viewport.** Two captures originally targeted the element holding the
-whole catalog, which measures 13,347 pixels. They failed intermittently under load, timing out on
-the stability check rather than on any visual difference. Raising the timeout would have hidden the
-more important half: nobody scans thirteen thousand pixels for the four that changed, so those cases
-could only ever be rubber stamped. Both now anchor the section heading to the top of the viewport
-and capture the viewport, at 412 KB instead of 2.8 MB.
+### 2. Deliver page objects to tests as fixtures, not constructed per test
 
-**Two MCP servers, for two jobs.** Verifying that the second one actually starts caught a real error
-in the first configuration: `--browser chromium` is not a valid value, so the server would have
-failed on launch while the configuration looked plausible.
+**Status:** Reversed 2026-09-10
 
-## What Broke While Building This
+**Context:** Page objects were originally constructed inside each test, on the reasoning that a page
+object is a vocabulary wrapping an application-specific API, while a fixture establishes environment
+and owns teardown. Page objects here hold only locators and methods, so using a fixture for that
+looked like the wrong mechanism for the job.
 
-Kept because the failures are more informative than the passes.
+**Decision:** Deliver page objects to tests as fixtures instead, per
+[Playwright's fixtures documentation](https://playwright.dev/docs/test-fixtures), which recommends
+fixtures over `beforeEach` and shows page objects delivered that way.
+
+**Consequences:** Removes the constructor call repeated in every test. The alternative to a fixture,
+a `let` assigned in `beforeEach`, would share mutable state between tests with no teardown, so it was
+not used either. Account setup is unaffected by this change: it still needs a user to exist before a
+test starts and gone when it ends, which is environment, not a page object.
+
+**Verified:** `utils/fixtures/testFixtures.ts` defines every page object as a fixture; read
+directly, 2026-09-21.
+
+### 3. Use Playwright's native screenshot assertions, no custom runtime
+
+**Status:** Accepted
+
+**Context:** A wrapper enforcing named capture strategies is worth its cost across hundreds of
+visual tests. This suite has 33.
+
+**Decision:** Call `toHaveScreenshot()` directly, with thresholds documented in the
+`playwright-visual-regression` skill.
+
+**Consequences:** Same guarantees, less code, no wrapper to maintain. Revisit if the visual suite
+grows an order of magnitude.
+
+**Verified:** 33 direct calls to `toHaveScreenshot()` across `vr-tests/`, thresholds set once in
+`playwright.config.ts`, no wrapper function in `utils/pageObjects/` or `utils/fixtures/`; checked
+2026-09-21.
+
+### 4. Cap every baseline at the viewport height
+
+**Status:** Accepted
+
+**Context:** Two captures originally targeted the element holding the whole product catalog, which
+measures 13,347 pixels tall. They failed intermittently under load, timing out on the stability check
+rather than on any real visual difference. A baseline that size cannot be checked by looking at it.
+
+**Decision:** No baseline may be taller than the viewport. Anchor the section heading to the top of
+the viewport and capture the viewport instead.
+
+**Consequences:** Both captures dropped from 2.8 MB to 412 KB and stopped failing under load.
+
+**Verified:** the largest committed baseline today is 494 KB
+(`home-add-to-cart-modal-vr-linux.png`), and the `scrollToTop` anchoring pattern is defined in
+`baseAppPage.ts` and used in `home.vr.spec.ts`; checked 2026-09-21.
+
+### 5. Run two MCP servers, one per job
+
+**Status:** Accepted
+
+**Context:** Authoring tests and exploring the live application are different jobs.
+
+**Decision:** Configure two servers in `.mcp.json`: `playwright-test` for authoring, `playwright` for
+exploration.
+
+**Consequences:** Two servers to keep in sync with Playwright's CLI instead of one, but each job has
+a purpose-built tool. The `playwright` server's `--browser chromium` argument was dropped from its
+config on 2026-09-08 in favor of `--isolated`, `--test-id-attribute` and `--viewport-size`; the
+commit that removed it does not record why.
+
+**Verified:** `.mcp.json` defines both `playwright-test` and `playwright` exactly as described;
+read directly, 2026-09-21.
+
+### 6. Cap CI workers at two per suite
+
+**Status:** Accepted
+
+**Context:** The default worker count let one run open six browser instances against the shared demo
+host at once. The two heaviest cases timed out while the same checkout passed on WebKit in that same
+run.
+
+**Decision:** Cap workers at two per suite in CI (`playwright.config.ts`).
+
+**Consequences:** Later runs passed with roughly twelve instances against the same host, so its
+capacity is variable rather than a fixed limit. The cap does not guarantee headroom, but it removes
+the suite itself as a suspect when something times out.
+
+**Verified:** `playwright.config.ts:51` reads `workers: process.env.CI ? 2 : undefined`; checked
+2026-09-21.
+
+## Incidents
+
+Bugs found during development. Not decisions; kept for reference.
 
 | Symptom                                     | Actual cause                                                                                                                                                                                                        |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
