@@ -58,7 +58,7 @@ The coding standard is in the skills, not here. Both load automatically for the 
 ## Persistent State
 
 `specs/STATUS.md` — coverage, findings, open decisions. Read it at the start of any session.
-Reasoning behind the architecture is in the README, under "Decisions Worth Defending".
+Reasoning behind the architecture is in [`docs/decisions.md`](docs/decisions.md).
 
 ## Agent System
 
@@ -78,26 +78,16 @@ Planner, generator and healer are regenerated after a Playwright upgrade with
 
 Slash commands in `.claude/commands/` invoke them: `/coverage`, `/plan`, `/implement`, `/review`, `/heal`, `/cycle`, `/baseline`, `/triage`.
 
-Browser access goes through the two MCP servers in `.mcp.json`: `playwright-test` for authoring,
-`playwright` for exploration. See `.claude/skills/playwright-mcp/SKILL.md`.
-
 ## CI/CD
 
 GitHub Actions (`.github/workflows/ci.yml`), stages `build` → `check` → `end2end`:
 
-0. `resolve-merge-group-run` — on a push to `main`, looks for the `merge_group` run that already
-   tested this exact commit. Found, every job below reports `skipped` and `publish-dashboard` reads
-   that run's artifacts instead of running here; not found (true for every push today, since a merge
-   queue isn't required yet), everything runs as if this job didn't exist
-1. `prepare-playwright-image` — builds the execution image and pushes it to ghcr.io; every later job
-   runs inside it. The tag hashes `package.json` plus `yarn.lock`
+0. `resolve-merge-group-run` — reuses a matching `merge_group` run's artifacts on push to `main`
+1. `prepare-playwright-image` — builds and pushes the execution image every later job runs inside
 2. `static-checks` — typecheck, lint, format; gates everything after it
-3. `e2e-chromium`, `e2e-webkit`, `visual-regression`, `api` — in parallel; WebKit is skipped on pull
-   requests, and `api` has no shared-account setup dependency since every case provisions its own
-   throwaway account
+3. `e2e-chromium`, `e2e-webkit`, `visual-regression`, `api` — in parallel; WebKit skipped on pull requests
 4. `publish-dashboard` — merges the reports and deploys to Pages, `main` only
 5. `ci-gate` — reads every other job's result; the only check branch protection requires
 
-`main` takes no direct pushes. Adding a job means adding it to the gate's `needs`.
-
-The reasoning behind each of these is in [`docs/pipeline.md`](docs/pipeline.md).
+`main` takes no direct pushes. Adding a job means adding it to the gate's `needs`. The reasoning
+behind each of these is in [`docs/pipeline.md`](docs/pipeline.md).

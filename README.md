@@ -13,19 +13,13 @@ MCP, and published from a containerised CI pipeline.
 | [Functional](https://ella79.github.io/agentic-playwright-suite/functional/), [Visual](https://ella79.github.io/agentic-playwright-suite/visual/) and [API](https://ella79.github.io/agentic-playwright-suite/api/) | Each suite with its own trend                                                   |
 | [Trace Viewer](https://ella79.github.io/agentic-playwright-suite/playwright-report/)                                                                                                                               | Every step of every case, replayable                                            |
 
-**22 functional cases, 33 visual ones and 19 API cases, each earning its place.** The functional
-cases are replayed on WebKit, so the same coverage is proven on the engine behind Safari. Visual
-baselines stay Chromium on Linux, generated in the same image CI runs. New coverage exists only
-because a genuine state or endpoint was found missing and verified live before it was added — a
-success banner, a validation error, an expanded panel — never to pad the count, and a case earns
-removal the same way, by no longer corresponding to anything the application does.
-
 Built with Playwright, TypeScript, Yarn, Docker, Allure, GitHub Actions and Renovate, with Claude
 Code agents reaching the browser over MCP.
 
-The target is a public demo storefront, so every run crosses a real network and hits a real database
-with third party advertising on the page. The failures that produces are the failures a real
-pipeline produces.
+## Current Coverage
+
+See [`specs/STATUS.md`](specs/STATUS.md) for the full coverage table, open questions and decisions
+needed.
 
 ## Run it
 
@@ -68,11 +62,9 @@ enforced.
 
 The test jobs run in parallel under a worker budget: one each for the functional (both engines) and
 visual jobs, two for the API job, which needs no browser and provisions its own throwaway accounts.
-The budget is a precaution, not a measured limit. One run failed with six browser instances against
-the shared demo host, the two heaviest cases timing out while the same checkout passed on WebKit in
-that same run. Later runs passed with roughly twelve instances against it, so the host's capacity is
-variable rather than a clean threshold. The budget costs nothing and removes the suite as a suspect
-when something does time out.
+The shared demo host's capacity is inconsistent rather than a fixed limit; see
+[`docs/decisions.md`](docs/decisions.md) for why the budget is capped rather than left to the
+default.
 
 ## When a test goes flaky
 
@@ -88,10 +80,8 @@ A flaky test is a defect in the suite, not weather. The policy, in order:
 4. Above one percent flaky rate, no new coverage is added until it is back under. A suite nobody
    believes is worse than no suite.
 
-This has already been exercised. Five cases failed only under parallel load, and the cause was not
-timing pressure but the cart's controls being anchors without `href` whose handlers had not bound
-yet, so the clicks landed as silent no operations. The investigation is in
-[`docs/decisions.md`](docs/decisions.md).
+This has already been exercised once; see [`docs/decisions.md`](docs/decisions.md) for the cause and
+the fix.
 
 ## Structure
 
