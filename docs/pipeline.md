@@ -1,10 +1,22 @@
 # Pipeline and Reporting
 
 ```
-                                                     →  e2e-chromium       ┐
-resolve-merge-group-run  →  prepare-playwright  →  static-checks  →  e2e-webkit         ┤
-                                  image                           →  visual-regression  ┼→  publish-dashboard
-                                                                 →  api                 ┘
+                              resolve-merge-group-run
+                                         │
+                                         ▼
+                             prepare-playwright-image
+                                         │
+                                         ▼
+                                   static-checks
+                                         │
+          ┌────────────────────┬────────┴─────────┬────────────────────┐
+          ▼                    ▼                   ▼                    ▼
+    e2e-chromium          e2e-webkit       visual-regression           api
+          │                    │                   │                    │
+          └────────────────────┴────────┬─────────┴────────────────────┘
+                                         │
+                                         ▼
+                                 publish-dashboard
 ```
 
 Runs on every push and pull request to `main`, and on `merge_group` once a merge queue is required

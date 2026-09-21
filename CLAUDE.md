@@ -1,24 +1,27 @@
 # Agentic Playwright Suite
 
-E2E and visual regression test suite for [Automation Exercise](https://automationexercise.com), built with Playwright and TypeScript.
+End to end, API and visual regression test suite for [Automation Exercise](https://automationexercise.com), built with Playwright and TypeScript.
 
 ## Tech Stack
 
 - **Node.js 20+** + **Yarn 4** via Corepack (`yarn.lock` is the only lockfile; CI runs `yarn install --immutable`)
 - **TypeScript 5**: strict mode
-- **Playwright**: Chromium only, fully parallel runs
+- **Playwright**: Chromium and WebKit for the functional suite, Chromium only for visual regression, fully parallel runs
 - **Allure**: reporting, published to GitHub Pages with trend history
 
 ## Environment
 
-Yarn 4 through Corepack; there is no global install. Invoke everything with `yarn`, and Playwright's
-own CLI as `yarn playwright <args>`.
+Yarn 4 through Corepack; there is no global install. Invoke everything with `yarn`. Browser
+interaction during development goes through the two MCP servers in `.mcp.json`
+(`playwright-test` for authoring, `playwright` for exploration), not a direct
+`yarn playwright <args>` invocation; see `.claude/skills/playwright-mcp/SKILL.md`.
 
 ## Commands
 
 | Command                                          | Purpose                                          |
 | ------------------------------------------------ | ------------------------------------------------ |
 | `yarn test:e2e`                                  | Run all functional E2E tests                     |
+| `yarn test:api`                                  | Run all API tests                                |
 | `yarn test:vr`                                   | Run all visual regression tests                  |
 | `yarn docker:vr` / `yarn docker:vr:update`       | Run or regenerate baselines in the image CI uses |
 | `yarn typecheck`, `yarn lint`, `yarn stylecheck` | The three static checks. All must be clean       |
@@ -32,15 +35,18 @@ Base URL defaults to `https://automationexercise.com`. Override with `E2E_BASE_U
 
 ```
 tests/               Functional E2E spec files (*.spec.ts), one directory per feature area
+api-tests/           API spec files (*.api.spec.ts), one per resource area, no browser
 vr-tests/            Visual regression spec files (*.vr.spec.ts) + baseline snapshots
 specs/               Test plans (Markdown) + STATUS.md + seed.spec.ts
 utils/
   pageObjects/        Page object classes, BaseAppPage (pages) / BaseComponentPage (modals)
-  fixtures/           Custom Playwright fixtures (account lifecycle)
+  apiClients/         API client classes, one per resource area, wraps `request`
+  fixtures/           Custom Playwright fixtures (account lifecycle, third party blocking)
   testData.ts         Unique data generators
   url.ts              URL constants
-playwright.config.ts  Playwright configuration (e2e-chromium, e2e-webkit, seed, vr projects)
-.github/workflows/    CI pipeline: prepare-playwright-image, static-checks, e2e-chromium, e2e-webkit, visual-regression, publish-dashboard
+playwright.config.ts  Playwright configuration (e2e-chromium, e2e-webkit, api, seed, vr projects)
+.github/workflows/    CI pipeline: resolve-merge-group-run, prepare-playwright-image, static-checks,
+                       e2e-chromium, e2e-webkit, visual-regression, api, publish-dashboard, ci-gate
 ```
 
 ## Writing Tests
