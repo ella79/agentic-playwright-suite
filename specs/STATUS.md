@@ -42,9 +42,11 @@ Two kinds of case live here, per plan: pure endpoint contract tests with no UI e
 cross-validation asserted from inside a UI case rather than as a row of its own —
 `products.spec.ts` TC-13 and TC-14 check the rendered grid against `GET /api/productsList` and
 `POST /api/searchProduct`; `home.spec.ts` TC-01 checks the brands sidebar against
-`GET /api/brandsList`; `signup.spec.ts` TC-11 and `login.spec.ts` TC-10 confirm an account the UI
-created or deleted against `GET /api/getUserDetailByEmail`. Together the two plans below cover every
-one of the 14 scenarios documented at `/api_list`, plus additional edge cases beyond that list.
+`GET /api/brandsList`, and TC-04 checks a category's and a brand's filtered result count the same
+way, against `GET /api/productsList` twice; `signup.spec.ts` TC-11 and `login.spec.ts` TC-10 confirm
+an account the UI created or deleted against `GET /api/getUserDetailByEmail`. Together the two plans
+below cover every one of the 14 scenarios documented at `/api_list`, plus additional edge cases
+beyond that list.
 
 | #   | Feature Plan                                                          | API Test                                                  | Test Cases | Implemented | Passed | Failed | Flaky | Skipped | Fixme |
 | --- | --------------------------------------------------------------------- | --------------------------------------------------------- | ---------- | ----------- | ------ | ------ | ----- | ------- | ----- |
