@@ -43,13 +43,7 @@ interface Fixtures extends PageObjects {
   uniqueAccount: ActiveAccount;
 }
 
-/**
- * The spec files whose cases change the cart. The cart belongs to the
- * account, so through the shared account they all shared one cart, and the
- * parallel CI jobs emptied each other's carts mid-test (VR-28, verified in two
- * traces). Each case in these files gets an account created through the API,
- * is signed into it through the login form, and has it deleted afterwards.
- */
+/** Specs whose cases change the cart; the cart belongs to the account, so each case gets its own. */
 const CART_SPECS = new Set([
   "cart.spec.ts",
   "checkout.spec.ts",
@@ -184,8 +178,7 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     const account = buildAccount();
     const accounts = new AccountApiClient(request);
 
-    // The context starts signed in as the shared account; dropping its
-    // session cookie is what lets the login below sign in as this one.
+    // Drop the shared account's session before signing in as this one.
     await page.context().clearCookies();
     await signInAsNewAccount(page, accounts, account);
 
@@ -234,11 +227,7 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     await use(new OrderConfirmationPage(page));
   },
 
-  /**
-   * A throwaway account for the test, created and deleted through the API and
-   * signed in through the login form. Each test owns its own account, so
-   * parallel workers never contend and no test inherits state from another.
-   */
+  /** A throwaway account per test, created and deleted through the API. */
   uniqueAccount: async ({ page, request }, use) => {
     const account: ActiveAccount = { ...buildAccount(), deleted: false };
     const accounts = new AccountApiClient(request);
@@ -253,12 +242,7 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
   },
 });
 
-/**
- * Creates the account through the API and signs the page into it through the
- * login form, the only way to a browser session: the login API answers no
- * cookie. The signup form and the cleanup pages this replaces were each one
- * more request for the demo host to answer 503, as it did in run 241.
- */
+/** The login API sets no session cookie, so the browser signs in through the form. */
 async function signInAsNewAccount(
   page: Page,
   accounts: AccountApiClient,
@@ -273,10 +257,7 @@ async function signInAsNewAccount(
   await expect(loginPage.logoutLink).toBeVisible();
 }
 
-/**
- * A silent cleanup failure would leak accounts run after run with nothing
- * surfacing, so the deletion confirms its own outcome.
- */
+/** Confirms the deletion, so a failed cleanup surfaces instead of leaking accounts. */
 async function removeAccount(
   accounts: AccountApiClient,
   account: TestAccount,
