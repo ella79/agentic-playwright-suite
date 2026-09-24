@@ -48,8 +48,7 @@ its own throwaway account directly against the API.
 | `E2E_BASE_URL`       | Point the suite at a different host. Defaults to `https://automationexercise.com`       |
 | `CI`                 | Set by the pipeline. Switches reporters to blob, enables one retry, caps workers at two |
 
-The pipeline itself, including the merge queue `ci.yml` already supports but does not yet require, is
-[`docs/pipeline.md`](pipeline.md).
+The pipeline itself is in [`docs/pipeline.md`](pipeline.md).
 
 ## The Standards Behind This
 
