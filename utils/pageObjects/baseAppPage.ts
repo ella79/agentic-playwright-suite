@@ -111,6 +111,9 @@ export abstract class BaseAppPage {
   async unionBoundingBox(
     locators: Locator[],
   ): Promise<{ x: number; y: number; width: number; height: number }> {
+    // A clip is computed from layout, and layout is only final once the
+    // document, stylesheets included, has loaded.
+    await this.page.waitForLoadState("load");
     const boxes = await Promise.all(
       locators.map((locator) => locator.boundingBox()),
     );
