@@ -1,5 +1,5 @@
 import path from "path";
-import { expect, test as base } from "@playwright/test";
+import { expect, test as base, type Page } from "@playwright/test";
 import { AccountApiClient } from "../apiClients/accountApiClient";
 import { applyAllureLabels } from "./allureLabels";
 import {
@@ -15,7 +15,6 @@ import {
   ProductsPage,
 } from "../pageObjects";
 import { buildAccount, type TestAccount } from "../testData";
-import { url } from "../url";
 
 export interface ActiveAccount extends TestAccount {
   /** Set by a test that deletes the account itself, so teardown skips cleanup. */
@@ -42,15 +41,10 @@ interface PageObjects {
 
 interface Fixtures extends PageObjects {
   uniqueAccount: ActiveAccount;
+  guestPage: Page;
 }
 
-/**
- * The spec files whose cases change the cart. The cart belongs to the
- * account, so through the shared account they all shared one cart, and the
- * parallel CI jobs emptied each other's carts mid-test (VR-28, verified in two
- * traces). Each case in these files gets an account created through the API,
- * is signed into it through the login form, and has it deleted afterwards.
- */
+/** Specs whose cases change the cart; the cart belongs to the account, so each case gets its own. */
 const CART_SPECS = new Set([
   "cart.spec.ts",
   "checkout.spec.ts",
@@ -120,62 +114,7 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
   ],
 
   page: async ({ page, request }, use, testInfo) => {
-    await page.route(
-      (url) => !isAllowedRequest(url.href),
-      (route) => route.abort(),
-    );
-
-    /**
-     * Funding Choices still injects its dialog root with its own script
-     * blocked above: the container renders empty, but it keeps intercepting
-     * clicks underneath it. Seen live as a real failure — Playwright's own
-     * actionability check reported `<div class="fc-dialog-overlay">…</div>
-     * intercepts pointer events` on an "Add to cart" click with nothing to do
-     * with consent. There is never content in it to dismiss, only a hitbox
-     * left behind to disarm.
-     *
-     * `addLocatorHandler` is Playwright's own mechanism for exactly this: an
-     * unpredictable overlay that must be cleared before the action underneath
-     * it can proceed. Registered once here, it survives every navigation
-     * within the test, fires only when the element is actually blocking
-     * something, and Playwright itself re-verifies it is gone before
-     * retrying — no separate observer racing the page's own timing.
-     *
-     * The handler targets `.fc-consent-root`, the outer container, not
-     * `.fc-dialog-overlay` alone: removing only the inner overlay left the
-     * root itself still intercepting the next click, verified live against a
-     * reliable reproduction of the real element — the failure just moved from
-     * "`.fc-dialog-overlay` intercepts" to "`.fc-consent-root` intercepts".
-     * Removing the root removes the overlay along with it.
-     */
-    await page.addLocatorHandler(
-      page.locator(".fc-consent-root"),
-      async (root) => {
-        await root.evaluate((el) => el.remove());
-      },
-    );
-
-    /**
-     * The demo host sporadically sheds a cart write with a 503, seen in a trace
-     * as `GET /add_to_cart/1?quantity=1 -> 503` on a page where every other
-     * request returned 200. The app ignores the failure silently, so the modal
-     * never opens and the test times out on a state that cannot arrive.
-     *
-     * One retry on that request, not a loop. It changes nothing the tests
-     * assert: an endpoint that is genuinely broken still fails twice.
-     */
-    await page.route(CART_WRITE_ENDPOINTS, async (route, request) => {
-      if (request.method() !== "GET") {
-        return route.fallback();
-      }
-
-      let response = await route.fetch();
-      if (response.status() >= 500) {
-        response = await route.fetch();
-      }
-
-      await route.fulfill({ response });
-    });
+    await hardenPage(page);
 
     if (!CART_SPECS.has(path.basename(testInfo.file))) {
       await use(page);
@@ -185,26 +124,13 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     const account = buildAccount();
     const accounts = new AccountApiClient(request);
 
-    const created = await accounts.createAccount(account);
-    expect(created.responseCode, `createAccount: ${created.message}`).toBe(201);
-
-    // The context starts signed in as the shared account; dropping its
-    // session cookie is what lets the login below sign in as this one.
+    // Drop the shared account's session before signing in as this one.
     await page.context().clearCookies();
-    const loginPage = new LoginPage(page);
-    await loginPage.gotoLoginPage();
-    await loginPage.login(account.email, account.password);
-    await expect(loginPage.logoutLink).toBeVisible();
+    await signInAsNewAccount(page, accounts, account);
 
     await use(page);
 
-    const deleted = await accounts.deleteAccount(
-      account.email,
-      account.password,
-    );
-    expect(deleted.responseCode, `deleteAccount: ${deleted.message}`).toBe(200);
-    const lookup = await accounts.getUserDetailByEmail(account.email);
-    expect(lookup.responseCode).toBe(404);
+    await removeAccount(accounts, account);
   },
 
   homePage: async ({ page }, use) => {
@@ -247,53 +173,94 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     await use(new OrderConfirmationPage(page));
   },
 
-  /**
-   * Registers a throwaway account for the test and removes it afterwards.
-   * Each test owns its own account, so parallel workers never contend and no
-   * test inherits state from another.
-   */
-  uniqueAccount: async ({ page }, use) => {
+  /** A throwaway account per test, created and deleted through the API. */
+  uniqueAccount: async ({ page, request }, use) => {
     const account: ActiveAccount = { ...buildAccount(), deleted: false };
+    const accounts = new AccountApiClient(request);
 
-    const loginPage = new LoginPage(page);
-    const accountInfoPage = new AccountInfoPage(page);
-    const confirmationPage = new ConfirmationPage(page);
-    const homePage = new HomePage(page);
-
-    await loginPage.gotoLoginPage();
-    await loginPage.startSignup(account.name, account.email);
-
-    await accountInfoPage.createAccount(account);
-
-    await confirmationPage.continueButton.waitFor({ state: "visible" });
-    await confirmationPage.continue();
+    await signInAsNewAccount(page, accounts, account);
 
     await use(account);
 
-    if (account.deleted) {
-      return;
+    if (!account.deleted) {
+      await removeAccount(accounts, account);
     }
+  },
 
-    await homePage.gotoHomePage();
-    const stillSignedIn = await homePage.logoutLink
-      .isVisible()
-      .catch(() => false);
-
-    if (!stillSignedIn) {
-      await loginPage.gotoLoginPage();
-      await loginPage.login(account.email, account.password);
-      // login() submits the form and returns; the session only exists once
-      // that POST has been processed. Navigating straight to /delete_account
-      // can overtake it and arrive anonymously, which deletes nothing and
-      // fails the assertion below for the wrong reason.
-      await expect(homePage.logoutLink).toBeVisible();
-    }
-
-    await page.goto(url.deleteAccount);
-    // A silent teardown failure would leak accounts run after run with nothing
-    // surfacing, so cleanup asserts its own outcome.
-    await expect(confirmationPage.accountDeletedBanner).toBeVisible();
+  /** A signed-out page, for a case that compares a guest with the signed-in visitor. */
+  guestPage: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    const page = await context.newPage();
+    await hardenPage(page);
+    await use(page);
+    await context.close();
   },
 });
+
+/** Every page the suite drives gets the same protection from third-party noise. */
+async function hardenPage(page: Page): Promise<void> {
+  await page.route(
+    (url) => !isAllowedRequest(url.href),
+    (route) => route.abort(),
+  );
+
+  // Google's consent dialog can cover the page: accept it when it renders, and
+  // remove the empty container it leaves, which still intercepts clicks, when
+  // its script is blocked.
+  await page.addLocatorHandler(
+    page.locator(".fc-consent-root"),
+    async (root) => {
+      const consent = root.getByRole("button", { name: "Consent" });
+      if (await consent.isVisible()) {
+        await consent.click();
+      } else {
+        await root.evaluate((el) => el.remove());
+      }
+    },
+  );
+
+  // One retry on a cart write the host sheds with a 5xx; a broken endpoint
+  // still fails twice.
+  await page.route(CART_WRITE_ENDPOINTS, async (route, request) => {
+    if (request.method() !== "GET") {
+      return route.fallback();
+    }
+
+    let response = await route.fetch();
+    if (response.status() >= 500) {
+      response = await route.fetch();
+    }
+
+    await route.fulfill({ response });
+  });
+}
+
+/** The login API sets no session cookie, so the browser signs in through the form. */
+async function signInAsNewAccount(
+  page: Page,
+  accounts: AccountApiClient,
+  account: TestAccount,
+): Promise<void> {
+  const created = await accounts.createAccount(account);
+  expect(created.responseCode, `createAccount: ${created.message}`).toBe(201);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.gotoLoginPage();
+  await loginPage.login(account.email, account.password);
+  await expect(loginPage.logoutLink).toBeVisible();
+}
+
+/** Confirms the deletion, so a failed cleanup surfaces instead of leaking accounts. */
+async function removeAccount(
+  accounts: AccountApiClient,
+  account: TestAccount,
+): Promise<void> {
+  const deleted = await accounts.deleteAccount(account.email, account.password);
+  expect(deleted.responseCode, `deleteAccount: ${deleted.message}`).toBe(200);
+  const lookup = await accounts.getUserDetailByEmail(account.email);
+  expect(lookup.responseCode).toBe(404);
+}
 
 export { expect } from "@playwright/test";

@@ -120,6 +120,14 @@ distinct cases (22 functional, 33 visual, 19 API) with the functional cases coun
 for ninety-six results in total. `functional/`, `visual/` and `api/` exist because Allure draws a
 single trend line per report, so a combined one could never show three trends at once.
 
+Before any report is generated, `utils/scripts/prepare-allure-results.mjs` makes two corrections.
+It drops the `setup` project's result when it passed: signing the shared account in is a
+precondition, not a case, and counted it put a `Functional E2E · Chromium` row into the visual
+report. A failed setup stays, so the reason nothing after it ran is still visible. And it marks a
+result flaky when it passed only after an earlier attempt failed: allure-playwright keeps every
+attempt but never sets `statusDetails.flaky`, so without this a case Playwright reports as flaky
+reached Allure as a plain pass. The "Flaky" category in `categories.json` then lists those cases.
+
 The engine sits in `parentSuite` rather than a level below it because Allure's Overview reads only
 the top level of the suites tree. While both engines shared a parent, the dashboard drew one bar for
 forty results, and a run that failed every case on Chromium and passed every case on WebKit read as
@@ -132,7 +140,8 @@ failure are three different conversations. The same file reaches the suite healt
 `--categories`, alongside `--allure`, which points at the generated report so the page can read the
 counts Allure worked out for those rules rather than matching the regexes a second time and possibly
 disagreeing with the Categories tab one click away. `environmentInfo` records the base URL, browser,
-viewport, commit and branch behind a run. `executor.json` links the published report back to the
+viewport, commit and branch behind a run; the API run records no browser or viewport, and the
+functional and root reports name both engines. `executor.json` links the published report back to the
 pipeline run that produced it.
 
 ### The report is verified before it is published

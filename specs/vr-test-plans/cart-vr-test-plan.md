@@ -27,7 +27,7 @@ check out.
 
 ## Notes
 
-- VR-27 captures the full page rather than the modal alone, since the modal is a Bootstrap overlay
+- VR-27 captures the page from header to footer rather than the modal alone, since the modal is a Bootstrap overlay
   whose backdrop is part of what a regression could break.
 
 ## Out of Scope

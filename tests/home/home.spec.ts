@@ -70,7 +70,7 @@ test.describe("Home Page", () => {
   });
 
   test("TC-02: The header shows a different menu and account state for a guest and a signed-in visitor", async ({
-    browser,
+    guestPage,
     homePage,
   }) => {
     await test.step("the signed-in visitor's header shows the full menu and the account state", async () => {
@@ -87,14 +87,8 @@ test.describe("Home Page", () => {
       await expect(homePage.loggedInAs).toBeVisible();
     });
 
-    // A second, anonymous context: the case compares both identities at once,
-    // which a single page cannot hold, since the shared session every other
-    // spec depends on is already signed in.
     await test.step("a guest's header offers the same menu, minus the signed-in-only links", async () => {
-      const guestContext = await browser.newContext({
-        storageState: { cookies: [], origins: [] },
-      });
-      const guestHome = new HomePage(await guestContext.newPage());
+      const guestHome = new HomePage(guestPage);
 
       await guestHome.gotoHomePage();
       await expect(guestHome.homeLink).toBeVisible();
@@ -110,8 +104,6 @@ test.describe("Home Page", () => {
       await expect(guestHome.logoutLink).toBeHidden();
       await expect(guestHome.deleteAccountLink).toBeHidden();
       await expect(guestHome.loggedInAs).toBeHidden();
-
-      await guestContext.close();
     });
   });
 
