@@ -47,8 +47,8 @@ failure, including the expected, actual and diff images of a screenshot comparis
 
 | Trigger                  | Runs                                                                                                                                                   |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Pull request             | Static checks, functional suite (Chromium only), visual suite, API suite                                                                               |
-| Push to `main`           | The same plus WebKit, then the dashboards and the suite health page publish                                                                            |
+| Pull request             | Static checks, functional suite (Chromium and WebKit), visual suite, API suite                                                                         |
+| Push to `main`           | The same, then the dashboards and the suite health page publish                                                                                        |
 | Merge queue entry        | Not required yet; when it is, this row runs the queue's push instead, before rather than after the merge, and the push that follows reuses its results |
 | Image or lockfile change | The execution image is rebuilt and pushed to the registry first                                                                                        |
 
