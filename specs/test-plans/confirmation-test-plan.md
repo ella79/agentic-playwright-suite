@@ -8,7 +8,7 @@
 | Page Title   | `Automation Exercise - Order Placed`                  |
 | Spec File    | `tests/confirmation/confirmation.spec.ts`             |
 | Page Object  | `utils/pageObjects/checkout/orderConfirmationPage.ts` |
-| Precondition | Login (shared account)                                |
+| Precondition | Login (own account, decision #7)                      |
 
 ## Scope
 
@@ -19,9 +19,9 @@ and Continue lead. Completing the payment form itself is covered by `payment-tes
 
 Seed: `specs/seed.spec.ts`
 
-- The shared account signs in automatically via `login.setup.ts`.
-- The case clears the cart with `cartPage.clearCart()` first, since it belongs to the same shared
-  account every other file in this group uses, then arranges its own precondition: a product added
+- The case runs on an account of its own, created through the API, signed in through the login
+  form and deleted afterwards (decision #7), so its cart is its own. It clears the cart with
+  `cartPage.clearCart()` first, then arranges its own precondition: a product added
   to the cart, checkout and payment completed with valid card details, before any assertion in this
   plan runs.
 

@@ -6,7 +6,8 @@ rewritten to hide that it changed.
 
 ### 1. Shared authenticated storage state, except where the account's own lifecycle is the point
 
-**Status:** Accepted, replacing full per-test isolation
+**Status:** Accepted, replacing full per-test isolation; amended by #7 for cases that change the
+cart
 
 **Context:** Every functional and visual case needs a signed-in user as a precondition. The original
 approach gave every case its own throwaway account, to avoid two problems with sharing one: the
@@ -114,6 +115,33 @@ the suite itself as a suspect when something times out.
 
 **Verified:** `playwright.config.ts:51` reads `workers: process.env.CI ? 2 : undefined`; checked
 2026-09-21.
+
+### 7. Give each case that changes the cart an account of its own
+
+**Status:** Accepted
+
+**Context:** The cart belongs to the account, not to the test or the browser session. Through the
+shared account of #1, every case in the cart, checkout, payment and confirmation files shared one
+cart, and the functional and visual CI jobs run in parallel. VR-28 was flaky in 6 of its first 8
+runs; in 2 of them the trace shows the cart empty seconds after `add_to_cart` answered 200, while
+TC-18 (WebKit job) and TC-22 (Chromium job) were changing the same cart.
+
+**Decision:** Each case in those 8 spec files gets an account created through the API
+(`POST /api/createAccount`), signs into it through the login form, and has it deleted through the API
+afterwards, with the deletion confirmed by `GET /api/getUserDetailByEmail`. The files are listed in
+`utils/fixtures/testFixtures.ts`; the specs themselves are unchanged. Every other case keeps the
+shared account of #1, which no remaining case reads the cart through.
+
+**Consequences:** Parallel jobs, parallel workers and overlapping runs no longer share a cart. Each
+of those cases pays for one API signup, one form login and one API deletion. A run cancelled mid-case
+can leave that case's account on the demo host, as the API suite already can.
+
+**Verified:** 2026-09-24, locally, cases in parallel, no retries. In the Linux image CI uses, VR-28
+passed 10 of 11 runs, the one failure the demo host's own "under heavy load (queue full)" page; VR-29
+passed 11 of 11, and every other cart capture passed. 4 of the 5 functional cases passed. TC-19 and
+VR-27 failed locally on unchanged code too: their guest context has no third-party blocking, and
+the consent dialog Google shows to EU visitors covers the page. CI runs from the US and does not
+get it.
 
 ## Incidents
 

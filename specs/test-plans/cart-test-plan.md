@@ -2,13 +2,13 @@
 
 ## Metadata
 
-| Field        | Value                                                                                        |
-| ------------ | -------------------------------------------------------------------------------------------- |
-| Page URL     | `/view_cart`                                                                                 |
-| Page Title   | `Automation Exercise - Checkout`                                                             |
-| Spec File    | `tests/cart/cart.spec.ts`                                                                    |
-| Page Object  | `utils/pageObjects/cart/cartPage.ts`                                                         |
-| Precondition | Login (shared account), except TC-19's guest half, which resets to Guest for that comparison |
+| Field        | Value                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------- |
+| Page URL     | `/view_cart`                                                                                                    |
+| Page Title   | `Automation Exercise - Checkout`                                                                                |
+| Spec File    | `tests/cart/cart.spec.ts`                                                                                       |
+| Page Object  | `utils/pageObjects/cart/cartPage.ts`                                                                            |
+| Precondition | Login (own account per case, decision #7), except TC-19's guest half, which resets to Guest for that comparison |
 
 ## Scope
 
@@ -21,12 +21,9 @@ against a signed-in visitor. What Proceed to Checkout opens for a signed-in visi
 
 Seed: `specs/seed.spec.ts`
 
-- The shared account signs in automatically via `login.setup.ts`; every case here starts already
-  signed in.
-- The cart belongs to that same shared, persistent account, so every case clears it with
-  `cartPage.clearCart()` before arranging its own state, rather than assuming another file left it
-  empty. Parallel workers each run their own file, so this is what keeps the cart deterministic
-  across `cart`, `checkout`, `payment` and `confirmation`.
+- The cart belongs to the account, so every case here runs on an account of its own: created
+  through the API, signed in through the login form, deleted afterwards (decision #7). Every case
+  starts already signed in, with an empty cart; `cartPage.clearCart()` still runs first.
 - TC-19 resets to a guest context for its guard half, using
   `test.use({ storageState: { cookies: [], origins: [] } })` scoped to that case alone.
 

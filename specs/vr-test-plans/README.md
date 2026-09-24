@@ -44,7 +44,8 @@ default carries an inline `// VR:` comment naming the reason.
 Ad, analytics, and consent-management requests are aborted at the route level by the shared fixture,
 so none of it needs masking. This is why the visual suite imports the project fixture rather than
 Playwright's bare `test`. No case currently uses `mask` either: every account-shaped value on screen
-comes from the shared account's own fixed literal profile (`buildAccount()` in `utils/testData.ts`),
+comes from the fixed literal profile of `buildAccount()` in `utils/testData.ts`, which the shared
+account and the own accounts of decision #7 both use,
 not per-run data, so there is nothing left to hide. The mechanism stays available for a future case
 that genuinely renders per-run data.
 

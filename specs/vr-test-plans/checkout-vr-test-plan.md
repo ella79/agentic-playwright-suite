@@ -28,8 +28,9 @@ review.
 
 - VR-28 captures a clip spanning the "Address Details" heading and both address blocks together,
   not either block on its own: the two are read together on the real page. No masking is used: the
-  address values are the shared account's own fixed literal defaults from `buildAccount()` in
-  `utils/testData.ts`, not per-run data, so there is nothing unstable to hide.
+  address values are the fixed literal defaults from `buildAccount()` in
+  `utils/testData.ts`, the same on the case's own account as on the shared one, not per-run data, so
+  there is nothing unstable to hide.
 
 ## Out of Scope
 

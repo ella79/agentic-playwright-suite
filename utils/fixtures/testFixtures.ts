@@ -1,4 +1,6 @@
+import path from "path";
 import { expect, test as base } from "@playwright/test";
+import { AccountApiClient } from "../apiClients/accountApiClient";
 import { applyAllureLabels } from "./allureLabels";
 import {
   AccountInfoPage,
@@ -41,6 +43,24 @@ interface PageObjects {
 interface Fixtures extends PageObjects {
   uniqueAccount: ActiveAccount;
 }
+
+/**
+ * The spec files whose cases change the cart. The cart belongs to the
+ * account, so through the shared account they all shared one cart, and the
+ * parallel CI jobs emptied each other's carts mid-test (VR-28, verified in two
+ * traces). Each case in these files gets an account created through the API,
+ * is signed into it through the login form, and has it deleted afterwards.
+ */
+const CART_SPECS = new Set([
+  "cart.spec.ts",
+  "checkout.spec.ts",
+  "payment.spec.ts",
+  "confirmation.spec.ts",
+  "cart.vr.spec.ts",
+  "checkout.vr.spec.ts",
+  "payment.vr.spec.ts",
+  "confirmation.vr.spec.ts",
+]);
 
 /**
  * Everything the product itself needs to render: its own origin, plus the two
@@ -99,7 +119,7 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     { auto: true },
   ],
 
-  page: async ({ page }, use) => {
+  page: async ({ page, request }, use, testInfo) => {
     await page.route(
       (url) => !isAllowedRequest(url.href),
       (route) => route.abort(),
@@ -157,7 +177,34 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
       await route.fulfill({ response });
     });
 
+    if (!CART_SPECS.has(path.basename(testInfo.file))) {
+      await use(page);
+      return;
+    }
+
+    const account = buildAccount();
+    const accounts = new AccountApiClient(request);
+
+    const created = await accounts.createAccount(account);
+    expect(created.responseCode, `createAccount: ${created.message}`).toBe(201);
+
+    // The context starts signed in as the shared account; dropping its
+    // session cookie is what lets the login below sign in as this one.
+    await page.context().clearCookies();
+    const loginPage = new LoginPage(page);
+    await loginPage.gotoLoginPage();
+    await loginPage.login(account.email, account.password);
+    await expect(loginPage.logoutLink).toBeVisible();
+
     await use(page);
+
+    const deleted = await accounts.deleteAccount(
+      account.email,
+      account.password,
+    );
+    expect(deleted.responseCode, `deleteAccount: ${deleted.message}`).toBe(200);
+    const lookup = await accounts.getUserDetailByEmail(account.email);
+    expect(lookup.responseCode).toBe(404);
   },
 
   homePage: async ({ page }, use) => {

@@ -182,12 +182,12 @@ added product`, not `TC-05: Test cart`. Sentence case: the first letter capitali
 
 Everything a test needs arrives through `utils/fixtures/testFixtures.ts`.
 
-| Fixture                              | Provides                                                                             |
-| ------------------------------------ | ------------------------------------------------------------------------------------ |
-| `homePage`, `cartPage`, and the rest | One page object per surface, built for the tests that name it                        |
-| `uniqueAccount`                      | A throwaway account, registered through its own signup, deleted afterwards           |
-| `page`                               | Playwright's page with ad, analytics and consent hosts aborted                       |
-| `request`                            | Playwright's own API request context, base-URL'd the same as `page` — API specs only |
+| Fixture                              | Provides                                                                                                             |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `homePage`, `cartPage`, and the rest | One page object per surface, built for the tests that name it                                                        |
+| `uniqueAccount`                      | A throwaway account, registered through its own signup, deleted afterwards                                           |
+| `page`                               | Playwright's page with ad, analytics and consent hosts aborted; in the cart specs, signed into an account of its own |
+| `request`                            | Playwright's own API request context, base-URL'd the same as `page` — API specs only                                 |
 
 A new page object gets a fixture in the same commit that adds the class. Fixtures are on demand, so
 an unused one costs nothing.
@@ -235,10 +235,12 @@ back out. `login-test-plan.md` and `signup-test-plan.md` are Guest for the whole
 `home-test-plan.md` and `TC-19` in `cart-test-plan.md` open the second-context form for their
 guest half. Everything else is Login.
 
-The cart belongs to that same shared, persistent account, so a case in `cart-test-plan.md`,
-`checkout-test-plan.md`, `payment-test-plan.md` or `confirmation-test-plan.md` that needs a known
-cart state calls `cartPage.clearCart()` first, rather than assuming another file in the group left it
-that way — those files can run in different parallel workers over the same account's cart.
+The cart belongs to the account, so a case that changes it cannot share the shared account: the
+parallel CI jobs emptied each other's cart through it (decision #7 in `docs/decisions.md`). The
+`page` fixture gives every case in the `cart`, `checkout`, `payment` and `confirmation` specs,
+functional and visual, an account of its own: created through the API, signed in through the login
+form, deleted through the API afterwards. The specs do nothing for it. A new spec file that changes
+the cart is added to `CART_SPECS` in `testFixtures.ts`.
 
 **Cleanup belongs to the fixture, never to a trailing step.** A `test.step` at the end of a case
 that removes what the case created does not run when an earlier step fails: Playwright skips the
