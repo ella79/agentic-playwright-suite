@@ -77,8 +77,8 @@ A flaky test is a defect in the suite, not weather. The policy, in order:
    the application is genuinely broken.
 3. If the application is at fault the test is not repaired. It is parked with `test.fixme()` naming
    the defect, and the defect is recorded in [`specs/STATUS.md`](specs/STATUS.md).
-4. Above one percent flaky rate, no new coverage is added until it is back under. A suite nobody
-   believes is worse than no suite.
+4. Above one percent flaky rate over the last 30 runs, no new coverage is added until it is back
+   under. A suite nobody believes is worse than no suite.
 
 This has already been exercised once; see [`docs/decisions.md`](docs/decisions.md) for the cause and
 the fix.
