@@ -24,8 +24,8 @@ Seed: `specs/seed.spec.ts`
 
 - The shared account signs in automatically via `login.setup.ts`; every case here starts already
   signed in unless stated otherwise.
-- TC-02 is the exception: it resets to a guest context for one half of its comparison, using
-  `test.use({ storageState: { cookies: [], origins: [] } })` scoped to that case alone.
+- TC-02 is the exception: it takes the `guestPage` fixture, a signed-out page, for one half of its
+  comparison.
 
 ## Test Cases
 

@@ -1,4 +1,5 @@
 import { type APIRequestContext } from "@playwright/test";
+import { readJson } from "./readJson";
 import { type TestAccount } from "../testData";
 
 export interface ApiResponseBody {
@@ -45,14 +46,14 @@ export class AccountApiClient {
     const response = await this.request.post("/api/createAccount", {
       form: this.accountForm(account),
     });
-    return response.json();
+    return readJson(response);
   }
 
   async updateAccount(account: TestAccount): Promise<ApiResponseBody> {
     const response = await this.request.put("/api/updateAccount", {
       form: this.accountForm(account),
     });
-    return response.json();
+    return readJson(response);
   }
 
   async deleteAccount(
@@ -62,20 +63,20 @@ export class AccountApiClient {
     const response = await this.request.delete("/api/deleteAccount", {
       form: { email, password },
     });
-    return response.json();
+    return readJson(response);
   }
 
   async verifyLogin(email: string, password: string): Promise<ApiResponseBody> {
     const response = await this.request.post("/api/verifyLogin", {
       form: { email, password },
     });
-    return response.json();
+    return readJson(response);
   }
 
   async getUserDetailByEmail(email: string): Promise<UserDetailBody> {
     const response = await this.request.get(
       `/api/getUserDetailByEmail?email=${encodeURIComponent(email)}`,
     );
-    return response.json();
+    return readJson(response);
   }
 }

@@ -83,10 +83,10 @@ lines everywhere, and a `let` at describe level assigned in `beforeEach`, which 
 between tests and has no teardown.
 
 **Three ways to be signed in, chosen by what the case actually proves.** `uniqueAccount` is the fixture
-that carries real lifecycle: it registers a throwaway user through the UI, yields it, and removes it
-afterwards while asserting the removal actually happened. It exists for the handful of cases that
-prove something about signup, login or account deletion themselves — `login.spec.ts` and
-`signup.spec.ts`, in full — where a fresh, disposable account is the point.
+that carries real lifecycle: it creates a throwaway user through the API, signs it in through the
+login form, yields it, and deletes it through the API afterwards, confirming the deletion. It exists
+for the handful of cases that prove something about signup, login or account deletion themselves —
+`login.spec.ts` and `signup.spec.ts`, in full — where a fresh, disposable account is the point.
 
 Everything else defaults to a shared, persistent account instead: `utils/setup/login.setup.ts` runs
 as its own project once per suite run, registers that account through the API if it does not already
@@ -96,7 +96,8 @@ at all — and saves the result as `storageState`. Every functional and visual p
 and starts already signed in, so a case that only needs "some logged-in user" as a precondition never
 pays for a signup it has no reason to prove. `login.spec.ts` and `signup.spec.ts` opt back out with
 `test.use({ storageState: { cookies: [], origins: [] } })` at the top of the file; `home.spec.ts`'s
-TC-02 and `cart.spec.ts`'s TC-19 open a second, anonymous `browser.newContext()` instead, since
+TC-02 and `cart.spec.ts`'s TC-19 take the `guestPage` fixture instead, a signed-out page with the
+same third-party blocking, since
 those two compare a guest and a signed-in visitor within one case rather than running the whole case
 as one or the other.
 

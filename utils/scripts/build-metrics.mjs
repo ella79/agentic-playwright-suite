@@ -76,6 +76,9 @@ const round = (value, digits = 1) => Number(value.toFixed(digits));
 function collectCases(node, cases = []) {
   for (const spec of node.specs ?? []) {
     for (const test of spec.tests ?? []) {
+      // Signing the shared account in is a precondition, not a case. It
+      // counts only when it fails, so a broken login stays visible.
+      if (test.projectName === "setup" && test.status === "expected") continue;
       const attempts = test.results ?? [];
       cases.push({
         title: spec.title,
@@ -163,7 +166,11 @@ const entry = {
   ),
 };
 
-history = [...history, entry].slice(-200);
+// A re-run of the publishing job repeats its run: keep one entry per run.
+const byRun = new Map(
+  [...history, entry].map((run, index) => [run.runUrl ?? index, run]),
+);
+history = [...byRun.values()].slice(-200);
 const window = history.slice(-WINDOW);
 
 const verdict = (value, good, acceptable, higherIsBetter = true) => {

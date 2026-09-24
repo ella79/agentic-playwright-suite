@@ -19,6 +19,9 @@ const BASE_URL = process.env.E2E_BASE_URL || "https://automationexercise.com";
 /** Suffix that keeps each suite's local report in its own folder. */
 const SUITE = process.env.E2E_REPORT_SUFFIX ?? "";
 
+/** The API suite runs no browser, so its report records neither one nor a viewport. */
+const IS_API = SUITE === "-api";
+
 /**
  * The published dashboard is built from these results. environmentInfo fills
  * the report's Environment widget, so a run says what it executed against
@@ -33,8 +36,12 @@ const allureReporter: ReporterDescription = [
       // What actually ran. The WebKit job overrides these, because a report
       // saying Chromium while it holds WebKit results is worse than one that
       // says nothing.
-      Browser: process.env.E2E_BROWSERS || "Chromium",
-      Viewport: process.env.E2E_VIEWPORT || "1920x1080",
+      ...(IS_API
+        ? {}
+        : {
+            Browser: process.env.E2E_BROWSERS || "Chromium",
+            Viewport: process.env.E2E_VIEWPORT || "1920x1080",
+          }),
       Node: process.version,
       OS: `${process.platform} ${process.arch}`,
       CI: process.env.CI ? "GitHub Actions" : "local",
