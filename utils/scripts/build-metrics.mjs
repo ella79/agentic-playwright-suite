@@ -482,7 +482,7 @@ ${donut(
   })),
 )}
 <table>
-  <thead><tr><th>Suite</th><th>Cases</th><th>Pass rate</th><th>Flaky</th><th>Flaky rate, last ${WINDOW} runs</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
+  <thead><tr><th>Suite</th><th>Cases</th><th>Pass rate</th><th>Flaky</th><th>Flaky rate<br><small>last ${WINDOW} runs</small></th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
   <tbody>${suiteRows}</tbody>
 </table>
 
