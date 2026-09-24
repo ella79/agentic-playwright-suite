@@ -53,12 +53,15 @@ export class CartPage extends BaseAppPage {
 
   async proceedToCheckout(): Promise<void> {
     await this.proceedToCheckoutButton.click();
+    // waitForURL waits for the load event, not only the new URL. A capture
+    // measured before checkout.css lands comes out 30px short (VR-28).
+    await this.page.waitForURL(new RegExp(`${url.checkout}$`));
   }
 
   /**
-   * The cart belongs to one shared, persistent account, so a case that needs
-   * a known starting state clears it first rather than assuming another
-   * file's test left it that way.
+   * A case that changes the cart runs on an account of its own (see
+   * `testFixtures.ts`), so this normally finds the cart empty; it stays so no
+   * case depends on that.
    */
   async clearCart(): Promise<void> {
     await this.gotoCartPage();
@@ -75,7 +78,9 @@ export class CartPage extends BaseAppPage {
    * Anonymous visitors get the account guard instead of the checkout page.
    */
   async proceedToCheckoutAsGuest(): Promise<CheckoutGuardModal> {
-    await this.proceedToCheckout();
+    // Not proceedToCheckout(): a guest never navigates, so waiting for the
+    // checkout URL would time out.
+    await this.proceedToCheckoutButton.click();
     const modal = new CheckoutGuardModal(this.page);
     await modal.waitForVisible();
     return modal;

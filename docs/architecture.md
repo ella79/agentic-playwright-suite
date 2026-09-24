@@ -82,7 +82,7 @@ alternatives seen in the wild: constructing page objects in every test, which re
 lines everywhere, and a `let` at describe level assigned in `beforeEach`, which shares mutable state
 between tests and has no teardown.
 
-**Two ways to be signed in, chosen by what the case actually proves.** `uniqueAccount` is the fixture
+**Three ways to be signed in, chosen by what the case actually proves.** `uniqueAccount` is the fixture
 that carries real lifecycle: it registers a throwaway user through the UI, yields it, and removes it
 afterwards while asserting the removal actually happened. It exists for the handful of cases that
 prove something about signup, login or account deletion themselves — `login.spec.ts` and
@@ -110,10 +110,13 @@ a credential written into a trace that this suite publishes would be public. Not
 step needs debugging from a trace anyway: it is one page, one form, and a failure there fails loudly
 with its own error rather than a silent wrong turn a trace would be needed to diagnose.
 
-**The cart is shared state too, since it belongs to the same persistent account.** Every case in
-`cart.spec.ts`, `checkout.spec.ts`, `payment.spec.ts` and `confirmation.spec.ts` that needs a
-known cart calls `cartPage.clearCart()` first, rather than assuming another file in the group left it
-empty — the four files can run in different workers over the same account's cart.
+**A case that changes the cart gets an account of its own.** The cart belongs to the account, so
+through the shared account every case in `cart`, `checkout`, `payment` and `confirmation`, functional
+and visual, shared one cart, and the parallel CI jobs emptied it under each other (decision #7). The
+`page` fixture recognises those 8 spec files and, for each of their cases, creates an account through
+the API, signs into it through the login form, and deletes it through the API afterwards, confirming
+the deletion. The specs are unchanged: `cartPage.clearCart()` still runs first and now finds the cart
+empty. Every other case stays on the shared account, and none of them reads the cart.
 
 **API tests use their own throwaway accounts, never the shared one.** `api-tests/` calls the public
 API directly through Playwright's `request` fixture, wrapped by a small client per resource area in

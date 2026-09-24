@@ -8,7 +8,7 @@
 | Page Title   | `Automation Exercise - Checkout`             |
 | Spec File    | `tests/checkout/checkout.spec.ts`            |
 | Page Object  | `utils/pageObjects/checkout/checkoutPage.ts` |
-| Precondition | Login (shared account)                       |
+| Precondition | Login (own account, decision #7)             |
 
 ## Scope
 
@@ -21,9 +21,9 @@ by `payment-test-plan.md`.
 
 Seed: `specs/seed.spec.ts`
 
-- The shared account signs in automatically via `login.setup.ts`.
-- The case clears the cart with `cartPage.clearCart()` first, since it belongs to the same shared
-  account every other file in this group uses, then arranges its own precondition: a product added
+- The case runs on an account of its own, created through the API, signed in through the login
+  form and deleted afterwards (decision #7), so its cart is its own. It clears the cart with
+  `cartPage.clearCart()` first, then arranges its own precondition: a product added
   to the cart, then Proceed to Checkout pressed, before any assertion in this plan runs.
 
 ## Test Cases
