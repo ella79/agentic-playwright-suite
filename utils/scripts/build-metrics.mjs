@@ -76,6 +76,9 @@ const round = (value, digits = 1) => Number(value.toFixed(digits));
 function collectCases(node, cases = []) {
   for (const spec of node.specs ?? []) {
     for (const test of spec.tests ?? []) {
+      // Signing the shared account in is a precondition, not a case. It
+      // counts only when it fails, so a broken login stays visible.
+      if (test.projectName === "setup" && test.status === "expected") continue;
       const attempts = test.results ?? [];
       cases.push({
         title: spec.title,
