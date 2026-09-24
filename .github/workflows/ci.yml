@@ -176,17 +176,8 @@ jobs:
   # runner, so the engines run in parallel rather than trebling the wall clock
   # of a single job.
   #
-  # WebKit only appears once the change is actually being merged - on
-  # merge_group, and as the fallback on push when nothing already covered it.
-  # Rendering differences are not the feedback a review needs within seconds,
-  # and dropping it from pull requests cuts each one to half the executions.
-  # The list is built from the event rather than guarded with `if`, because a
-  # matrix entry that exists and is skipped still shows as a box in the graph
-  # and still has to be reasoned about.
-  #
-  # `include` is deliberately not used to carry the engine label. An include
-  # entry that matches nothing in the base list does not vanish, it adds a
-  # combination, so on a pull request it would put WebKit back.
+  # Both engines run on pull requests too, so a WebKit failure blocks the merge
+  # instead of surfacing on main after it.
   e2e:
     name: ${{ matrix.project }}
     needs: [resolve-merge-group-run, prepare-playwright-image, static-checks]
@@ -201,7 +192,7 @@ jobs:
       # away what the other already produced.
       fail-fast: false
       matrix:
-        project: ${{ github.event_name == 'pull_request' && fromJSON('["e2e-chromium"]') || fromJSON('["e2e-chromium","e2e-webkit"]') }}
+        project: [e2e-chromium, e2e-webkit]
     container:
       image: ${{ needs.prepare-playwright-image.outputs.image }}
       credentials:
@@ -396,9 +387,8 @@ jobs:
   # The single check the branch protection requires.
   #
   # GitHub counts a skipped job as a satisfied requirement, so requiring the
-  # test jobs directly would be hollow: the WebKit entry is absent on pull
-  # requests by design, and any job that stops running would silently stop
-  # being enforced. This job always runs, reads the results of the others, and
+  # test jobs directly would be hollow: any job that stops running would
+  # silently stop being enforced. This job always runs, reads the results of the others, and
   # fails on anything that is not success or a deliberate skip. Adding a job
   # later means adding it here rather than editing repository settings.
   ci-gate:

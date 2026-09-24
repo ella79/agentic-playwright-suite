@@ -22,17 +22,17 @@
 Runs on every push and pull request to `main`, and on `merge_group` once a merge queue is required
 there (see below).
 
-| Job                        | Responsibility                                                                                     |
-| -------------------------- | -------------------------------------------------------------------------------------------------- |
-| `resolve-merge-group-run`  | Looks for a `merge_group` run that already tested this exact push; see below                       |
-| `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry                          |
-| `static-checks`            | Typecheck, lint, format. Gates everything after it                                                 |
-| `e2e-chromium`             | The functional suite on Chromium, one entry of the `e2e` matrix                                    |
-| `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal                      |
-| `e2e-webkit`               | The same cases on WebKit, the second `e2e` entry, present once the change is actually being merged |
-| `api`                      | The REST API suite. No `setup` dependency: every case provisions its own throwaway account         |
-| `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages         |
-| `ci-gate`                  | Reads every other job's result. The only check the branch protection requires                      |
+| Job                        | Responsibility                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| `resolve-merge-group-run`  | Looks for a `merge_group` run that already tested this exact push; see below               |
+| `prepare-playwright-image` | Builds the execution image and pushes it to the GitHub Container Registry                  |
+| `static-checks`            | Typecheck, lint, format. Gates everything after it                                         |
+| `e2e-chromium`             | The functional suite on Chromium, one entry of the `e2e` matrix                            |
+| `visual-regression`        | The visual suite, separate so a screenshot diff never hides functional signal              |
+| `e2e-webkit`               | The same cases on WebKit, the second `e2e` entry                                           |
+| `api`                      | The REST API suite. No `setup` dependency: every case provisions its own throwaway account |
+| `publish-dashboard`        | Merges the reports, restores trend history, builds the suite health page, deploys to Pages |
+| `ci-gate`                  | Reads every other job's result. The only check the branch protection requires              |
 
 `api` feeds `publish-dashboard` the same way the other two do: its own Allure results join the
 combined report, and it gets its own `api/` report with its own trend line, the same treatment
@@ -44,10 +44,8 @@ A merge queue is not required on `main` yet, but `ci.yml` already supports one: 
 to a repository's ruleset (a `merge_queue` rule) needs no further workflow change to start working.
 
 Without a queue, `ci-gate` passes on a pull request's own preview of the merge, which can already be
-stale by the time it actually lands, and gates on a reduced matrix that never runs WebKit at all -
-WebKit only exists once the change reaches `main`, after the gate that was supposed to catch it. A
-required queue tests the exact commit about to land, before it lands, on the full matrix, and only
-then allows the merge - closing the staleness gap and the missing coverage at once.
+stale by the time it actually lands. A required queue tests the exact commit about to land, before
+it lands, and only then allows the merge.
 
 That still leaves one thing worth avoiding: retesting a commit the queue just tested, seconds after,
 on the `push` that follows a successful merge. `resolve-merge-group-run` is what avoids it. On a push
@@ -77,9 +75,8 @@ directly would have meant that a job which stopped running quietly stopped being
 
 The two functional boxes come from one job with a matrix over the Playwright project, which is the
 shape GitHub offers for this and the one Playwright's CI guidance uses: each entry gets its own
-runner, so the engines run in parallel instead of trebling one job's wall clock. The matrix list is
-built from the event rather than guarded with `if`, so on a pull request the WebKit entry does not
-exist at all rather than existing and being skipped.
+runner, so the engines run in parallel instead of trebling one job's wall clock. Both run on pull
+requests too, so a WebKit failure blocks the merge instead of surfacing on `main` after it.
 
 Every job after the build runs inside the image the build produced, so browsers and dependencies are
 installed once instead of three times. The image tag carries the Playwright version and a hash of
