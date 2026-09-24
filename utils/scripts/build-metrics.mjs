@@ -166,7 +166,11 @@ const entry = {
   ),
 };
 
-history = [...history, entry].slice(-200);
+// A re-run of the publishing job repeats its run: keep one entry per run.
+const byRun = new Map(
+  [...history, entry].map((run, index) => [run.runUrl ?? index, run]),
+);
+history = [...byRun.values()].slice(-200);
 const window = history.slice(-WINDOW);
 
 const verdict = (value, good, acceptable, higherIsBetter = true) => {

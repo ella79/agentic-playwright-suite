@@ -3,6 +3,7 @@
 // Allure gave it its own top-level suite named "setup" — invisible until the
 // first real run of the consumer contract's `exact: true` check rejected it
 // outright as an unannounced suite. Verified live, in that run's own logs.
+import { AccountApiClient } from "../apiClients/accountApiClient";
 import { test as setup, expect } from "../fixtures/testFixtures";
 import { HomePage, LoginPage } from "../pageObjects";
 import { buildAccount } from "../testData";
@@ -35,33 +36,9 @@ setup("authenticate", async ({ page, request }) => {
   const { email, password } = credentialsFromEnv();
   const account = buildAccount({ email, password });
 
-  // API first: registering through /api/createAccount is one request against
-  // a form eleven fields long, and it is idempotent here on purpose. The
-  // account already existing from a previous run is not a failure, it is the
-  // steady state this setup runs into on every run after the first.
-  const response = await request.post("/api/createAccount", {
-    form: {
-      name: account.name,
-      email: account.email,
-      password: account.password,
-      title: "Mr",
-      birth_date: account.birthDay,
-      birth_month: account.birthMonth,
-      birth_year: account.birthYear,
-      firstname: account.firstName,
-      lastname: account.lastName,
-      company: account.company,
-      address1: account.address,
-      address2: "",
-      country: account.country,
-      zipcode: account.zipcode,
-      state: account.state,
-      city: account.city,
-      mobile_number: account.mobileNumber,
-    },
-  });
-
-  const body: { responseCode: number; message: string } = await response.json();
+  // API first, and idempotent on purpose: the account already existing from a
+  // previous run is the steady state, not a failure.
+  const body = await new AccountApiClient(request).createAccount(account);
   const alreadyExists =
     body.responseCode === 400 && body.message.includes("already exists");
 

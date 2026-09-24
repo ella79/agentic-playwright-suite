@@ -1,4 +1,5 @@
 import { type APIRequestContext } from "@playwright/test";
+import { readJson } from "./readJson";
 
 export interface CatalogProduct {
   id: number;
@@ -34,18 +35,18 @@ export class CatalogApiClient {
 
   async getProductsList(): Promise<ProductsListBody> {
     const response = await this.request.get("/api/productsList");
-    return response.json();
+    return readJson(response);
   }
 
   async getBrandsList(): Promise<BrandsListBody> {
     const response = await this.request.get("/api/brandsList");
-    return response.json();
+    return readJson(response);
   }
 
   async searchProduct(term: string): Promise<SearchProductBody> {
     const response = await this.request.post("/api/searchProduct", {
       form: { search_product: term },
     });
-    return response.json();
+    return readJson(response);
   }
 }

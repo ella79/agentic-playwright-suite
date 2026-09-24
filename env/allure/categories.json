@@ -19,7 +19,7 @@
   },
   {
     "name": "Host unavailable",
-    "messageRegex": ".*(503|502|504|ECONNREFUSED|ERR_CONNECTION).*",
+    "messageRegex": ".*(Host unavailable|503|502|504|ECONNREFUSED|ERR_CONNECTION).*",
     "matchedStatuses": ["failed", "broken"],
     "description": "The public demo host shed the request. Infrastructure noise, not a product regression."
   },
