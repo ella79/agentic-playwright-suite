@@ -185,7 +185,7 @@ Everything a test needs arrives through `utils/fixtures/testFixtures.ts`.
 | Fixture                              | Provides                                                                                                             |
 | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `homePage`, `cartPage`, and the rest | One page object per surface, built for the tests that name it                                                        |
-| `uniqueAccount`                      | A throwaway account, registered through its own signup, deleted afterwards                                           |
+| `uniqueAccount`                      | A throwaway account created through the API, signed in through the login form, deleted through the API afterwards    |
 | `page`                               | Playwright's page with ad, analytics and consent hosts aborted; in the cart specs, signed into an account of its own |
 | `request`                            | Playwright's own API request context, base-URL'd the same as `page` — API specs only                                 |
 
@@ -203,7 +203,7 @@ way to get a session at all, since the login API answers no `Set-Cookie` — and
 
 That default is wrong for exactly one kind of case: one that proves something about the boundary
 between signed-in and not, where starting already authenticated either breaks the case outright
-(`uniqueAccount`'s own signup navigates to the login page, which a live session redirects away from)
+(`uniqueAccount`'s own sign-in navigates to the login page, which a live session redirects away from)
 or defeats the point of it (a guard test that only means something if it starts unguarded). A case
 where the _whole file_ needs Guest opts out with:
 
