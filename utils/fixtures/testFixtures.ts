@@ -1,5 +1,5 @@
 import path from "path";
-import { expect, test as base } from "@playwright/test";
+import { expect, test as base, type Page } from "@playwright/test";
 import { AccountApiClient } from "../apiClients/accountApiClient";
 import { applyAllureLabels } from "./allureLabels";
 import {
@@ -15,7 +15,6 @@ import {
   ProductsPage,
 } from "../pageObjects";
 import { buildAccount, type TestAccount } from "../testData";
-import { url } from "../url";
 
 export interface ActiveAccount extends TestAccount {
   /** Set by a test that deletes the account itself, so teardown skips cleanup. */
@@ -185,26 +184,14 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
     const account = buildAccount();
     const accounts = new AccountApiClient(request);
 
-    const created = await accounts.createAccount(account);
-    expect(created.responseCode, `createAccount: ${created.message}`).toBe(201);
-
     // The context starts signed in as the shared account; dropping its
     // session cookie is what lets the login below sign in as this one.
     await page.context().clearCookies();
-    const loginPage = new LoginPage(page);
-    await loginPage.gotoLoginPage();
-    await loginPage.login(account.email, account.password);
-    await expect(loginPage.logoutLink).toBeVisible();
+    await signInAsNewAccount(page, accounts, account);
 
     await use(page);
 
-    const deleted = await accounts.deleteAccount(
-      account.email,
-      account.password,
-    );
-    expect(deleted.responseCode, `deleteAccount: ${deleted.message}`).toBe(200);
-    const lookup = await accounts.getUserDetailByEmail(account.email);
-    expect(lookup.responseCode).toBe(404);
+    await removeAccount(accounts, account);
   },
 
   homePage: async ({ page }, use) => {
@@ -248,52 +235,56 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
   },
 
   /**
-   * Registers a throwaway account for the test and removes it afterwards.
-   * Each test owns its own account, so parallel workers never contend and no
-   * test inherits state from another.
+   * A throwaway account for the test, created and deleted through the API and
+   * signed in through the login form. Each test owns its own account, so
+   * parallel workers never contend and no test inherits state from another.
    */
-  uniqueAccount: async ({ page }, use) => {
+  uniqueAccount: async ({ page, request }, use) => {
     const account: ActiveAccount = { ...buildAccount(), deleted: false };
+    const accounts = new AccountApiClient(request);
 
-    const loginPage = new LoginPage(page);
-    const accountInfoPage = new AccountInfoPage(page);
-    const confirmationPage = new ConfirmationPage(page);
-    const homePage = new HomePage(page);
-
-    await loginPage.gotoLoginPage();
-    await loginPage.startSignup(account.name, account.email);
-
-    await accountInfoPage.createAccount(account);
-
-    await confirmationPage.continueButton.waitFor({ state: "visible" });
-    await confirmationPage.continue();
+    await signInAsNewAccount(page, accounts, account);
 
     await use(account);
 
-    if (account.deleted) {
-      return;
+    if (!account.deleted) {
+      await removeAccount(accounts, account);
     }
-
-    await homePage.gotoHomePage();
-    const stillSignedIn = await homePage.logoutLink
-      .isVisible()
-      .catch(() => false);
-
-    if (!stillSignedIn) {
-      await loginPage.gotoLoginPage();
-      await loginPage.login(account.email, account.password);
-      // login() submits the form and returns; the session only exists once
-      // that POST has been processed. Navigating straight to /delete_account
-      // can overtake it and arrive anonymously, which deletes nothing and
-      // fails the assertion below for the wrong reason.
-      await expect(homePage.logoutLink).toBeVisible();
-    }
-
-    await page.goto(url.deleteAccount);
-    // A silent teardown failure would leak accounts run after run with nothing
-    // surfacing, so cleanup asserts its own outcome.
-    await expect(confirmationPage.accountDeletedBanner).toBeVisible();
   },
 });
+
+/**
+ * Creates the account through the API and signs the page into it through the
+ * login form, the only way to a browser session: the login API answers no
+ * cookie. The signup form and the cleanup pages this replaces were each one
+ * more request for the demo host to answer 503, as it did in run 241.
+ */
+async function signInAsNewAccount(
+  page: Page,
+  accounts: AccountApiClient,
+  account: TestAccount,
+): Promise<void> {
+  const created = await accounts.createAccount(account);
+  expect(created.responseCode, `createAccount: ${created.message}`).toBe(201);
+
+  const loginPage = new LoginPage(page);
+  await loginPage.gotoLoginPage();
+  await loginPage.login(account.email, account.password);
+  await expect(loginPage.logoutLink).toBeVisible();
+}
+
+/**
+ * A silent cleanup failure would leak accounts run after run with nothing
+ * surfacing, so the deletion confirms its own outcome.
+ */
+async function removeAccount(
+  accounts: AccountApiClient,
+  account: TestAccount,
+): Promise<void> {
+  const deleted = await accounts.deleteAccount(account.email, account.password);
+  expect(deleted.responseCode, `deleteAccount: ${deleted.message}`).toBe(200);
+  const lookup = await accounts.getUserDetailByEmail(account.email);
+  expect(lookup.responseCode).toBe(404);
+}
 
 export { expect } from "@playwright/test";
