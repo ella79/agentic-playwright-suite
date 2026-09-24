@@ -96,7 +96,8 @@ at all — and saves the result as `storageState`. Every functional and visual p
 and starts already signed in, so a case that only needs "some logged-in user" as a precondition never
 pays for a signup it has no reason to prove. `login.spec.ts` and `signup.spec.ts` opt back out with
 `test.use({ storageState: { cookies: [], origins: [] } })` at the top of the file; `home.spec.ts`'s
-TC-02 and `cart.spec.ts`'s TC-19 open a second, anonymous `browser.newContext()` instead, since
+TC-02 and `cart.spec.ts`'s TC-19 take the `guestPage` fixture instead, a signed-out page with the
+same third-party blocking, since
 those two compare a guest and a signed-in visitor within one case rather than running the whole case
 as one or the other.
 

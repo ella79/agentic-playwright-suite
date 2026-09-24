@@ -28,14 +28,7 @@ test.describe("Visual regression - Cart Page", () => {
     });
   });
 
-  test("VR-27: Checkout guard modal", async ({ browser }) => {
-    // A second, anonymous context: this case proves the guest guard, which
-    // the shared logged-in session every other spec depends on would never
-    // reach.
-    const guestContext = await browser.newContext({
-      storageState: { cookies: [], origins: [] },
-    });
-    const guestPage = await guestContext.newPage();
+  test("VR-27: Checkout guard modal", async ({ guestPage }) => {
     const guestProductDetail = new ProductDetailPage(guestPage);
     const guestCart = new CartPage(guestPage);
 
@@ -49,7 +42,5 @@ test.describe("Visual regression - Cart Page", () => {
     await expect(guestPage).toHaveScreenshot("cart-checkout-guard.png", {
       maxDiffPixelRatio: 0.03, // VR: full-page capture over the page's own product imagery
     });
-
-    await guestContext.close();
   });
 });
