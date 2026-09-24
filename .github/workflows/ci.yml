@@ -530,11 +530,16 @@ jobs:
       - name: Stage results
         run: |
           cp -r results/webkit/. results/functional/ 2>/dev/null || true
+          # WebKit's environment file just replaced Chromium's; the report holds both.
+          sed -i 's/^Browser=.*/Browser=Chromium, WebKit/' results/functional/environment.properties 2>/dev/null || true
 
           mkdir -p results/combined
           cp -r results/functional/. results/combined/ 2>/dev/null || true
           cp -r results/visual/. results/combined/ 2>/dev/null || true
           cp -r results/api/. results/combined/ 2>/dev/null || true
+          # The copies above left the API run's environment in the root report,
+          # which spans every suite: the functional one names both engines.
+          cp results/functional/environment.properties results/combined/environment.properties 2>/dev/null || true
 
           write_meta() {
             dir=$1; label=$2; path=$3
@@ -557,6 +562,7 @@ jobs:
           write_meta results/visual "Visual Regression" "visual/"
           write_meta results/api "API" "api/"
 
+          node utils/scripts/prepare-allure-results.mjs results/combined results/functional results/visual results/api
           node utils/scripts/group-allure-packages.mjs             results/combined results/functional results/visual results/api
 
       # Trend graphs only exist if the previous report's history is carried

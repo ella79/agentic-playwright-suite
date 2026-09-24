@@ -39,6 +39,12 @@
     "name": "Assertion failed",
     "messageRegex": ".*expect.*",
     "matchedStatuses": ["failed"],
-    "description": "An assertion about the application's behaviour did not hold. The most interesting category of the six."
+    "description": "An assertion about the application's behaviour did not hold. The most interesting category here."
+  },
+  {
+    "name": "Flaky",
+    "matchedStatuses": ["passed"],
+    "flaky": true,
+    "description": "Passed only after an earlier attempt of the same case failed. The retry kept the run green; the case still needs its cause found."
   }
 ]
