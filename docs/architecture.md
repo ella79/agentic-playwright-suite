@@ -84,10 +84,9 @@ between tests and has no teardown.
 
 **Three ways to be signed in, chosen by what the case actually proves.** `uniqueAccount` is the fixture
 that carries real lifecycle: it creates a throwaway user through the API, signs it in through the
-login form, yields it, and deletes it through the API afterwards, confirming the deletion (decision
-#8). It exists for the handful of cases that
-prove something about signup, login or account deletion themselves — `login.spec.ts` and
-`signup.spec.ts`, in full — where a fresh, disposable account is the point.
+login form, yields it, and deletes it through the API afterwards, confirming the deletion. It exists
+for the handful of cases that prove something about signup, login or account deletion themselves —
+`login.spec.ts` and `signup.spec.ts`, in full — where a fresh, disposable account is the point.
 
 Everything else defaults to a shared, persistent account instead: `utils/setup/login.setup.ts` runs
 as its own project once per suite run, registers that account through the API if it does not already

@@ -143,31 +143,6 @@ VR-27 failed locally on unchanged code too: their guest context has no third-par
 the consent dialog Google shows to EU visitors covers the page. CI runs from the US and does not
 get it.
 
-### 8. Create and delete throwaway accounts through the API, not the signup form
-
-**Status:** Accepted
-
-**Context:** `uniqueAccount` registered its account through the signup form and deleted it by
-signing back in and opening `/delete_account`: about five pages to create, up to four to delete. In
-run 241 three failed attempts, of TC-09 on WebKit and TC-12 on Chromium, were each a 503 from the demo
-host on one of those pages (`POST /signup`, `GET /`, `GET /delete_account`); the tests' own steps had
-passed. The signup is a precondition for TC-08, TC-09, TC-10 and TC-12, not what they prove: TC-11,
-which proves signup, runs its own.
-
-**Decision:** `uniqueAccount` creates the account with `POST /api/createAccount`, signs in through
-the login form, the only way to a browser session, and deletes it with `DELETE /api/deleteAccount`,
-confirmed by `GET /api/getUserDetailByEmail`. The same two steps serve the own accounts of #7.
-Playwright's API testing guide describes this use: "Prepare server side state before visiting the
-web application in a test".
-
-**Consequences:** Each of those cases loads the login page and home instead of the signup flow, and
-no page at all to clean up, so it is faster and offers the host fewer requests to shed. A 503 on
-the requests that remain is still possible and still fails the case. TC-10, which deletes the
-account through the UI because that is what it proves, is unchanged.
-
-**Verified:** 2026-09-24, locally, no retries: the login, signup and checkout specs passed on
-Chromium and WebKit, 14 of 14.
-
 ## Incidents
 
 Bugs found during development. Not decisions; kept for reference.
