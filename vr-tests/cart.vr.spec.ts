@@ -39,8 +39,13 @@ test.describe("Visual regression - Cart Page", () => {
     const guardModal = await guestCart.proceedToCheckoutAsGuest();
     await expect(guardModal.message).toBeVisible();
 
+    const clip = await guestCart.unionBoundingBox([
+      guestCart.header,
+      guestCart.footer,
+    ]);
     await expect(guestPage).toHaveScreenshot("cart-checkout-guard.png", {
-      maxDiffPixelRatio: 0.03, // VR: full-page capture over the page's own product imagery
+      clip,
+      maxDiffPixelRatio: 0.03, // VR: header-to-footer capture over the page's own product imagery
     });
   });
 });

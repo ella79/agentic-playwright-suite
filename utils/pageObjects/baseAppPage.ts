@@ -3,6 +3,7 @@ import { expect, type Locator, type Page } from "@playwright/test";
 export abstract class BaseAppPage {
   readonly page: Page;
   readonly header: Locator;
+  readonly footer: Locator;
   readonly homeLink: Locator;
   readonly productsLink: Locator;
   readonly cartLink: Locator;
@@ -19,6 +20,7 @@ export abstract class BaseAppPage {
   constructor(page: Page) {
     this.page = page;
     this.header = page.getByRole("banner");
+    this.footer = page.getByRole("contentinfo");
     // Every nav link is scoped to the header rather than matched page-wide:
     // "Cart"'s accessible name carries a leading space from its icon markup,
     // which exact matching does not trim, and several of these names are also
