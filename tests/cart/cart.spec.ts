@@ -54,18 +54,11 @@ test.describe("Cart Page", () => {
 
   test("TC-19: Proceeding to checkout differs for a guest and a signed-in visitor", async ({
     page,
-    browser,
+    guestPage,
     cartPage,
     productDetailPage,
   }) => {
-    // A second, anonymous context: the case compares both identities at once,
-    // and the shared session every other spec depends on is already signed
-    // in, so the guest half cannot run on the default page.
     await test.step("a guest is guarded and kept on the cart page", async () => {
-      const guestContext = await browser.newContext({
-        storageState: { cookies: [], origins: [] },
-      });
-      const guestPage = await guestContext.newPage();
       const guestProductDetail = new ProductDetailPage(guestPage);
       const guestCart = new CartPage(guestPage);
 
@@ -77,8 +70,6 @@ test.describe("Cart Page", () => {
       await expect(guardModal.heading).toBeVisible();
       await expect(guardModal.message).toBeVisible();
       await expect(guestPage).toHaveURL(new RegExp(`${url.cart}$`));
-
-      await guestContext.close();
     });
 
     await test.step("a signed-in visitor reaches checkout", async () => {

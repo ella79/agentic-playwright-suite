@@ -187,6 +187,7 @@ Everything a test needs arrives through `utils/fixtures/testFixtures.ts`.
 | `homePage`, `cartPage`, and the rest | One page object per surface, built for the tests that name it                                                        |
 | `uniqueAccount`                      | A throwaway account created through the API, signed in through the login form, deleted through the API afterwards    |
 | `page`                               | Playwright's page with ad, analytics and consent hosts aborted; in the cart specs, signed into an account of its own |
+| `guestPage`                          | A signed-out page with the same blocking as `page`, for a case that compares a guest with the signed-in visitor      |
 | `request`                            | Playwright's own API request context, base-URL'd the same as `page` — API specs only                                 |
 
 A new page object gets a fixture in the same commit that adds the class. Fixtures are on demand, so
@@ -213,15 +214,13 @@ test.use({ storageState: { cookies: [], origins: [] } });
 
 at the top of the file. A case that needs _both_ identities at once — comparing what a guest sees
 against what a signed-in visitor sees, in one test — cannot use `test.use()` for that, since it sets
-the one context the whole test runs in; instead it opens a second, anonymous context directly:
+the one context the whole test runs in; instead it takes the `guestPage` fixture:
 
 ```typescript
-const guestContext = await browser.newContext({
-  storageState: { cookies: [], origins: [] },
+test("TC-02: ...", async ({ homePage, guestPage }) => {
+  const guestHome = new HomePage(guestPage);
+  // ...assert against homePage and guestHome
 });
-const guestHome = new HomePage(await guestContext.newPage());
-// ...assert against guestHome, then:
-await guestContext.close();
 ```
 
 `uniqueAccount` still does its own registration and its own teardown; what changed is that it is no
@@ -232,8 +231,7 @@ teardown does not try again.
 Every plan states which of the two its cases assume, in its Metadata table's `Precondition` row:
 `Login` for the shared signed-in default, `Guest` for a plan (or a single case inside one) that opts
 back out. `login-test-plan.md` and `signup-test-plan.md` are Guest for the whole file; `TC-02` in
-`home-test-plan.md` and `TC-19` in `cart-test-plan.md` open the second-context form for their
-guest half. Everything else is Login.
+`home-test-plan.md` and `TC-19` in `cart-test-plan.md` take `guestPage` for their guest half. Everything else is Login.
 
 The cart belongs to the account, so a case that changes it cannot share the shared account: the
 parallel CI jobs emptied each other's cart through it (decision #7 in `docs/decisions.md`). The

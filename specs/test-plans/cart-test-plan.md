@@ -24,8 +24,7 @@ Seed: `specs/seed.spec.ts`
 - The cart belongs to the account, so every case here runs on an account of its own: created
   through the API, signed in through the login form, deleted afterwards (decision #7). Every case
   starts already signed in, with an empty cart; `cartPage.clearCart()` still runs first.
-- TC-19 resets to a guest context for its guard half, using
-  `test.use({ storageState: { cookies: [], origins: [] } })` scoped to that case alone.
+- TC-19 takes the `guestPage` fixture, a signed-out page, for its guard half.
 
 ## Test Cases
 

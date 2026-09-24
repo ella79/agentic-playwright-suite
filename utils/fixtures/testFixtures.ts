@@ -41,6 +41,7 @@ interface PageObjects {
 
 interface Fixtures extends PageObjects {
   uniqueAccount: ActiveAccount;
+  guestPage: Page;
 }
 
 /** Specs whose cases change the cart; the cart belongs to the account, so each case gets its own. */
@@ -113,62 +114,7 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
   ],
 
   page: async ({ page, request }, use, testInfo) => {
-    await page.route(
-      (url) => !isAllowedRequest(url.href),
-      (route) => route.abort(),
-    );
-
-    /**
-     * Funding Choices still injects its dialog root with its own script
-     * blocked above: the container renders empty, but it keeps intercepting
-     * clicks underneath it. Seen live as a real failure — Playwright's own
-     * actionability check reported `<div class="fc-dialog-overlay">…</div>
-     * intercepts pointer events` on an "Add to cart" click with nothing to do
-     * with consent. There is never content in it to dismiss, only a hitbox
-     * left behind to disarm.
-     *
-     * `addLocatorHandler` is Playwright's own mechanism for exactly this: an
-     * unpredictable overlay that must be cleared before the action underneath
-     * it can proceed. Registered once here, it survives every navigation
-     * within the test, fires only when the element is actually blocking
-     * something, and Playwright itself re-verifies it is gone before
-     * retrying — no separate observer racing the page's own timing.
-     *
-     * The handler targets `.fc-consent-root`, the outer container, not
-     * `.fc-dialog-overlay` alone: removing only the inner overlay left the
-     * root itself still intercepting the next click, verified live against a
-     * reliable reproduction of the real element — the failure just moved from
-     * "`.fc-dialog-overlay` intercepts" to "`.fc-consent-root` intercepts".
-     * Removing the root removes the overlay along with it.
-     */
-    await page.addLocatorHandler(
-      page.locator(".fc-consent-root"),
-      async (root) => {
-        await root.evaluate((el) => el.remove());
-      },
-    );
-
-    /**
-     * The demo host sporadically sheds a cart write with a 503, seen in a trace
-     * as `GET /add_to_cart/1?quantity=1 -> 503` on a page where every other
-     * request returned 200. The app ignores the failure silently, so the modal
-     * never opens and the test times out on a state that cannot arrive.
-     *
-     * One retry on that request, not a loop. It changes nothing the tests
-     * assert: an endpoint that is genuinely broken still fails twice.
-     */
-    await page.route(CART_WRITE_ENDPOINTS, async (route, request) => {
-      if (request.method() !== "GET") {
-        return route.fallback();
-      }
-
-      let response = await route.fetch();
-      if (response.status() >= 500) {
-        response = await route.fetch();
-      }
-
-      await route.fulfill({ response });
-    });
+    await hardenPage(page);
 
     if (!CART_SPECS.has(path.basename(testInfo.file))) {
       await use(page);
@@ -240,7 +186,56 @@ export const test = base.extend<Fixtures & { allureLabels: void }>({
       await removeAccount(accounts, account);
     }
   },
+
+  /** A signed-out page, for a case that compares a guest with the signed-in visitor. */
+  guestPage: async ({ browser }, use) => {
+    const context = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    const page = await context.newPage();
+    await hardenPage(page);
+    await use(page);
+    await context.close();
+  },
 });
+
+/** Every page the suite drives gets the same protection from third-party noise. */
+async function hardenPage(page: Page): Promise<void> {
+  await page.route(
+    (url) => !isAllowedRequest(url.href),
+    (route) => route.abort(),
+  );
+
+  // Google's consent dialog can cover the page: accept it when it renders, and
+  // remove the empty container it leaves, which still intercepts clicks, when
+  // its script is blocked.
+  await page.addLocatorHandler(
+    page.locator(".fc-consent-root"),
+    async (root) => {
+      const consent = root.getByRole("button", { name: "Consent" });
+      if (await consent.isVisible()) {
+        await consent.click();
+      } else {
+        await root.evaluate((el) => el.remove());
+      }
+    },
+  );
+
+  // One retry on a cart write the host sheds with a 5xx; a broken endpoint
+  // still fails twice.
+  await page.route(CART_WRITE_ENDPOINTS, async (route, request) => {
+    if (request.method() !== "GET") {
+      return route.fallback();
+    }
+
+    let response = await route.fetch();
+    if (response.status() >= 500) {
+      response = await route.fetch();
+    }
+
+    await route.fulfill({ response });
+  });
+}
 
 /** The login API sets no session cookie, so the browser signs in through the form. */
 async function signInAsNewAccount(

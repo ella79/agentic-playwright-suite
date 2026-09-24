@@ -23,7 +23,6 @@ export class HomePage extends BaseAppPage {
   readonly subscriptionEmailInput: Locator;
   readonly subscriptionSubmitButton: Locator;
   readonly subscriptionSuccessMessage: Locator;
-  readonly footer: Locator;
   readonly footerBottom: Locator;
   readonly copyrightText: Locator;
 
@@ -84,7 +83,6 @@ export class HomePage extends BaseAppPage {
     this.subscriptionSuccessMessage = page.getByText(
       "You have been successfully subscribed!",
     );
-    this.footer = page.getByRole("contentinfo");
     this.footerBottom = page.locator(".footer-bottom");
     this.copyrightText = this.footer.getByText("Copyright");
   }
