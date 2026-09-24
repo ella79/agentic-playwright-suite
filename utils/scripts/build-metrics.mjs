@@ -179,6 +179,17 @@ const verdict = (value, good, acceptable, higherIsBetter = true) => {
   return ok ? "good" : middling ? "warn" : "bad";
 };
 
+/** Flaky results over all results across the window: a rate is a trend, one run only has a count. */
+const windowFlakyRate = (name) => {
+  let flaky = 0;
+  let total = 0;
+  for (const run of window) {
+    flaky += run.suites?.[name]?.flaky ?? 0;
+    total += run.suites?.[name]?.total ?? 0;
+  }
+  return total ? round((flaky / total) * 100, 2) : 0;
+};
+
 /** Offenders are counted across the window, not the last run alone. */
 const offenders = new Map();
 for (const run of window) {
@@ -347,8 +358,9 @@ const escape = (text) =>
 const suiteRows = suites
   .map((s) => {
     const pass = verdict(s.passRate, PASS_RATE_GOOD, PASS_RATE_ACCEPTABLE);
+    const flakyRate = windowFlakyRate(s.name);
     const flake = verdict(
-      s.flakyRate,
+      flakyRate,
       FLAKY_RATE_GOOD,
       FLAKY_RATE_ACCEPTABLE,
       false,
@@ -357,7 +369,8 @@ const suiteRows = suites
       <th scope="row">${escape(label(s.name))}</th>
       <td>${s.total}</td>
       <td class="${pass}">${s.passRate}%</td>
-      <td class="${flake}">${s.flakyRate}%</td>
+      <td>${s.flaky}</td>
+      <td class="${flake}">${flakyRate}%</td>
       <td>${seconds(s.p50)}</td>
       <td>${seconds(s.p95)}</td>
       <td>${seconds(s.durationMs)}</td>
@@ -469,7 +482,7 @@ ${donut(
   })),
 )}
 <table>
-  <thead><tr><th>Suite</th><th>Cases</th><th>Pass rate</th><th>Flaky rate</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
+  <thead><tr><th>Suite</th><th>Cases</th><th>Pass rate</th><th>Flaky</th><th>Flaky rate, last ${WINDOW} runs</th><th>p50</th><th>p95</th><th>Wall clock</th></tr></thead>
   <tbody>${suiteRows}</tbody>
 </table>
 
@@ -510,7 +523,7 @@ ${donut(
 <h2>Thresholds</h2>
 <dl>
   <dt>Pass rate</dt><dd>${PASS_RATE_GOOD}% or above is healthy, ${PASS_RATE_ACCEPTABLE} to ${PASS_RATE_GOOD}% is acceptable during active development, below ${PASS_RATE_ACCEPTABLE}% means the suite has a stability problem rather than the application.</dd>
-  <dt>Flaky rate</dt><dd>Below ${FLAKY_RATE_GOOD}% is the target. Past ${FLAKY_RATE_ACCEPTABLE}% the suite stops being believed, and a suite nobody believes is worse than no suite.</dd>
+  <dt>Flaky rate</dt><dd>Measured across the last ${WINDOW} runs, not one. Below ${FLAKY_RATE_GOOD}% is the target. Past ${FLAKY_RATE_ACCEPTABLE}% the suite stops being believed, and a suite nobody believes is worse than no suite.</dd>
   <dt>Duration</dt><dd>Tracked as a trend, not a fixed limit. What matters is whether it is growing faster than coverage.</dd>
   <dt>Coverage</dt><dd>New coverage exists only because a genuine state on the page or the API was found missing and verified live before it was added, never to pad the count. The WebKit run is not a coverage number of its own: it replays the same functional cases on a second engine.</dd>
 </dl>
@@ -531,6 +544,6 @@ await writeFile(join(options.out, "index.html"), html);
 console.log(`Metrics written to ${options.out} (${history.length} runs kept)`);
 for (const s of suites) {
   console.log(
-    `  ${label(s.name)}: ${s.passRate}% pass, ${s.flakyRate}% flaky, p95 ${seconds(s.p95)}`,
+    `  ${label(s.name)}: ${s.passRate}% pass, ${s.flaky} flaky, p95 ${seconds(s.p95)}`,
   );
 }
