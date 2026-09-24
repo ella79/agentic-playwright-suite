@@ -13,6 +13,7 @@
 // Usage: node utils/scripts/prepare-allure-results.mjs <results-dir> [...]
 import { readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { stripVTControlCharacters } from "node:util";
 
 const directories = process.argv.slice(2);
 
@@ -74,11 +75,19 @@ for (const directory of directories) {
     if (group.length < 2) continue;
     group.sort((a, b) => a.result.start - b.result.start);
     const last = group[group.length - 1];
-    const failedBefore = group
+    const firstFailure = group
       .slice(0, -1)
-      .some((item) => ["failed", "broken"].includes(item.result.status));
-    if (last.result.status === "passed" && failedBefore) {
-      last.result.statusDetails = { ...last.result.statusDetails, flaky: true };
+      .find((item) => ["failed", "broken"].includes(item.result.status));
+    if (last.result.status === "passed" && firstFailure) {
+      // Allure groups a category by message; a passing attempt has none.
+      const reason = stripVTControlCharacters(
+        firstFailure.result.statusDetails?.message ?? "",
+      ).split("\n")[0];
+      last.result.statusDetails = {
+        ...last.result.statusDetails,
+        flaky: true,
+        message: `Passed on retry. First attempt: ${reason}`,
+      };
       await writeFile(last.path, JSON.stringify(last.result));
       flaky += 1;
     }
