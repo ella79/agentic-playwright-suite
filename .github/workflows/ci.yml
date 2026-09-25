@@ -5,7 +5,6 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  merge_group:
   workflow_dispatch:
 
 concurrency:
@@ -20,44 +19,55 @@ env:
   IMAGE_NAME: ${{ github.repository }}/e2e-exec-playwright
 
 jobs:
-  # Once a merge queue is required on `main`, `merge_group` runs the full
-  # suite against the exact commit about to land, before it lands. The push
-  # to `main` that follows is that same commit: retesting it gains nothing,
-  # so this job looks for the `merge_group` run that already covered it and
-  # hands its run id downstream. Every test job and `publish-dashboard` treat
-  # an empty output as "nothing to reuse, test here" - a pull request, a
-  # merge_group run itself, or a push whose commit reached `main` some way
-  # this could not find (the queue disabled, a rerun of a stale push) all
-  # fall back to exactly today's behaviour.
-  resolve-merge-group-run:
-    name: resolve-merge-group-run
+  # Every suite runs on the pull request. On the push its merge makes to
+  # `main`, this job looks for that pull request's successful run and checks
+  # it tested the same files `main` now holds. For now it only reports what it
+  # would reuse: `prior_run_id` stays empty, so every suite still runs here.
+  resolve-pr-run:
+    name: resolve-pr-run
     runs-on: ubuntu-latest
     permissions:
       actions: read
+      contents: read
+      pull-requests: read
     outputs:
       prior_run_id: ${{ steps.find.outputs.prior_run_id }}
     steps:
-      - name: Find the merge_group run that already tested this commit
+      - name: Find the pull request run that already tested this commit
         id: find
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
         run: |
-          # merge_method: MERGE means the queue fast-forwards `main` to the
-          # exact commit it tested, so this push's SHA and that run's SHA
-          # match whenever the queue produced this push. Scoped to this
-          # workflow file, not the repository's whole run history, in case
-          # another workflow ever also listens for merge_group. Twenty is
-          # several times the queue depth this project has ever needed at
-          # once.
-          run_id=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?event=merge_group&status=success&per_page=20" \
-            --jq "[.workflow_runs[] | select(.head_sha == \"${{ github.sha }}\")][0].id // empty")
-          echo "prior_run_id=$run_id" >> "$GITHUB_OUTPUT"
-          if [ -n "$run_id" ]; then
-            echo "Reusing results from merge_group run $run_id"
-          else
-            echo "No matching merge_group run; testing here"
+          # The pull request whose merge produced this commit. A fork's run
+          # executed code nobody had merged yet, so forks are left out.
+          pr=$(gh api "repos/$REPO/commits/$SHA/pulls" \
+            --jq "[.[] | select(.merge_commit_sha == \"$SHA\" and .head.repo.full_name == \"$REPO\")][0] // empty | \"\(.number) \(.head.sha)\"")
+          if [ -z "$pr" ]; then
+            echo "No pull request from this repository merged as $SHA; testing here"
+            exit 0
           fi
+          read -r number head <<< "$pr"
+
+          # A pull request that was not up to date merged onto a newer `main`
+          # than the one its run tested, so the files differ and nothing is
+          # reused.
+          main_tree=$(gh api "repos/$REPO/git/commits/$SHA" --jq .tree.sha)
+          head_tree=$(gh api "repos/$REPO/git/commits/$head" --jq .tree.sha)
+          if [ "$main_tree" != "$head_tree" ]; then
+            echo "PR #$number tested different files than main now holds; testing here"
+            exit 0
+          fi
+
+          run_id=$(gh api "repos/$REPO/actions/workflows/ci.yml/runs?event=pull_request&head_sha=$head&status=success&per_page=1" \
+            --jq '.workflow_runs[0].id // empty')
+          if [ -z "$run_id" ]; then
+            echo "No successful run for PR #$number; testing here"
+            exit 0
+          fi
+          echo "PR #$number run $run_id tested these files; reporting only, testing here as well"
 
   # Stage: build
   #
@@ -69,8 +79,8 @@ jobs:
   # match the lockfile.
   prepare-playwright-image:
     name: prepare-playwright-image
-    needs: resolve-merge-group-run
-    if: needs.resolve-merge-group-run.outputs.prior_run_id == ''
+    needs: resolve-pr-run
+    if: needs.resolve-pr-run.outputs.prior_run_id == ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -111,8 +121,8 @@ jobs:
   # Stage: check
   static-checks:
     name: static-checks
-    needs: [resolve-merge-group-run, prepare-playwright-image]
-    if: needs.resolve-merge-group-run.outputs.prior_run_id == ''
+    needs: [resolve-pr-run, prepare-playwright-image]
+    if: needs.resolve-pr-run.outputs.prior_run_id == ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -176,21 +186,12 @@ jobs:
   # runner, so the engines run in parallel rather than trebling the wall clock
   # of a single job.
   #
-  # WebKit only appears once the change is actually being merged - on
-  # merge_group, and as the fallback on push when nothing already covered it.
-  # Rendering differences are not the feedback a review needs within seconds,
-  # and dropping it from pull requests cuts each one to half the executions.
-  # The list is built from the event rather than guarded with `if`, because a
-  # matrix entry that exists and is skipped still shows as a box in the graph
-  # and still has to be reasoned about.
-  #
-  # `include` is deliberately not used to carry the engine label. An include
-  # entry that matches nothing in the base list does not vanish, it adds a
-  # combination, so on a pull request it would put WebKit back.
+  # Both engines run on pull requests too, so a WebKit failure blocks the merge
+  # instead of surfacing on main after it.
   e2e:
     name: ${{ matrix.project }}
-    needs: [resolve-merge-group-run, prepare-playwright-image, static-checks]
-    if: needs.resolve-merge-group-run.outputs.prior_run_id == ''
+    needs: [resolve-pr-run, prepare-playwright-image, static-checks]
+    if: needs.resolve-pr-run.outputs.prior_run_id == ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -201,7 +202,7 @@ jobs:
       # away what the other already produced.
       fail-fast: false
       matrix:
-        project: ${{ github.event_name == 'pull_request' && fromJSON('["e2e-chromium"]') || fromJSON('["e2e-chromium","e2e-webkit"]') }}
+        project: [e2e-chromium, e2e-webkit]
     container:
       image: ${{ needs.prepare-playwright-image.outputs.image }}
       credentials:
@@ -271,8 +272,8 @@ jobs:
 
   visual-regression:
     name: visual-regression
-    needs: [resolve-merge-group-run, prepare-playwright-image, static-checks]
-    if: needs.resolve-merge-group-run.outputs.prior_run_id == ''
+    needs: [resolve-pr-run, prepare-playwright-image, static-checks]
+    if: needs.resolve-pr-run.outputs.prior_run_id == ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -343,8 +344,8 @@ jobs:
 
   api:
     name: api
-    needs: [resolve-merge-group-run, prepare-playwright-image, static-checks]
-    if: needs.resolve-merge-group-run.outputs.prior_run_id == ''
+    needs: [resolve-pr-run, prepare-playwright-image, static-checks]
+    if: needs.resolve-pr-run.outputs.prior_run_id == ''
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -396,16 +397,15 @@ jobs:
   # The single check the branch protection requires.
   #
   # GitHub counts a skipped job as a satisfied requirement, so requiring the
-  # test jobs directly would be hollow: the WebKit entry is absent on pull
-  # requests by design, and any job that stops running would silently stop
-  # being enforced. This job always runs, reads the results of the others, and
+  # test jobs directly would be hollow: any job that stops running would
+  # silently stop being enforced. This job always runs, reads the results of the others, and
   # fails on anything that is not success or a deliberate skip. Adding a job
   # later means adding it here rather than editing repository settings.
   ci-gate:
     name: ci-gate
     needs:
       [
-        resolve-merge-group-run,
+        resolve-pr-run,
         static-checks,
         e2e,
         visual-regression,
@@ -443,7 +443,7 @@ jobs:
 
   publish-dashboard:
     name: publish-dashboard
-    needs: [resolve-merge-group-run, e2e, visual-regression, api]
+    needs: [resolve-pr-run, e2e, visual-regression, api]
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
@@ -472,15 +472,13 @@ jobs:
 
       - run: yarn install --immutable
 
-      # This run's own id, unless resolve-merge-group-run found the
-      # merge_group run that already tested this exact commit - the common
-      # case once the queue is required, and always the case today, since
-      # nothing sets prior_run_id until it is. Every download below reads
-      # from whichever run this resolves to.
+      # This run's own id, unless resolve-pr-run hands over the pull request
+      # run that already tested these files. Every download below reads from
+      # whichever run this resolves to.
       - name: Resolve which run's artifacts to read
         id: source
         run: |
-          prior="${{ needs.resolve-merge-group-run.outputs.prior_run_id }}"
+          prior="${{ needs.resolve-pr-run.outputs.prior_run_id }}"
           echo "run_id=${prior:-${{ github.run_id }}}" >> "$GITHUB_OUTPUT"
 
       - name: Collect functional results
