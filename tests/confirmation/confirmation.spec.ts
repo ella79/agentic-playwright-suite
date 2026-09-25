@@ -37,12 +37,11 @@ test.describe("Confirmation Page", () => {
       // limitation, not a flake — `test.skip()` is not used here, since the
       // project forbids it, and skipping the whole case would also drop the
       // Continue check below, which does not depend on downloads working.
-      // See specs/STATUS.md.
       if (testInfo.project.name === "e2e-webkit") {
         testInfo.annotations.push({
           type: "skip",
           description:
-            "WebKit on Linux does not fire the download event for this invoice link; see specs/STATUS.md",
+            "WebKit on Linux does not fire the download event for this invoice link",
         });
         return;
       }
