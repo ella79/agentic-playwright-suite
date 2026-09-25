@@ -37,16 +37,20 @@ setup("authenticate", async ({ page, request }) => {
   const account = buildAccount({ email, password });
 
   // API first, and idempotent on purpose: the account already existing from a
-  // previous run is the steady state, not a failure.
-  const body = await new AccountApiClient(request).createAccount(account);
-  const alreadyExists =
-    body.responseCode === 400 && body.message.includes("already exists");
+  // previous run is the steady state, not a failure. Retried with growing
+  // pauses, because every project waits on this one call and the demo host
+  // sheds load for seconds at a time.
+  await expect(async () => {
+    const body = await new AccountApiClient(request).createAccount(account);
+    const alreadyExists =
+      body.responseCode === 400 && body.message.includes("already exists");
 
-  if (body.responseCode !== 201 && !alreadyExists) {
-    throw new Error(
-      `POST /api/createAccount answered ${body.responseCode}: ${body.message}`,
-    );
-  }
+    if (body.responseCode !== 201 && !alreadyExists) {
+      throw new Error(
+        `POST /api/createAccount answered ${body.responseCode}: ${body.message}`,
+      );
+    }
+  }).toPass({ intervals: [2_000, 5_000], timeout: 20_000 });
 
   // UI second, and not optional: verifyLogin answers JSON with no Set-Cookie
   // header, so it proves credentials are valid without ever starting a
