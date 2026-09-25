@@ -52,6 +52,12 @@ request's latest successful run:
   passed only after a re-run holds each re-run job's artifacts twice under one name, and
   `download-artifact` picks by highest id, which is not always the latest attempt.
 
+A failed run is repeated differently on each side. On a pull request, re-run its failed jobs: the
+cheapest option, and safe, since a run that needed a re-run is never reused, so `main` simply tests
+again after the merge. On `main`, start a new run with Run workflow on `main` instead, because
+`publish-dashboard` reads the run's own artifacts, and a partial re-run would leave the failed
+attempt's beside the new ones for it to pick from.
+
 ## Branch Protection
 
 `main` accepts no direct pushes, from anyone, and the bypass list is empty on purpose: a rule with an
