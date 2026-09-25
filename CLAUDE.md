@@ -85,8 +85,8 @@ GitHub Actions (`.github/workflows/ci.yml`), stages `build` → `check` → `end
 0. `resolve-pr-run` — on push to `main`, finds the pull request run that already tested the same files
 1. `prepare-playwright-image` — builds and pushes the execution image every later job runs inside
 2. `static-checks` — typecheck, lint, format; gates everything after it
-3. `e2e-chromium`, `e2e-webkit`, `visual-regression`, `api` — in parallel, on pull requests and on `main`
-4. `publish-dashboard` — merges the reports and deploys to Pages, `main` only
+3. `e2e-chromium`, `e2e-webkit`, `visual-regression`, `api` — in parallel on pull requests; on `main` only when `resolve-pr-run` finds nothing to reuse
+4. `publish-dashboard` — merges the reports, from the reused run or this one, and deploys to Pages, `main` only
 5. `ci-gate` — reads every other job's result; the only check branch protection requires
 
 `main` takes no direct pushes. Adding a job means adding it to the gate's `needs`. The reasoning

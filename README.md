@@ -45,11 +45,11 @@ failure, including the expected, actual and diff images of a screenshot comparis
 
 ## What runs when
 
-| Trigger                  | Runs                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------ |
-| Pull request             | Static checks, functional suite (Chromium and WebKit), visual suite, API suite |
-| Push to `main`           | The same, then the dashboards and the suite health page publish                |
-| Image or lockfile change | The execution image is rebuilt and pushed to the registry first                |
+| Trigger                  | Runs                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------- |
+| Pull request             | Static checks, functional suite (Chromium and WebKit), visual suite, API suite                |
+| Push to `main`           | Publishes the pull request's results; runs the suites itself only when those cannot be reused |
+| Image or lockfile change | The execution image is rebuilt and pushed to the registry first                               |
 
 Every job runs inside an image built by the first job, so browsers and dependencies install once
 rather than four times, and a local run uses that same image.
