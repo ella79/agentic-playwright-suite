@@ -7,8 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# A newer push to a pull request replaces its older run. Each run on `main`
+# gets a group of its own, so one merge never cancels the one before it.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.ref == 'refs/heads/main' && format('ci-main-{0}', github.run_id) || format('ci-{0}', github.ref) }}
   cancel-in-progress: true
 
 env:
@@ -455,6 +457,12 @@ jobs:
     name: publish-dashboard
     needs: [resolve-pr-run, e2e, visual-regression, api]
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    # One publish at a time, queued rather than replaced: each reads the
+    # published history and writes it back, so two at once would lose one.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -715,7 +723,21 @@ jobs:
             --base ./allure-report \
             --expect-version 5
 
+      # The queue is first in, first out, but GitHub does not guarantee the
+      # order, so a commit older than the one already published stops here.
+      - name: Skip if a newer commit is already published
+        id: order
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          published=$(node -p "(require('./gh-pages-tmp/metrics/history.json').at(-1) ?? {}).commit ?? ''" 2>/dev/null || true)
+          if [ -n "$published" ] && [ "$(gh api "repos/${{ github.repository }}/compare/$published...${{ github.sha }}" --jq .status)" = "behind" ]; then
+            echo "$published, already published, is newer than ${GITHUB_SHA::8}; not publishing over it"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to GitHub Pages
+        if: steps.order.outputs.skip != 'true'
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
