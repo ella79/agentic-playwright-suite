@@ -20,9 +20,9 @@ env:
 
 jobs:
   # Every suite runs on the pull request. On the push its merge makes to
-  # `main`, this job looks for that pull request's successful run and checks
-  # it tested the same files `main` now holds. For now it only reports what it
-  # would reuse: `prior_run_id` stays empty, so every suite still runs here.
+  # `main`, this job looks for that pull request's successful run, checks it
+  # tested the same files `main` now holds, and hands its id downstream: the
+  # test jobs skip, and `publish-dashboard` publishes that run's results.
   resolve-pr-run:
     name: resolve-pr-run
     runs-on: ubuntu-latest
@@ -61,13 +61,23 @@ jobs:
             exit 0
           fi
 
-          run_id=$(gh api "repos/$REPO/actions/workflows/ci.yml/runs?event=pull_request&head_sha=$head&status=success&per_page=1" \
-            --jq '.workflow_runs[0].id // empty')
-          if [ -z "$run_id" ]; then
+          run=$(gh api "repos/$REPO/actions/workflows/ci.yml/runs?event=pull_request&head_sha=$head&status=success&per_page=1" \
+            --jq '.workflow_runs[0] // empty | "\(.id) \(.run_attempt)"')
+          if [ -z "$run" ]; then
             echo "No successful run for PR #$number; testing here"
             exit 0
           fi
-          echo "PR #$number run $run_id tested these files; reporting only, testing here as well"
+          read -r run_id attempt <<< "$run"
+
+          # A re-run keeps each re-run job's artifacts twice under the same
+          # name, and download-artifact picks by highest id, which is not
+          # always the latest attempt. Only a first-attempt run is reused.
+          if [ "$attempt" != "1" ]; then
+            echo "PR #$number run $run_id passed on attempt $attempt; testing here"
+            exit 0
+          fi
+          echo "prior_run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "Publishing PR #$number run $run_id, which tested these files"
 
   # Stage: build
   #
@@ -527,6 +537,10 @@ jobs:
       # published report back to the run that produced it.
       - name: Stage results
         run: |
+          # A reused pull request run labelled its results with its own merge
+          # ref; what is published is `main`.
+          sed -i "s/^Branch=.*/Branch=main/; s/^Commit=.*/Commit=${GITHUB_SHA::8}/" results/*/environment.properties 2>/dev/null || true
+
           cp -r results/webkit/. results/functional/ 2>/dev/null || true
           # WebKit's environment file just replaced Chromium's; the report holds both.
           sed -i 's/^Browser=.*/Browser=Chromium, WebKit/' results/functional/environment.properties 2>/dev/null || true
@@ -549,7 +563,7 @@ jobs:
             "reportName": "$label",
             "buildOrder": ${{ github.run_number }},
             "buildName": "CI #${{ github.run_number }}",
-            "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+            "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ steps.source.outputs.run_id }}",
             "reportUrl": "https://ella79.github.io/agentic-playwright-suite/$path"
           }
           JSON

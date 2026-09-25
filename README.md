@@ -45,11 +45,11 @@ failure, including the expected, actual and diff images of a screenshot comparis
 
 ## What runs when
 
-| Trigger                  | Runs                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------ |
-| Pull request             | Static checks, functional suite (Chromium and WebKit), visual suite, API suite |
-| Push to `main`           | The same, then the dashboards and the suite health page publish                |
-| Image or lockfile change | The execution image is rebuilt and pushed to the registry first                |
+| Trigger                  | Runs                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------- |
+| Pull request             | Static checks, functional suite (Chromium and WebKit), visual suite, API suite                |
+| Push to `main`           | Publishes the pull request's results; runs the suites itself only when those cannot be reused |
+| Image or lockfile change | The execution image is rebuilt and pushed to the registry first                               |
 
 Every job runs inside an image built by the first job, so browsers and dependencies install once
 rather than four times, and a local run uses that same image.
@@ -98,7 +98,8 @@ env/docker/   Execution images for CI and local use
 
 **The whole functional suite fails at the same step.** Look at the other engine in that run: if
 WebKit passed the same twenty-two cases, the demo host was overloaded, not the suite. Four test jobs
-hit it in parallel on `main`. Re-run with that hypothesis rather than editing a test.
+hit it in parallel on `main`. Re-run with that hypothesis rather than editing a test: the failed jobs
+on a pull request, a new run with Run workflow on `main`.
 
 **Visual cases fail locally with no obvious diff.** Baselines are Chromium on Linux. A local run on
 Windows or macOS compares against a set that was never committed. Use `yarn docker:vr`, which runs

@@ -44,19 +44,26 @@ has nothing new to test. On that push, `resolve-pr-run` finds the merged pull re
 commit, compares the files its head holds with the files `main` now holds, and looks up the pull
 request's latest successful run:
 
-- Same files and a successful run: that run tested exactly what `main` now holds. A pull request that
-  was not up to date merges onto a newer `main`, so its files differ and it does not qualify.
-- Anything else, including a pull request from a fork, whose run executed code nobody had merged yet:
-  everything runs here.
+- Same files and a run that passed on its first attempt: that run tested exactly what `main` now
+  holds. The test jobs skip, and `publish-dashboard` publishes that run's results, relabelled with
+  `main`'s commit, with the report linking back to the run that produced them.
+- Anything else runs every suite here. A pull request that was not up to date merged onto a newer
+  `main`, so its files differ. A pull request from a fork ran code nobody had merged yet. A run that
+  passed only after a re-run holds each re-run job's artifacts twice under one name, and
+  `download-artifact` picks by highest id, which is not always the latest attempt.
 
-For now the job only reports what it would reuse, and every suite still runs on `main`. Handing the
-run downstream, so `publish-dashboard` reads its artifacts instead of testing again, is the next step.
+A failed run is repeated differently on each side. On a pull request, re-run its failed jobs: the
+cheapest option, and safe, since a run that needed a re-run is never reused, so `main` simply tests
+again after the merge. On `main`, start a new run with Run workflow on `main` instead, because
+`publish-dashboard` reads the run's own artifacts, and a partial re-run would leave the failed
+attempt's beside the new ones for it to pick from.
 
 ## Branch Protection
 
 `main` accepts no direct pushes, from anyone, and the bypass list is empty on purpose: a rule with an
 exception for its author is a rule a reviewer discounts. Every change arrives through a pull request
-that cannot merge until `ci-gate` is green, and force pushes and branch deletion are refused.
+that cannot merge until `ci-gate` is green, and force pushes and branch deletion are refused. It
+must also be up to date with `main`, so the files its run tested are the files the merge produces.
 
 The gate exists because GitHub treats a skipped job as a satisfied requirement. Naming the test jobs
 directly would have meant that a job which stopped running quietly stopped being enforced.
