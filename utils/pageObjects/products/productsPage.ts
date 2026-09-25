@@ -89,6 +89,9 @@ export class ProductsPage extends BaseAppPage {
     width: number;
     height: number;
   }> {
+    // A clip is computed from layout, and layout is only final once the
+    // document, stylesheets included, has loaded.
+    await this.page.waitForLoadState("load");
     const [searchBox, gridBox] = await Promise.all([
       this.searchInput.boundingBox(),
       this.productGrid.boundingBox(),
