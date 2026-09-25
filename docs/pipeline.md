@@ -65,6 +65,11 @@ exception for its author is a rule a reviewer discounts. Every change arrives th
 that cannot merge until `ci-gate` is green, and force pushes and branch deletion are refused. It
 must also be up to date with `main`, so the files its run tested are the files the merge produces.
 
+A newer push to a pull request cancels that pull request's older run. Runs on `main` never cancel
+each other, so every merge is published, and `publish-dashboard` runs one at a time in a queue
+(`concurrency: pages`, `queue: max`): each publish reads the published history and writes it back. A
+queued publish whose commit is older than the one already published stops before overwriting it.
+
 The gate exists because GitHub treats a skipped job as a satisfied requirement. Naming the test jobs
 directly would have meant that a job which stopped running quietly stopped being enforced.
 
