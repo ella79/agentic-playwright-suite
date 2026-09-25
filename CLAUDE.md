@@ -45,7 +45,7 @@ utils/
   testData.ts         Unique data generators
   url.ts              URL constants
 playwright.config.ts  Playwright configuration (e2e-chromium, e2e-webkit, api, seed, vr projects)
-.github/workflows/    CI pipeline: resolve-merge-group-run, prepare-playwright-image, static-checks,
+.github/workflows/    CI pipeline: resolve-pr-run, prepare-playwright-image, static-checks,
                        e2e-chromium, e2e-webkit, visual-regression, api, publish-dashboard, ci-gate
 ```
 
@@ -82,10 +82,10 @@ Slash commands in `.claude/commands/` invoke them: `/coverage`, `/plan`, `/imple
 
 GitHub Actions (`.github/workflows/ci.yml`), stages `build` → `check` → `end2end`:
 
-0. `resolve-merge-group-run` — reuses a matching `merge_group` run's artifacts on push to `main`
+0. `resolve-pr-run` — on push to `main`, finds the pull request run that already tested the same files
 1. `prepare-playwright-image` — builds and pushes the execution image every later job runs inside
 2. `static-checks` — typecheck, lint, format; gates everything after it
-3. `e2e-chromium`, `e2e-webkit`, `visual-regression`, `api` — in parallel; WebKit skipped on pull requests
+3. `e2e-chromium`, `e2e-webkit`, `visual-regression`, `api` — in parallel, on pull requests and on `main`
 4. `publish-dashboard` — merges the reports and deploys to Pages, `main` only
 5. `ci-gate` — reads every other job's result; the only check branch protection requires
 

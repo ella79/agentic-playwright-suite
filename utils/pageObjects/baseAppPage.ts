@@ -97,6 +97,9 @@ export abstract class BaseAppPage {
    * viewport needs the same framing every run, which this guarantees.
    */
   async scrollToTop(target: Locator): Promise<void> {
+    // Where the target lands depends on layout, which is only final once the
+    // document, stylesheets included, has loaded.
+    await this.page.waitForLoadState("load");
     await target.evaluate((element: Element) =>
       element.scrollIntoView({ block: "start", behavior: "instant" }),
     );
@@ -111,6 +114,9 @@ export abstract class BaseAppPage {
   async unionBoundingBox(
     locators: Locator[],
   ): Promise<{ x: number; y: number; width: number; height: number }> {
+    // A clip is computed from layout, and layout is only final once the
+    // document, stylesheets included, has loaded.
+    await this.page.waitForLoadState("load");
     const boxes = await Promise.all(
       locators.map((locator) => locator.boundingBox()),
     );
