@@ -12,4 +12,5 @@ Name the job and the failing step first. A setup, image, install or publish step
 and is fixed in the workflow file; only a failing test step goes to the healer.
 
 Report: job, step, first error line, classification, and the fix you propose. Never re-run a job
-without a hypothesis for why the second attempt would differ.
+without a hypothesis for why the second attempt would differ. On a pull request, re-run the failed
+jobs; on `main`, start a new run with Run workflow instead (see `docs/pipeline.md`).

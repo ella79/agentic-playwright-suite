@@ -89,5 +89,6 @@ GitHub Actions (`.github/workflows/ci.yml`), stages `build` → `check` → `end
 4. `publish-dashboard` — merges the reports, from the reused run or this one, and deploys to Pages, `main` only
 5. `ci-gate` — reads every other job's result; the only check branch protection requires
 
-`main` takes no direct pushes. Adding a job means adding it to the gate's `needs`. The reasoning
-behind each of these is in [`docs/pipeline.md`](docs/pipeline.md).
+A failed run is repeated with Re-run failed jobs on a pull request, and with Run workflow on `main`,
+never a partial re-run there. `main` takes no direct pushes. Adding a job means adding it to the
+gate's `needs`. The reasoning behind each of these is in [`docs/pipeline.md`](docs/pipeline.md).
