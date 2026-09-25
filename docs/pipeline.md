@@ -52,6 +52,10 @@ request's latest successful run:
   passed only after a re-run holds each re-run job's artifacts twice under one name, and
   `download-artifact` picks by highest id, which is not always the latest attempt.
 
+The same applies to a run on `main` itself. When one fails and has to be repeated, start a new run
+with Run workflow on `main` rather than re-running its failed jobs, which would leave the failed
+attempt's artifacts beside the new ones for `publish-dashboard` to pick from.
+
 ## Branch Protection
 
 `main` accepts no direct pushes, from anyone, and the bypass list is empty on purpose: a rule with an
