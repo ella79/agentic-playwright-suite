@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Playwright + TypeScript E2E and visual regression suite for Automation Exercise, built with an agentic Claude Code workflow",
   "private": true,
-  "packageManager": "yarn@4.18.0",
+  "packageManager": "yarn@4.18.1",
   "scripts": {
     "stylecheck": "prettier --check .",
     "stylecheck:ci": "yarn stylecheck",
