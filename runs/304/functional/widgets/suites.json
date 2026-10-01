@@ -1,0 +1,1 @@
+{"total":2,"items":[{"uid":"7142b775c7fadbd5c19bde08155e0b55","name":"Functional E2E · WebKit","statistic":{"failed":0,"broken":0,"skipped":0,"passed":22,"unknown":0,"total":22}},{"uid":"ddba72770ce160edc2334cd7056e13a8","name":"Functional E2E · Chromium","statistic":{"failed":0,"broken":0,"skipped":0,"passed":22,"unknown":0,"total":22}}]}
