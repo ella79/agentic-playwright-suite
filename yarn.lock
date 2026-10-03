@@ -232,15 +232,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/mcp@npm:0.0.82":
-  version: 0.0.82
-  resolution: "@playwright/mcp@npm:0.0.82"
+"@playwright/mcp@npm:0.0.83":
+  version: 0.0.83
+  resolution: "@playwright/mcp@npm:0.0.83"
   dependencies:
-    playwright: "npm:1.64.0-alpha-1789764292000"
-    playwright-core: "npm:1.64.0-alpha-1789764292000"
+    playwright: "npm:1.64.0-alpha-1790635538000"
+    playwright-core: "npm:1.64.0-alpha-1790635538000"
   bin:
     playwright-mcp: cli.js
-  checksum: 10c0/86e22b25b590642968ee844e0226b5bd23af6a4bd3a8d05b8ec5b720dd082b241ba9a1308c508a74d092a93e58939177c7e4ea183067bf81f547fbf2323afea4
+  checksum: 10c0/39e73942ad2e7a2d609566f0c06b08fd893cb2a16f574daeaaaa887a21b17cc8c84cce535089e286a5750432b75e98ef4a02d57511c78977ac6c941d165fa840
   languageName: node
   linkType: hard
 
@@ -466,7 +466,7 @@ __metadata:
   resolution: "agentic-playwright-suite@workspace:."
   dependencies:
     "@microsoft/eslint-formatter-sarif": "npm:3.1.0"
-    "@playwright/mcp": "npm:0.0.82"
+    "@playwright/mcp": "npm:0.0.83"
     "@playwright/test": "npm:1.63.0"
     "@types/node": "npm:24.19.0"
     "@typescript-eslint/eslint-plugin": "npm:8.70.0"
@@ -1390,12 +1390,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.64.0-alpha-1789764292000":
-  version: 1.64.0-alpha-1789764292000
-  resolution: "playwright-core@npm:1.64.0-alpha-1789764292000"
+"playwright-core@npm:1.64.0-alpha-1790635538000":
+  version: 1.64.0-alpha-1790635538000
+  resolution: "playwright-core@npm:1.64.0-alpha-1790635538000"
   bin:
     playwright-core: cli.js
-  checksum: 10c0/0a767fec6abbb12744d313187e84f2d6f1e947dfecdd1216b7522f7ac7bb63f69cd67923bb6a3fb7b4bda4b4ec9484c1289838b91a6206f83d7779a31d32fda2
+  checksum: 10c0/aa88cd7d507bb20eb42440e736a13206cf155521ced2f34a84344998eacbae1ad2bd69a2097f74b778b330b23b1af296727270eb9b6d6d6d64d8246b2e7547dc
   languageName: node
   linkType: hard
 
@@ -1410,14 +1410,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright@npm:1.64.0-alpha-1789764292000":
-  version: 1.64.0-alpha-1789764292000
-  resolution: "playwright@npm:1.64.0-alpha-1789764292000"
+"playwright@npm:1.64.0-alpha-1790635538000":
+  version: 1.64.0-alpha-1790635538000
+  resolution: "playwright@npm:1.64.0-alpha-1790635538000"
   dependencies:
-    playwright-core: "npm:1.64.0-alpha-1789764292000"
+    playwright-core: "npm:1.64.0-alpha-1790635538000"
   bin:
     playwright: cli.js
-  checksum: 10c0/d49e67dc7d2f66abe0d6373646c4fda60eed1b3229b49f6338f858861ddae127fec986725553ebd84ad4c3208ad72abeab4d942155e8106eeb8a9ff6978cec80
+  checksum: 10c0/1ccbc03284b7fe6855c5d8354484e0a20657df5405b0b30419662a4e4736c653bbac1f631d3b7e2b574467b5a7e18fba1cf88aa05289317cac8e089b9691cf77
   languageName: node
   linkType: hard
 
