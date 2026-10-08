@@ -54,9 +54,8 @@ export class ProductsPage extends BaseAppPage {
   }
 
   async gotoProductsPage(): Promise<void> {
-    await this.goto(url.products);
+    await this.goto(url.products, this.allProductsHeading);
     await expect(this.page).toHaveURL(new RegExp(`${url.products}$`));
-    await expect(this.allProductsHeading).toBeVisible();
   }
 
   async searchFor(term: string): Promise<void> {

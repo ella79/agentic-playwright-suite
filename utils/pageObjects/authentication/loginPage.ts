@@ -51,9 +51,8 @@ export class LoginPage extends BaseAppPage {
   }
 
   async gotoLoginPage(): Promise<void> {
-    await this.goto(url.login);
+    await this.goto(url.login, this.loginHeading);
     await expect(this.page).toHaveURL(new RegExp(`${url.login}$`));
-    await expect(this.loginHeading).toBeVisible();
   }
 
   async login(email: string, password: string): Promise<void> {
