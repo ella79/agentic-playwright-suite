@@ -20,7 +20,7 @@ hidden.
 
 1. **Capture with `expect(locator).toHaveScreenshot()` directly.** There is no snapshot wrapper here.
    A sibling repository routes every capture through a `vrSnapshot()` runtime with a declared
-   strategy per case; this one does not, deliberately. With twenty captures the indirection costs
+   strategy per case; this one does not, deliberately. At this suite's size the indirection costs
    more than it buys, and Playwright's own assertion already carries the retry, the threshold and the
    path template.
 2. **One case, one screenshot.** A `test()` reaches one state and captures it once. Two captures in

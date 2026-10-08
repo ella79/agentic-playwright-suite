@@ -67,7 +67,7 @@ delegates to the four specialists.
 
 | Agent                       | Role                                | Source        |
 | --------------------------- | ----------------------------------- | ------------- |
-| `playwright-test-manager`   | Scope, caps, gates, the whole cycle | hand-written  |
+| `playwright-test-manager`   | Scope, gates, the whole cycle       | hand-written  |
 | `playwright-test-planner`   | Explores the live app, writes plans | `init-agents` |
 | `playwright-test-generator` | Implements one case at a time       | `init-agents` |
 | `playwright-test-reviewer`  | Read-only convention audit          | hand-written  |

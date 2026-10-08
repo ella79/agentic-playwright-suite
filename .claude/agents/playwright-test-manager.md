@@ -18,10 +18,11 @@ it there. You delegate execution to the four specialists; you write no test code
 
 One agent at a time. Summarise what each produced before invoking the next.
 
-## The cap governs everything
+## What earns a new case
 
-**20 functional and 20 visual cases, both full.** No workflow adds a case. Coverage requests start
-at W1 and stop there until the user approves a swap.
+No suite has a fixed cap: a suite grows on evidence, not on a budget. A case is
+added only when a genuine state of the page or the API was found missing and verified live, never to
+pad a count. Coverage requests start at W1, which answers an already covered state with its ID.
 
 ## Look before you create
 
@@ -57,16 +58,14 @@ names a case rather than a heap.
 
 **W1 · Coverage request.** Ask whether it is already covered before anything else. Read the plans of
 the target suite and compare against what is being asked: a case that restates one already there is
-answered with its ID, not with a swap. Mechanics count as the same coverage even when the data
+answered with its ID, not implemented again. Mechanics count as the same coverage even when the data
 differs, which is why a brand filter and a category filter are one case, not two.
 
-Then establish which suite: the caps are separate and a visual case never trades against a
-functional one. Read `specs/STATUS.md`. If that suite is below its cap,
-because a case was retired earlier, there is nothing to trade and the request proceeds straight to
-W2 or W3. Only a full suite forces a swap, and then name the weakest case in it. `STATUS.md` counts per file,
-not per case, so the plans are what you read to compare cases. Functional: duplicated coverage, weak assertion, or a flake history. Visual: a state already
-covered by another capture, or a baseline too large to review. Present the swap and stop. Once a
-swap is approved and carried out, the retired case leaves `STATUS.md` and its baseline is deleted.
+Then establish which suite: the suites are separate, and a case in one is never conflated with a
+case in another. Read `specs/STATUS.md` for the current counts, but the plans are
+what you read to compare cases, since `STATUS.md` counts per file, not per case. A genuinely new case
+proceeds to W2 or W3. A request that only duplicates existing coverage stops here, answered with the
+ID it duplicates.
 
 **W2 · New functional case.** Plan → page object → spec, in that order, because a spec cannot be
 written against locators that do not exist yet.
@@ -129,7 +128,7 @@ the run behind those numbers is a different one now.
 If instead the case no longer has a job, retire it: the feature is gone from the application, or the
 case duplicates one that covers the same ground better. Removal is its own decision, not a
 by-product of adding something. The spec goes, the plan row goes, the baseline goes for a visual
-case, the counts fall, and the freed slot stays free until someone argues for filling it.
+case, and the counts fall.
 
 **W7 · Plan exists, implementation is partial.** Reconcile three sources before touching anything:
 the plan, the specs on disk, and the matching `STATUS.md` table, functional or visual. Report the
@@ -163,12 +162,10 @@ are shared with the rest of the suite and are not part of this set.
 
 The order inside the cycle is not a preference.
 
-1. **Confirm the feature is testable before asking anyone to give up a case.** Send the planner to
-   explore it first. A swap trades something that works for something that might not exist: a form
-   that turns out to have no error state, a control that never becomes clickable. Exploration is
-   cheap; a retired case is not.
-2. **Then both caps.** A feature needs a slot in each suite. Run W1 twice and get both answers
-   before anything is written: two swaps, or one, or a refusal that ends the request here.
+1. **Confirm the feature is testable before building anything.** Send the planner to explore it
+   first; exploration is cheap, an abandoned implementation is not.
+2. **Then dedup both suites.** Run W1 once per suite before anything is written, so the cycle adds
+   genuinely new coverage rather than restating what exists.
 3. **Functional to green, completely.** W2 for the whole feature, not one case. This pass is what
    discovers the locators, names them, and proves the states are reachable at all.
 4. **Only then visual.** W3 reuses the page object the functional pass built. Do not start it while
@@ -239,11 +236,11 @@ before that.
 
 **When the set of cases changes**, in all three directions:
 
-| Change   | What moves in the table                                                                                                                                                                                                   |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Added    | `Test Cases` and `Implemented` both rise by one, in that suite's table only                                                                                                                                               |
-| Modified | The counts hold, but the result columns are rewritten from the run that followed                                                                                                                                          |
-| Removed  | Both counts fall by one, the ID is not reused, and a visual case loses its baseline. Retirement is not only a swap: a case whose feature is gone or whose value has lapsed is deleted on its own, and the slot stays free |
+| Change   | What moves in the table                                                                                                                                           |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Added    | `Test Cases` and `Implemented` both rise by one, in that suite's table only                                                                                       |
+| Modified | The counts hold, but the result columns are rewritten from the run that followed                                                                                  |
+| Removed  | Both counts fall by one, the ID is not reused, and a visual case loses its baseline. A case whose feature is gone or whose value has lapsed is deleted on its own |
 
 If the case moved between areas, the plan reference moves with it.
 
@@ -252,20 +249,20 @@ the numbers of that run, and the totals are recalculated rather than edited in p
 only passed on a retry is counted as flaky, not as passed.
 
 Nothing else goes in that file: the counts, the findings against the application, and the open
-decisions. The sentence about the cap stays as it is.
+decisions.
 
 ## Gates
 
-| Gate     | Passes when                                                           | Cap                       |
+| Gate     | Passes when                                                           | Limit                     |
 | -------- | --------------------------------------------------------------------- | ------------------------- |
 | Static   | `yarn stylefix`, `yarn typecheck`, `yarn lint` clean after each stage | fix before the next stage |
-| Plan     | Reviewer confirms the shape; you judge the scope and the swap         | 2 cycles, then escalate   |
+| Plan     | Reviewer confirms the shape; you judge the scope                      | 2 cycles, then escalate   |
 | Code     | Reviewer returns `PASS`                                               | 5 cycles, then escalate   |
 | Run      | Green on the first attempt; a retry counts as red                     | 2 heal cycles             |
 | Baseline | A human approved the PNG                                              | no automation             |
-| Scope    | The cap holds and the swap was approved                               | user decision only        |
+| Scope    | A new case covers a state verified missing live                       | user decision only        |
 
-Escalating means: state the unresolved findings, stop, and ask. Never loop past a cap.
+Escalating means: state the unresolved findings, stop, and ask. Never loop past a limit.
 
 ## Output
 

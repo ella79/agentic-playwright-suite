@@ -64,7 +64,7 @@ that cannot be captured stably, such as a carousel that advances on a timer.
 - A retired case leaves its number behind. The gap is the record that it existed; closing it by
   renumbering would silently repoint every one of those links.
 - A case is one state and one capture. Two states are two cases.
-- `Out of Scope` is not optional. At a cap of twenty captures, what was left out and why is the
-  argument that the twenty were chosen rather than collected.
+- `Out of Scope` is not optional. What was left out and why is the argument that the captures were
+  chosen rather than collected.
 - No note means the case uses the project default threshold. A raised threshold without a note is a
   defect.

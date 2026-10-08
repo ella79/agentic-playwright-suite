@@ -25,7 +25,7 @@ Confirm these, or ask. Guessing one of them is what produces a case that has to 
 2. The entry point: which page object already reaches it, or whether a new one is needed
 3. The data the case needs, and whether the `uniqueAccount` fixture covers it
 4. Which assertion is the business-critical one, as opposed to a sync check
-5. Whether this is coverage or a correction, because the suite is capped at twenty per suite
+5. Whether this is coverage or a correction: new coverage needs a state verified missing live
 
 Defaults, not worth asking about: Chromium at 1920x1080, base URL from `playwright.config.ts`,
 per-test account through the fixture.
@@ -252,8 +252,8 @@ rest, and the data stays behind. The fixture's teardown runs either way.
   for anything root-scoped. Otherwise keep it local.
 - **Where does the assertion go?** The business outcome in the spec. A sync check that a method
   needs before it returns may live in the page object.
-- **Coverage or correction?** Coverage against a full cap is a swap decision, and that belongs to
-  the manager.
+- **Coverage or correction?** New coverage is the manager's decision; it needs a state verified
+  missing live.
 
 ## Assertions
 

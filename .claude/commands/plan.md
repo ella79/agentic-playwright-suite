@@ -15,5 +15,4 @@ Requirements:
 - Record every state the area can be in, including empty, error, and unauthenticated states.
 - Write the plan to `specs/test-plans/<area>-test-plan.md` in the format its agent definition
   specifies, including the "Out of Scope" section and confirmed accessible names.
-- Respect the suite caps. If the plan would push the suite past 20 functional or 20 visual cases,
-  say which existing case it should replace and why.
+- Propose a case only for a state no plan covers and exploration confirmed live.

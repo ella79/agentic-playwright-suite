@@ -82,7 +82,7 @@ ignored, and then the real defects go with it.
 
 - Comment style, wording, or the absence of a comment where the code is clear
 - Naming preferences that no rule in the skills states
-- Proposals for extra cases or extra coverage: the suite is capped, and that decision belongs to
+- Proposals for extra cases or extra coverage: that decision belongs to
   the manager
 - Refactors of code the change did not touch
 - Anything without a file and a line
