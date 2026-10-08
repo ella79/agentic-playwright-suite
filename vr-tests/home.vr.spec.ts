@@ -36,11 +36,7 @@ test.describe("Visual regression - Home Page", () => {
   test("VR-03: Category sidebar, expanded", async ({ page, homePage }) => {
     await expect(homePage.categoryHeading).toBeVisible();
     await homePage.getCategoryLink("Women").click();
-    await expect(
-      homePage.categorySidebar.locator("#Women").getByRole("link", {
-        name: "Saree",
-      }),
-    ).toBeVisible();
+    await expect(homePage.getSubCategoryLink("Women", "Saree")).toBeVisible();
     // "Saree" being visible is not enough: the panel's growing height keeps
     // pushing "Men" and "Kids" down for a moment afterward, so a clip taken
     // right here can still miss "Kids" entirely. Confirmed in CI, where the

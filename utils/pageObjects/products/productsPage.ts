@@ -30,9 +30,9 @@ export class ProductsPage extends BaseAppPage {
     // captures this sidebar; the functional suite drives it from HomePage
     // instead, since that is where category and brand filtering are covered.
     this.categorySidebar = page.locator("#accordian");
-    // Carries no visible text of its own (alt="Website for practice"),
-    // identified by its stable id instead. Verified live.
-    this.specialOfferBanner = page.locator("#sale_image");
+    // No visible text of its own, so it is addressed by its alt text, which
+    // is unique on the page. Verified live.
+    this.specialOfferBanner = page.getByAltText("Website for practice");
   }
 
   getCategoryResultsHeading(

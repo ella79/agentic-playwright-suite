@@ -10,9 +10,7 @@ test.describe("Visual regression - Product Detail Page", () => {
 
   test("VR-21: Product showcase", async ({ page, productDetailPage }) => {
     await expect(productDetailPage.productImage).toBeVisible();
-    await productDetailPage.waitForImagesLoaded(
-      productDetailPage.page.locator("body"),
-    );
+    await productDetailPage.waitForImagesLoaded();
 
     // A viewport capture, not an element one: the row holding the image and
     // information columns carries Bootstrap's own negative row margins with

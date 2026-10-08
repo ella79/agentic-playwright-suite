@@ -150,16 +150,25 @@ export class HomePage extends BaseAppPage {
    * Subcategory links live in collapsed panels keyed by the parent category
    * name, and the same subcategory label appears under several parents, so the
    * panel must be scoped rather than matched globally.
+   *
+   * CSS for the panel itself: it is a Bootstrap collapse div carrying no role
+   * and no accessible name. Verified live.
    */
+  getSubCategoryLink(
+    parentCategory: "Women" | "Men" | "Kids",
+    subCategory: string,
+  ): Locator {
+    return this.categorySidebar
+      .locator(`#${parentCategory}`)
+      .getByRole("link", { name: subCategory });
+  }
+
   async openCategory(
     parentCategory: "Women" | "Men" | "Kids",
     subCategory: string,
   ): Promise<void> {
     await this.getCategoryLink(parentCategory).click();
-    await this.categorySidebar
-      .locator(`#${parentCategory}`)
-      .getByRole("link", { name: subCategory })
-      .click();
+    await this.getSubCategoryLink(parentCategory, subCategory).click();
   }
 
   async openBrand(brandName: string): Promise<void> {

@@ -46,8 +46,7 @@ export class ProductDetailPage extends BaseAppPage {
     this.brand = this.productInformation
       .getByRole("paragraph")
       .filter({ hasText: "Brand:" });
-    // Number input with no label and no data-qa hook.
-    this.quantityInput = page.locator("#quantity");
+    this.quantityInput = page.getByRole("spinbutton");
     this.addToCartButton = page.getByRole("button", { name: "Add to cart" });
     this.writeYourReviewTab = page.getByRole("link", {
       name: "Write Your Review",

@@ -82,23 +82,30 @@ export abstract class BaseAppPage {
    * any visual difference. Waiting for the images fixes the cause; a longer
    * screenshot timeout only moves the deadline. A broken image settles through
    * its error event, so it cannot hang this.
+   *
+   * Scope defaults to the document body, for a capture that takes the whole
+   * viewport rather than one element. `body` is the one place CSS is
+   * unavoidable: the document body carries no role and no accessible name, and
+   * keeping it here means no spec has to spell a locator out.
    */
-  async waitForImagesLoaded(scope: Locator): Promise<void> {
-    await scope.evaluate(async (element: HTMLElement) => {
-      const images: HTMLImageElement[] = Array.from(
-        element.querySelectorAll("img"),
-      );
-      await Promise.all(
-        images.map((image) =>
-          image.complete && image.naturalWidth > 0
-            ? Promise.resolve()
-            : new Promise((resolve) => {
-                image.addEventListener("load", resolve, { once: true });
-                image.addEventListener("error", resolve, { once: true });
-              }),
-        ),
-      );
-    });
+  async waitForImagesLoaded(scope?: Locator): Promise<void> {
+    await (scope ?? this.page.locator("body")).evaluate(
+      async (element: HTMLElement) => {
+        const images: HTMLImageElement[] = Array.from(
+          element.querySelectorAll("img"),
+        );
+        await Promise.all(
+          images.map((image) =>
+            image.complete && image.naturalWidth > 0
+              ? Promise.resolve()
+              : new Promise((resolve) => {
+                  image.addEventListener("load", resolve, { once: true });
+                  image.addEventListener("error", resolve, { once: true });
+                }),
+          ),
+        );
+      },
+    );
   }
 
   /**
