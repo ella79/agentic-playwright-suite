@@ -42,9 +42,9 @@ export class HomePage extends BaseAppPage {
     // suite. The wrapper has its own fixed height in the site's CSS and shows
     // only the active slide, since the other two are `display: none`.
     this.heroSection = page.locator("#slider-carousel");
-    this.heroHeading = heroSlide.locator("h1");
-    this.heroSubheading = heroSlide.locator("h2");
-    this.heroDescription = heroSlide.locator("p");
+    this.heroHeading = heroSlide.getByRole("heading", { level: 1 });
+    this.heroSubheading = heroSlide.getByRole("heading", { level: 2 });
+    this.heroDescription = heroSlide.getByRole("paragraph");
     this.testCasesButton = heroSlide.getByRole("link", { name: "Test Cases" });
     this.apiTestingButton = heroSlide.getByRole("link", {
       name: "APIs list for practice",
@@ -56,6 +56,9 @@ export class HomePage extends BaseAppPage {
     this.categoryHeading = page
       .locator(".left-sidebar")
       .getByRole("heading", { name: "Category" });
+    // CSS: both sidebars are plain divs with no role and no accessible name.
+    // The page renders 37 lists, so no role based query singles either out.
+    // Verified live.
     this.categorySidebar = page.locator("#accordian");
     this.brandsSidebar = page.locator(".brands_products");
     this.featuresItemsHeading = page.getByRole("heading", {
@@ -65,6 +68,7 @@ export class HomePage extends BaseAppPage {
     // name, so nothing semantic addresses it. It is a capture boundary, not
     // something a user interacts with.
     this.featuredProductsGrid = page.locator(".features_items");
+    // CSS: the cards are layout wrappers, like the grid holding them.
     this.productCards = page.locator(".features_items .product-image-wrapper");
     this.recommendedItemsHeading = page.getByRole("heading", {
       name: "recommended items",
@@ -83,6 +87,8 @@ export class HomePage extends BaseAppPage {
     this.subscriptionSuccessMessage = page.getByText(
       "You have been successfully subscribed!",
     );
+    // CSS: the copyright bar is a div inside <footer>; the contentinfo role
+    // belongs to the footer itself, not to this strip. Verified live.
     this.footerBottom = page.locator(".footer-bottom");
     this.copyrightText = this.footer.getByText("Copyright");
   }
