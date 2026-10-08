@@ -5,6 +5,7 @@ export class CheckoutPage extends BaseAppPage {
   readonly addressDetailsHeading: Locator;
   readonly deliveryAddress: Locator;
   readonly deliveryAddressValues: Locator;
+  readonly orderTable: Locator;
   readonly orderRows: Locator;
   readonly commentTextarea: Locator;
   readonly placeOrderLink: Locator;
@@ -21,6 +22,9 @@ export class CheckoutPage extends BaseAppPage {
     this.deliveryAddressValues = this.deliveryAddress.locator(
       "li:not(.address_title)",
     );
+    // The order summary is the only table this page renders, so the role
+    // resolves it without a selector.
+    this.orderTable = page.getByRole("table");
     this.orderRows = page.locator("#cart_info tbody tr");
     // Textarea with neither a label nor a placeholder.
     this.commentTextarea = page.locator('textarea[name="message"]');

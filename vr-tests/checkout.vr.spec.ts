@@ -17,6 +17,11 @@ test.describe("Visual regression - checkout", () => {
 
   test("VR-19: delivery address block", async ({ checkoutPage }) => {
     await expect(checkoutPage.addressDetailsHeading).toBeVisible();
+    // The order table sits below this block and loads its product images late.
+    // Until they arrive the document keeps growing, the block never holds the
+    // same position for two frames, and the capture times out on the stability
+    // check instead of on any visual difference.
+    await checkoutPage.waitForImagesLoaded(checkoutPage.orderTable);
 
     await expect(checkoutPage.deliveryAddress).toHaveScreenshot(
       "checkout-address-details.png",
