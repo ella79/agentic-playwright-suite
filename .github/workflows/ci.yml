@@ -105,8 +105,12 @@ jobs:
       - name: Resolve image tag
         id: meta
         run: |
+          # The tag has to move whenever anything the image is built from moves, the
+          # Dockerfile included. Leaving it out let a base image bump keep the tag it
+          # already had, so the suite was handed the image built from the release
+          # before it and the browser binaries it expected were not there.
           version=$(node -p "require('./package.json').devDependencies['@playwright/test']")
-          deps=$(cat package.json yarn.lock | sha256sum | cut -c1-12)
+          deps=$(cat package.json yarn.lock env/docker/e2e-playwright.Dockerfile | sha256sum | cut -c1-12)
           image="${REGISTRY}/${IMAGE_NAME}:v${version}-${deps}"
           echo "image=${image,,}" >> "$GITHUB_OUTPUT"
           echo "Image: ${image,,}"
