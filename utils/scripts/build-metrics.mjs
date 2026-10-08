@@ -14,7 +14,8 @@
 //     --categories env/allure/categories.json \
 //     --allure allure-report \
 //     --out site/metrics
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 
 /** Pass rate at or above this is a healthy suite. Below the second, it is not. */
@@ -319,6 +320,26 @@ if (options.allure) {
 }
 
 /**
+ * Remembered on the run entry, so the taxonomy stops being a snapshot of one
+ * run. A single run says an assertion failed twenty times; thirty runs say
+ * whether this suite mostly argues with the application or mostly with the
+ * public host it shares, which is the question actually worth answering before
+ * a red pipeline is believed. Allure stays the source of the numbers: this
+ * only keeps the ones it already worked out.
+ */
+entry.categories = Object.fromEntries(
+  [...matched.entries()].map(([name, hit]) => [name, hit.total]),
+);
+
+/** How many results the window put in this category, across every run of it. */
+const windowCategoryTotal = (name) =>
+  window.reduce((sum, run) => sum + (run.categories?.[name] ?? 0), 0);
+
+/** One value per run, for the sparkline beside each category. */
+const categorySeries = (name) =>
+  window.map((run) => run.categories?.[name] ?? 0);
+
+/**
  * The taxonomy in its declared order, then anything the report matched that the
  * taxonomy does not name. Allure's own catch-all buckets land in the second
  * group, and dropping them would hide exactly the failures nobody classified.
@@ -337,6 +358,85 @@ const categoryRows = [
       hit,
     })),
 ];
+
+/**
+ * The same category across the window, with its per run shape beside it: a
+ * total of twelve reads very differently when it is one run of twelve than
+ * when it is twelve runs of one.
+ */
+const windowCell = (name) => {
+  const total = windowCategoryTotal(name);
+  if (!total) return '<span class="none">none</span>';
+  const runs = categorySeries(name).filter((count) => count > 0).length;
+  return `${total} in ${runs} of ${window.length} runs ${sparkline(
+    categorySeries(name),
+    { width: 120, height: 18, min: 0 },
+  )}`;
+};
+
+/**
+ * The committed visual baselines, per area, with the last commit that touched
+ * them.
+ *
+ * A baseline is the one artefact in this suite that goes stale silently: it
+ * keeps passing against the renderer that produced it, and a browser upgrade
+ * invalidates every one of them at once. The count answers what a regeneration
+ * would have to review, and the date answers when the renderer behind them was
+ * last agreed with. The date comes from git rather than the file's own
+ * timestamp, which a fresh checkout sets to the time of the checkout; a shallow
+ * clone cannot answer it at all, and says so rather than guessing.
+ */
+const SNAPSHOT_SUFFIX = ".vr.spec.ts-snapshots";
+
+async function collectBaselines() {
+  let entries = [];
+  try {
+    entries = await readdir("vr-tests", { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  const areas = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory() || !entry.name.endsWith(SNAPSHOT_SUFFIX)) continue;
+    const directory = `vr-tests/${entry.name}`;
+    let shots = [];
+    try {
+      shots = (await readdir(directory)).filter((file) =>
+        file.endsWith(".png"),
+      );
+    } catch {
+      shots = [];
+    }
+
+    let lastChange = null;
+    try {
+      lastChange =
+        execFileSync("git", ["log", "-1", "--format=%cI", "--", directory], {
+          encoding: "utf-8",
+          stdio: ["ignore", "pipe", "ignore"],
+        }).trim() || null;
+    } catch {
+      lastChange = null;
+    }
+
+    areas.push({
+      area: entry.name.slice(0, -SNAPSHOT_SUFFIX.length),
+      count: shots.length,
+      lastChange,
+    });
+  }
+  return areas.sort((a, b) => a.area.localeCompare(b.area));
+}
+
+const baselines = await collectBaselines();
+const baselineTotal = baselines.reduce((sum, a) => sum + a.count, 0);
+
+/** A date, or the honest answer that this checkout cannot supply one. */
+const baselineDate = (value) =>
+  value
+    ? `<time datetime="${value}">${value.slice(0, 10)}</time>`
+    : '<span class="none">unknown in a shallow clone</span>';
 
 /** "20 results, all failed" reads better than a bare number and a legend. */
 const hitCell = (hit) => {
@@ -505,18 +605,35 @@ ${donut(
 </table>
 
 <h2>How a failure gets classified</h2>
-<p class="sub">The rules this suite carries, and how many results of this run each of them caught. The rules stand whether or not anything matched them; the counts are the ones the <a href="../#categories">Categories tab</a> of the report shows.</p>
+<p class="sub">The rules this suite carries, how many results of this run each of them caught, and how they have landed across the window. One run says an assertion failed; the window says whether this suite argues with the application or with the host it shares. The rules stand whether or not anything matched them; the counts are the ones the <a href="../#categories">Categories tab</a> of the report shows.</p>
 <table>
-  <thead><tr><th>Category</th><th>What it means</th><th>In this run</th></tr></thead>
+  <thead><tr><th>Category</th><th>What it means</th><th>In this run</th><th>Last ${window.length} runs</th></tr></thead>
   <tbody>${
     categoryRows.length
       ? categoryRows
           .map(
             (c) =>
-              `<tr><th scope="row">${escape(c.name)}</th><td>${escape(c.means)}</td><td>${hitCell(c.hit)}</td></tr>`,
+              `<tr><th scope="row">${escape(c.name)}</th><td>${escape(c.means)}</td><td>${hitCell(c.hit)}</td><td>${windowCell(c.name)}</td></tr>`,
           )
           .join("")
-      : '<tr><td colspan="3" class="none">No categories file was provided.</td></tr>'
+      : '<tr><td colspan="4" class="none">No categories file was provided.</td></tr>'
+  }</tbody>
+</table>
+
+<h2>Visual baselines</h2>
+<p class="sub">What a baseline regeneration would have to review, and when each area's captures were last agreed with. A browser upgrade moves glyph rendering and invalidates all of them at once, which is why the number and the date are worth seeing before one is taken.</p>
+<table>
+  <thead><tr><th>Area</th><th>Baselines</th><th>Last changed</th></tr></thead>
+  <tbody>${
+    baselines.length
+      ? baselines
+          .map(
+            (a) =>
+              `<tr><th scope="row">${escape(a.area)}</th><td>${a.count}</td><td>${baselineDate(a.lastChange)}</td></tr>`,
+          )
+          .join("") +
+        `<tr><th scope="row">All areas</th><td>${baselineTotal}</td><td></td></tr>`
+      : '<tr><td colspan="3" class="none">No committed baselines were found.</td></tr>'
   }</tbody>
 </table>
 
