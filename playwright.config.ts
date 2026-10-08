@@ -111,7 +111,7 @@ export default defineConfig({
       },
     },
     {
-      name: "vr",
+      name: "visual-regression",
       testDir: "./vr-tests",
       use: {
         ...devices["Desktop Chrome"],

@@ -21,14 +21,14 @@ cries wolf gets ignored, which is worse than having none.
 | `vr-tests/<name>.vr.spec.ts-snapshots/` | Baseline PNGs, created by Playwright next to the spec |
 | `specs/vr-test-plans/`                  | VR test plans                                         |
 
-| Item       | Pattern              | Example                     |
-| ---------- | -------------------- | --------------------------- |
-| Spec file  | `<area>.vr.spec.ts`  | `cart.vr.spec.ts`           |
-| Screenshot | `<area>-<state>.png` | `cart-with-single-item.png` |
+| Item       | Pattern              | Example                |
+| ---------- | -------------------- | ---------------------- |
+| Spec file  | `<area>.vr.spec.ts`  | `cart.vr.spec.ts`      |
+| Screenshot | `<area>-<state>.png` | `cart-single-item.png` |
 
-Playwright appends the platform suffix (`-chromium-linux.png`) itself. Baselines are generated on
-Linux to match CI. A baseline captured on Windows or macOS will not match and must not be
-committed.
+Playwright appends the project name and the platform (`-visual-regression-linux.png`) itself. Baselines are
+generated on Linux to match CI. A baseline captured on Windows or macOS will not match and must not
+be committed.
 
 ## Plan shape
 
@@ -53,7 +53,7 @@ and do persist, which is the opposite of what most people assume.
 | Default `maxDiffPixelRatio` | `0.01`, set globally in `expect.toHaveScreenshot` |
 | `animations`                | `disabled`, also global                           |
 | Viewport                    | 1920x1080                                         |
-| Project                     | `visual-regression`, Chromium only                |
+| Project                     | `visual-regression`, matching its CI job name     |
 | Baselines                   | `vr-tests/<area>.vr.spec.ts-snapshots/`, Linux    |
 
 ## Spec Structure
