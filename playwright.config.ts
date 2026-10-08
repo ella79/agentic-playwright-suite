@@ -29,16 +29,13 @@ const IS_API = SUITE === "-api";
  */
 const REPO_URL = "https://github.com/ella79/agentic-playwright-suite";
 
-/** Where a path inside the repository resolves to, for the plan links. */
 const REPO_BLOB = `${REPO_URL}/blob/main`;
 
 const allureReporter: ReporterDescription = [
   "allure-playwright",
   {
     resultsDir: "allure-results",
-    // The templates that turn an identifier into an address, so a test says
-    // which plan or defect it means and nothing in the suite repeats this
-    // repository's URL.
+    // So a test names an identifier and nothing repeats this repository's URL.
     links: {
       tms: {
         nameTemplate: "Test plan",

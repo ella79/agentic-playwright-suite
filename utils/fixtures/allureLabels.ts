@@ -53,28 +53,19 @@ const PROJECTS: Record<string, { parent: string; engine: string }> = {
  */
 const CRITICAL_AREAS = new Set(["Cart Page", "Login Page", "Signup Page"]);
 
-/**
- * The two areas where a failure stops a purchase outright, rather than making
- * one harder. They are the only blockers, which is what keeps the level
- * meaningful: a report where four levels are all "critical" ranks nothing.
- */
+/** Where a failure stops a purchase outright, rather than making one harder. */
 const BLOCKER_AREAS = new Set(["Checkout Page", "Payment Page"]);
 
-/**
- * `TC-05`, `VR-30`, `API-20`: the identifier every case title opens with, and
- * the plans' own primary key.
- */
+/** `TC-05`, `VR-30`, `API-20`: the identifier every case title opens with. */
 const CASE_ID = /^((?:TC|VR|API)-\d+)\b/;
 
 /** A parked case names its defect as `#123` in the `test.fixme` reason. */
 const ISSUE_REFERENCE = /#(\d+)/;
 
 /**
- * Severity across the whole scale rather than two of its five levels. Visual
- * cases sit at minor deliberately: a screenshot drifting by a few pixels is
- * worth knowing and is not worth paging anyone, and separating them keeps the
- * severity chart readable when a browser update moves every baseline at once.
- * The seed is trivial because it is the generator's template, not coverage.
+ * Visual drift is minor on purpose: worth knowing, not worth paging anyone, and
+ * it keeps the chart readable when a browser update moves every baseline at
+ * once. The seed is the generator's template, not coverage.
  */
 function severityFor(
   area: string,
@@ -136,25 +127,13 @@ export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
 
   await severity(severityFor(area, isVisual, testInfo.project.name === "seed"));
 
-  // The report's history and its retry count key on this when it is present,
-  // and on the full test name when it is not. The names here get rewritten —
-  // sentence casing, a renamed suite — and every rewrite orphaned the case's
-  // own history. The identifier in the title does not move, because the plans
-  // are written against it.
   const caseId = CASE_ID.exec(testInfo.title)?.[1];
   if (caseId) {
-    // Three identifiers, because Allure uses them for three different things.
-    //
-    // `historyId` is the one the History and Retries tabs key on, and it is
-    // normally derived from the test's full name plus its parameters, so every
-    // rename starts a case's history over. The plans give each case an
-    // identifier that does not move, so it is set from that instead, with the
-    // engine kept in the key: the browser is a parameter here, and collapsing
-    // Chromium and WebKit into one history would hide a failure on one of them.
-    //
-    // `testCaseId` is parameter independent by design, so the engine is left
-    // out of it, and `allureId` is the test plan identifier, which is what
-    // makes a saved selection survive the code being rearranged.
+    // History and retries key on `historyId`, normally derived from the full
+    // name plus the parameters, so a rename orphans a case's history. The
+    // engine stays in the key, or Chromium and WebKit share one history and a
+    // failure on either hides. `testCaseId` is parameter independent by
+    // design; `allureId` is the test plan identifier.
     await historyId(`${caseId}.${project.engine}`);
     await testCaseId(caseId);
     await allureId(caseId);
@@ -165,18 +144,13 @@ export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
   // instead of two unrelated results.
   await parameter("browser", project.engine);
 
-  // `tms` rather than a link of its own type: the plan is this suite's test
-  // management entry, and Allure gives that its own slot in the report. The
-  // path alone, because the reporter's `links` option holds the template that
-  // turns it into an address.
+  // The path alone: the reporter's `links` option turns it into an address.
   const plan = readPlanPath(testInfo.file);
   if (plan) {
     await tms(plan);
   }
 
-  // A case parked with `test.fixme` carries the defect it is waiting on in its
-  // reason. Linked here so the report answers why a skipped case is skipped,
-  // which is the one question a reader always has about one.
+  // So the report answers why a skipped case is skipped.
   const parked = testInfo.annotations.find(
     (annotation) => annotation.type === "fixme",
   );

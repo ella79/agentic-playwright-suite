@@ -320,12 +320,9 @@ if (options.allure) {
 }
 
 /**
- * Remembered on the run entry, so the taxonomy stops being a snapshot of one
- * run. A single run says an assertion failed twenty times; thirty runs say
- * whether this suite mostly argues with the application or mostly with the
- * public host it shares, which is the question actually worth answering before
- * a red pipeline is believed. Allure stays the source of the numbers: this
- * only keeps the ones it already worked out.
+ * Kept per run, so the taxonomy stops being a snapshot of one. Thirty runs say
+ * whether this suite argues with the application or with the host it shares.
+ * Allure stays the source of the numbers; this only remembers them.
  */
 entry.categories = Object.fromEntries(
   [...matched.entries()].map(([name, hit]) => [name, hit.total]),
@@ -359,11 +356,7 @@ const categoryRows = [
     })),
 ];
 
-/**
- * The same category across the window, with its per run shape beside it: a
- * total of twelve reads very differently when it is one run of twelve than
- * when it is twelve runs of one.
- */
+/** Twelve in one run reads very differently from one in each of twelve. */
 const windowCell = (name) => {
   const total = windowCategoryTotal(name);
   if (!total) return '<span class="none">none</span>';
@@ -375,16 +368,10 @@ const windowCell = (name) => {
 };
 
 /**
- * The committed visual baselines, per area, with the last commit that touched
- * them.
- *
- * A baseline is the one artefact in this suite that goes stale silently: it
- * keeps passing against the renderer that produced it, and a browser upgrade
- * invalidates every one of them at once. The count answers what a regeneration
- * would have to review, and the date answers when the renderer behind them was
- * last agreed with. The date comes from git rather than the file's own
- * timestamp, which a fresh checkout sets to the time of the checkout; a shallow
- * clone cannot answer it at all, and says so rather than guessing.
+ * The committed baselines per area, with the last commit that touched them: a
+ * baseline goes stale silently, and a browser upgrade invalidates every one at
+ * once. The date comes from git, not the file timestamp, which a checkout
+ * rewrites; a shallow clone cannot answer it and says so.
  */
 const SNAPSHOT_SUFFIX = ".vr.spec.ts-snapshots";
 
