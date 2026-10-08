@@ -24,6 +24,8 @@ export class ProductDetailPage extends BaseAppPage {
 
   constructor(page: Page) {
     super(page);
+    // CSS: the information column is a div with no role and no accessible
+    // name. It is the scope the fields below are read through. Verified live.
     this.productInformation = page.locator(".product-information");
     // Sibling column to .product-information, not inside it — verified live.
     this.productImage = page.locator(".view-product img");
@@ -32,18 +34,19 @@ export class ProductDetailPage extends BaseAppPage {
     // Each label sits in its own <b>; scope to the paragraph to get label +
     // value. Category's paragraph also carries an unrelated ad link appended
     // after the text, verified live, so assertions on it use `toContainText`.
-    this.category = this.productInformation.locator("p", {
-      hasText: "Category:",
-    });
-    this.availability = this.productInformation.locator("p", {
-      hasText: "Availability:",
-    });
-    this.condition = this.productInformation.locator("p", {
-      hasText: "Condition:",
-    });
-    this.brand = this.productInformation.locator("p", { hasText: "Brand:" });
-    // Number input with no label and no data-qa hook.
-    this.quantityInput = page.locator("#quantity");
+    this.category = this.productInformation
+      .getByRole("paragraph")
+      .filter({ hasText: "Category:" });
+    this.availability = this.productInformation
+      .getByRole("paragraph")
+      .filter({ hasText: "Availability:" });
+    this.condition = this.productInformation
+      .getByRole("paragraph")
+      .filter({ hasText: "Condition:" });
+    this.brand = this.productInformation
+      .getByRole("paragraph")
+      .filter({ hasText: "Brand:" });
+    this.quantityInput = page.getByRole("spinbutton");
     this.addToCartButton = page.getByRole("button", { name: "Add to cart" });
     this.writeYourReviewTab = page.getByRole("link", {
       name: "Write Your Review",

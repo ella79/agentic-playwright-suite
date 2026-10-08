@@ -16,11 +16,17 @@ export class CheckoutPage extends BaseAppPage {
     this.addressDetailsHeading = page.getByRole("heading", {
       name: "Address Details",
     });
-    this.deliveryAddress = page.locator("#address_delivery");
-    this.billingAddress = page.locator("#address_invoice");
+    this.deliveryAddress = page
+      .getByRole("list")
+      .filter({ hasText: "Your delivery address" });
+    this.billingAddress = page
+      .getByRole("list")
+      .filter({ hasText: "Your billing address" });
     this.orderReviewHeading = page.getByRole("heading", {
       name: "Review Your Order",
     });
+    // CSS: a layout wrapper around the order <table>, addressed the same way
+    // as the cart's. Verified live.
     this.orderTable = page.locator("#cart_info");
     // The same table also renders a trailing Total Amount row with no
     // product id; scoping to `product-<id>` rows excludes it. Verified live.

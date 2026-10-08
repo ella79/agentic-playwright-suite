@@ -13,6 +13,11 @@ export class CartPage extends BaseAppPage {
 
   constructor(page: Page) {
     super(page);
+    // CSS: the section and the table wrapper are layout containers with no
+    // role and no accessible name, and `getByRole("table")` resolves to the
+    // <table> nested inside `#cart_info` rather than the wrapper the capture
+    // needs. The rows are reached through the wrapper for the same reason.
+    // Verified live.
     this.cartItemsSection = page.locator("#cart_items");
     this.cartTable = page.locator("#cart_info");
     this.cartRows = page.locator("#cart_info tbody tr");
@@ -23,7 +28,8 @@ export class CartPage extends BaseAppPage {
     // this one's accessible name has no leading icon space, unlike the
     // header's. Verified live.
     this.homeBreadcrumbLink = page
-      .locator(".breadcrumb")
+      .getByRole("list")
+      .filter({ hasText: "Shopping Cart" })
       .getByRole("link", { name: "Home" });
     // Rendered as an anchor without href, so it carries no link role.
     this.proceedToCheckoutButton = page.getByText("Proceed To Checkout");
@@ -38,10 +44,22 @@ export class CartPage extends BaseAppPage {
     return this.cartRows.filter({ hasText: productName });
   }
 
+  /**
+   * The quantity cell is the only one holding a control: the site renders the
+   * number as a disabled button, which is what tells it apart from the price
+   * and total cells. Verified live.
+   */
   getRowQuantity(productName: string): Locator {
-    return this.getRow(productName).locator(".cart_quantity");
+    return this.getRow(productName)
+      .getByRole("cell")
+      .filter({ has: this.page.getByRole("button") });
   }
 
+  /**
+   * CSS: the row holds three paragraphs, price, quantity and total, none of
+   * them named, so `getByRole("paragraph")` cannot pick this one out. Verified
+   * live.
+   */
   getRowTotal(productName: string): Locator {
     return this.getRow(productName).locator(".cart_total_price");
   }

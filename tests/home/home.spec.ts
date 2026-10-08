@@ -43,7 +43,7 @@ test.describe("Home Page", () => {
 
     await test.step("the first featured item is a complete card", async () => {
       const firstCard = homePage.getProductCard(products.blueTop.name);
-      await expect(firstCard.locator("img").first()).toBeVisible();
+      await expect(firstCard.getByRole("img").first()).toBeVisible();
       await expect(
         firstCard.getByText(products.blueTop.price).first(),
       ).toBeVisible();
