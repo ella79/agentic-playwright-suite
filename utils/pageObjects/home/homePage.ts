@@ -137,10 +137,11 @@ export class HomePage extends BaseAppPage {
   }
 
   /**
-   * By href rather than accessible name: "Women" and "Men" are substrings of
-   * one another once matched loosely ("Wo-MEN"), and exact name matching
-   * fails here too, since the accessible name carries whitespace from the
-   * panel's own layout that exact mode does not trim. Verified live.
+   * By href rather than accessible name, measured rather than assumed: a loose
+   * name finds one link for "Women" and "Kids" but two for "Men", which also
+   * matches inside "Women"; exact matching finds none of the three, because the
+   * name carries the panel's own layout whitespace. An anchored regex finds
+   * none either, so the name holds more than whitespace around the label.
    */
   getCategoryLink(parentCategory: "Women" | "Men" | "Kids"): Locator {
     return this.categorySidebar.locator(`a[href="#${parentCategory}"]`);
