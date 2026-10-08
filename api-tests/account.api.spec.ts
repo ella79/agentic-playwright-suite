@@ -2,8 +2,10 @@
 import { expect, test } from "../utils/fixtures/testFixtures";
 import {
   AccountApiClient,
+  type ApiResponseBody,
   type UserDetailBody,
 } from "../utils/apiClients/accountApiClient";
+import { readJson } from "../utils/apiClients/readJson";
 import { buildAccount } from "../utils/testData";
 
 test.describe("Account API", () => {
@@ -27,7 +29,7 @@ test.describe("Account API", () => {
     const response = await request.post("/api/createAccount", {
       form: { email: "missing-name@example.com" },
     });
-    const body = await response.json();
+    const body = await readJson<ApiResponseBody>(response);
 
     expect(body.responseCode).toBe(400);
     expect(body.message).toContain("name parameter is missing");
@@ -128,7 +130,7 @@ test.describe("Account API", () => {
     const response = await request.post("/api/verifyLogin", {
       form: { password: "whatever" },
     });
-    const body = await response.json();
+    const body = await readJson<ApiResponseBody>(response);
 
     expect(body.responseCode).toBe(400);
     expect(body.message).toContain("email or password parameter is missing");
@@ -140,7 +142,7 @@ test.describe("Account API", () => {
     // Unlike createAccount, this one answers HTTP 200 with the real outcome
     // inside the body rather than a transport-level 405. Verified live.
     const response = await request.delete("/api/verifyLogin");
-    const body = await response.json();
+    const body = await readJson<ApiResponseBody>(response);
 
     expect(response.status()).toBe(200);
     expect(body.responseCode).toBe(405);
@@ -174,7 +176,7 @@ test.describe("Account API", () => {
     const response = await request.put("/api/updateAccount", {
       form: { name: "Jon Doe" },
     });
-    const body = await response.json();
+    const body = await readJson<ApiResponseBody>(response);
 
     expect(body.responseCode).toBe(400);
     expect(body.message).toContain("email parameter is missing");
