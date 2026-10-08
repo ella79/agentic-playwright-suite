@@ -143,6 +143,24 @@ yarn docker:vr:update
 Baselines written directly on a host are gitignored, and the visual job fails outright when none are
 committed rather than writing its own and reporting success.
 
+**Visual testing is a built-in Playwright feature.** `toHaveScreenshot()` captures and compares
+natively; no third-party visual testing library or service is involved. When a comparison fails,
+Playwright writes three PNGs into `test-results/`: the committed baseline as `-expected`, what the
+browser rendered as `-actual`, and the two overlaid as `-diff`.
+
+**Those three become one attachment in Allure.** `allure-playwright` recognises them by name and
+collapses them into a single `application/vnd.allure.image.diff`. Allure's `screen-diff-plugin`,
+which ships enabled in the command line distribution, renders it on the failing case in the
+`visual/` report: Expected, Actual, Diff, the two side by side, and an overlay slider. Neither half
+is configured here. The naming convention is the whole contract between them, which is why a
+manually attached image must never end in `-expected.png`, `-actual.png` or `-diff.png`.
+
+**A passing case attaches nothing, deliberately.** A comparison that matched produces no images, so
+there is nothing to show. Attaching the baselines anyway would put twenty identical pictures in
+every green run and keep them for as long as the published history does. Baselines are reviewed
+where the decision is taken: in the pull request that changes them, which is also where GitHub
+renders an image diff of its own.
+
 ## Repository Structure
 
 ```

@@ -7,7 +7,7 @@ Progress of testing activities against the baseline: the plans in `specs/test-pl
 Browsers: Chromium and WebKit for functional, Chromium only for visual regression; the API suite
 runs without a browser.
 
-Updated: 2026-09-21 · Source of truth for results:
+Updated: 2026-10-08 · Source of truth for results:
 [the published dashboard](https://ella79.github.io/agentic-playwright-suite/)
 
 ## Functional Coverage

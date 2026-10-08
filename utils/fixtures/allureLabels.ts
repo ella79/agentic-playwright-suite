@@ -19,7 +19,7 @@ const REPO_BLOB =
   "https://github.com/ella79/agentic-playwright-suite/blob/main";
 
 /** The visual project's name in `playwright.config.ts`. */
-const VISUAL_PROJECT = "vr";
+const VISUAL_PROJECT = "visual-regression";
 
 /** The API project's name in `playwright.config.ts`. */
 const API_PROJECT = "api";
