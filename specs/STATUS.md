@@ -3,7 +3,7 @@
 Progress of testing activities against the baseline: the plans in `specs/test-plans/` and
 `specs/vr-test-plans/`, and the suites in `tests/` and `vr-tests/`.
 
-Updated: 2026-09-10 · Source of truth for results:
+Updated: 2026-10-08 · Source of truth for results:
 [the published dashboard](https://ella79.github.io/agentic-playwright-suite/)
 
 ## Functional Coverage
@@ -50,8 +50,14 @@ its states now sit in one file and one baseline directory. The totals are unchan
 changed behaviour. The renamed baseline is byte-identical to the one it replaced, and it was
 compared under its new name in the Linux image on 2026-09-10: 20 passed.
 
-Cap: 20. Full. Baselines are Chromium on Linux at 1920x1080, generated in the CI image
-(`yarn docker:vr:update`); the visual job fails if none are committed rather than seeding its own.
+The visual project was renamed `visual-regression` to match its CI job, so every baseline now
+carries that name in place of `vr`. All twenty are byte-identical to the ones they replace and were
+compared under their new names in the Linux image on 2026-10-08: 20 passed. VR-19 was expiring on
+its stability check under parallel load rather than on any difference; its capture now waits for the
+order table's images first, and the suite passed three consecutive runs after the change.
+
+Cap: 20. Full. Baselines are regenerated with `yarn docker:vr:update`; the rules behind that are in
+[`docs/architecture.md`](../docs/architecture.md).
 
 ## Findings Raised Against the Application
 

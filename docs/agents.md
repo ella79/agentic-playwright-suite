@@ -49,7 +49,7 @@ a standard that erodes.
 
 ## The Loop
 
-The agents are not six ways to ask for a test. They are one chain, and each link hands the next
+The agents are not five ways to ask for a test. They are one chain, and each link hands the next
 something narrower than it received.
 
 1. **Explore.** The planner opens the application through MCP and reads the accessibility tree, so
@@ -63,9 +63,8 @@ something narrower than it received.
    why the project rules section overrides it.
 5. **Review.** The reviewer audits the result against the coding standard and reports. It cannot
    edit, so it cannot quietly fix what it should be reporting.
-6. **Heal.** If a case fails, the healer establishes the cause before changing anything, and
-   classifies it: application changed, test raced the UI, state left by another test, third party
-   noise, or a genuine defect, which is parked with `test.fixme()` rather than repaired.
+6. **Heal.** If a case fails, the healer establishes the cause before changing anything, then
+   classifies it under the policy in the [README](../README.md#when-a-test-goes-flaky).
 
 The manager runs that chain for one area, decides which area is next, and owns the caps. Its
 workflows cover the cases a suite actually meets: a coverage request against a full cap, a new

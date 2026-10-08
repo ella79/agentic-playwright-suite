@@ -98,7 +98,7 @@ tests/        20 functional cases, one directory per feature area
 vr-tests/     20 visual cases and their committed Linux baselines
 specs/        Test plans, the status report, the agent seed
 utils/        Page objects, fixtures, test data, scripts
-.claude/      Six agents, three skills, slash commands
+.claude/      Five agents, three skills, slash commands
 env/docker/   Execution images for CI and local use
 ```
 
@@ -125,5 +125,5 @@ in the image CI uses.
 | [`specs/STATUS.md`](specs/STATUS.md)           | Coverage per area, findings raised against the application, open decisions |
 | [`docs/architecture.md`](docs/architecture.md) | Page objects, fixtures, locator policy, visual regression                  |
 | [`docs/pipeline.md`](docs/pipeline.md)         | The seven jobs, the published reports, dependency updates                  |
-| [`docs/agents.md`](docs/agents.md)             | The six agents, the two MCP servers, how the skills are enforced           |
+| [`docs/agents.md`](docs/agents.md)             | The five agents, the two MCP servers, how the skills are enforced          |
 | [`docs/decisions.md`](docs/decisions.md)       | The calls a reviewer would question, and what broke while building this    |
