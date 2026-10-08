@@ -11,6 +11,11 @@ Target: $ARGUMENTS
 Open the diff before anything else, then classify the failure as a regression, an intended UI
 change, or an unstable capture. Report the classification with the evidence that supports it.
 
+The diff is the image comparator Allure renders on the failing case, under Attachments in the
+`visual/` report: `yarn allure:generate && yarn allure:open` after a local run, or the published
+dashboard for a CI one. The raw `-expected`, `-actual` and `-diff` PNGs are in `test-results/`, and
+CI uploads them as artifacts on failure.
+
 A regression is reported, never absorbed by regenerating. An intended change is regenerated through
 `Update VR baselines` with a written reason, and a human looks at the PNG before it is committed.
 Instability is fixed in state preparation, never by raising a threshold.
