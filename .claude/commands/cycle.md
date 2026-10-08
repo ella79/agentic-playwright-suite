@@ -10,8 +10,8 @@ Feature area: $ARGUMENTS
 
 The manager owns the cycle. For a whole feature it runs W9, which chains the two suites in order:
 functional to green first, then the visual pass on the page object that pass built. For a single
-case it runs W2 or W3 alone. Either way it starts at W1 if the request would push a suite past its
-cap.
+case it runs W2 or W3 alone. Either way it starts at W1, which answers an already covered state with
+its ID.
 
 Step order is planner, generator one case at a time, reviewer on the changed files, static checks,
 the case, the suite, healer on failure, then `specs/STATUS.md`.

@@ -86,12 +86,12 @@ So the reading is a filter, not a substitute:
 ## Seed file
 
 This project's seed is `specs/seed.spec.ts`, not `tests/seed.spec.ts`. It sits outside `tests/`
-because the suite is capped and a bootstrap template is not coverage. Reference that path in plans.
+because a bootstrap template is not coverage. Reference that path in plans.
 
-## Suite caps
+## Coverage decisions
 
-Both suites are capped and currently full; the manager owns the swap decision. Never propose silent
-growth: a plan that adds coverage says which case it replaces.
+A plan proposes a case only for a state no plan covers and exploration confirmed live. Check the
+existing plans before adding; the manager owns the coverage decision.
 
 ## Two kinds of plan
 

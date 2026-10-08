@@ -10,6 +10,6 @@
 
 - [ ] `yarn typecheck`, `yarn lint`, `yarn stylecheck` pass
 - [ ] Affected cases pass without retries
-- [ ] Coverage change respects the suite caps, or names the case it replaces
+- [ ] New coverage names a state found missing and verified live
 - [ ] New visual baselines were generated in the CI image, not on the host
 - [ ] `specs/STATUS.md` updated if coverage changed, and the README's decisions section if a call was made

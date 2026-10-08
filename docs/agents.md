@@ -10,13 +10,13 @@ because the official definitions know nothing about this codebase: the generator
 writes `page.click(...)` directly, which this repository does not allow. Manager and reviewer are hand
 written, since the official set has no equivalent.
 
-| Agent                       | Responsibility                                  | Source        |
-| --------------------------- | ----------------------------------------------- | ------------- |
-| `playwright-test-manager`   | Scope, the caps, the gates, and the whole cycle | hand written  |
-| `playwright-test-planner`   | Live exploration, then a written plan           | `init-agents` |
-| `playwright-test-generator` | One case at a time, from an existing plan       | `init-agents` |
-| `playwright-test-reviewer`  | Read only convention audit                      | hand written  |
-| `playwright-test-healer`    | Root cause diagnosis of failures                | `init-agents` |
+| Agent                       | Responsibility                            | Source        |
+| --------------------------- | ----------------------------------------- | ------------- |
+| `playwright-test-manager`   | Scope, the gates, and the whole cycle     | hand written  |
+| `playwright-test-planner`   | Live exploration, then a written plan     | `init-agents` |
+| `playwright-test-generator` | One case at a time, from an existing plan | `init-agents` |
+| `playwright-test-reviewer`  | Read only convention audit                | hand written  |
+| `playwright-test-healer`    | Root cause diagnosis of failures          | `init-agents` |
 
 | Command             | Effect                                                                      |
 | ------------------- | --------------------------------------------------------------------------- |
@@ -67,8 +67,8 @@ something narrower than it received.
    classifies it: application changed, test raced the UI, state left by another test, third party
    noise, or a genuine defect, which is parked with `test.fixme()` rather than repaired.
 
-The manager runs that chain for one area, decides which area is next, and owns the caps. Its
-workflows cover the cases a suite actually meets: a coverage request against a full cap, a new
+The manager runs that chain for one area and decides which area is next. Its
+workflows cover the cases a suite actually meets: a coverage request, a new
 functional or visual case, a failing baseline, a red pipeline, an existing case that is wrong, a
 plan implemented only in part, and a health check. Skills are not chosen by the agents: they are the
 standards each step is measured against.

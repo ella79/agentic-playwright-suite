@@ -532,7 +532,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # WebKit results join the functional ones instead of forming a report of
-      # their own: the same twenty cases on a second engine belong under one
+      # their own: the same functional cases on a second engine belong under one
       # suite, not at a second address.
       #
       # Four reports are still generated rather than one. Allure draws a single

@@ -121,7 +121,7 @@ export default defineConfig({
         storageState: ".auth/user.json",
       },
     },
-    // The same twenty cases replayed on the engine Chromium cannot speak for.
+    // The same functional cases replayed on the engine Chromium cannot speak for.
     // WebKit is the only route to Safari, and it is a project rather than extra
     // cases: same coverage, different surface. Visual stays on Chromium, since
     // a second engine would double the baselines a human has to review.
@@ -137,7 +137,7 @@ export default defineConfig({
     },
     {
       // The agent seed: the template generated tests start from, not coverage.
-      // Inside the functional project it would run as a twenty-first case, but
+      // Inside the functional project it would run as an extra case, but
       // the planner still has to execute it to prove the environment
       // initialises, so it gets a project of its own. It lives in specs/ beside
       // the plans it bootstraps, matched by name. It stays a guest: the seed
