@@ -57,8 +57,20 @@ export abstract class BaseAppPage {
    * verified against all 78 published browser-driven results, every one
    * carrying the same doomed three-second wait.
    */
-  protected async goto(path: string): Promise<void> {
-    await this.page.goto(path);
+  protected async goto(path: string, landmark?: Locator): Promise<void> {
+    if (!landmark) {
+      await this.page.goto(path);
+      return;
+    }
+
+    // The demo host sheds load with a holding page that answers on the right
+    // URL and renders none of the application, so a landmark the page always
+    // carries is the only proof the application arrived. Navigating again is
+    // the fix, not a longer wait: the holding page never becomes the app.
+    await expect(async () => {
+      await this.page.goto(path);
+      await expect(landmark).toBeVisible({ timeout: 5_000 });
+    }).toPass({ intervals: [1_000, 3_000], timeout: 20_000 });
   }
 
   /**

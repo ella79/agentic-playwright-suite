@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from "@playwright/test";
+import { type Locator, type Page } from "@playwright/test";
 import { BaseAppPage } from "../baseAppPage";
 import { AddToCartModal } from "../shared/addToCartModal";
 import { url } from "../../url";
@@ -88,8 +88,7 @@ export class HomePage extends BaseAppPage {
   }
 
   async gotoHomePage(): Promise<void> {
-    await this.goto(url.home);
-    await expect(this.featuresItemsHeading).toBeVisible();
+    await this.goto(url.home, this.featuresItemsHeading);
   }
 
   // `#slider-carousel` carries `data-ride="carousel"`, verified live, so
