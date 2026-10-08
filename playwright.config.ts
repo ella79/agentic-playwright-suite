@@ -151,7 +151,7 @@ export default defineConfig({
       },
     },
     {
-      name: "vr",
+      name: "visual-regression",
       testDir: "./vr-tests",
       dependencies: ["setup"],
       use: {

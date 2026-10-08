@@ -26,7 +26,7 @@ cries wolf gets ignored, which is worse than having none.
 | Spec file  | `<area>.vr.spec.ts`  | `cart.vr.spec.ts`           |
 | Screenshot | `<area>-<state>.png` | `cart-with-single-item.png` |
 
-Playwright appends the platform suffix (`-chromium-linux.png`) itself. Baselines are generated on
+Playwright appends the project name and the platform (`-visual-regression-linux.png`) itself. Baselines are generated on
 Linux to match CI. A baseline captured on Windows or macOS will not match and must not be
 committed.
 
