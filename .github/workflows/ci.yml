@@ -248,7 +248,7 @@ jobs:
 
       - name: Upload Allure results
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: allure-results-${{ matrix.project }}
           path: allure-results
@@ -258,7 +258,7 @@ jobs:
       # carries the traces for every engine, not only the canonical one.
       - name: Upload blob report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: blob-report-${{ matrix.project }}
           path: blob-report
@@ -268,7 +268,7 @@ jobs:
       # outcome, so it is what the suite health page is built from.
       - name: Upload JSON report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: results-json-${{ matrix.project }}
           path: reports/results.json
@@ -276,7 +276,7 @@ jobs:
 
       - name: Upload failure artifacts
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: ${{ matrix.project }}-traces
           path: test-results
@@ -324,7 +324,7 @@ jobs:
 
       - name: Upload Allure results
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: allure-results-vr
           path: allure-results
@@ -332,7 +332,7 @@ jobs:
 
       - name: Upload blob report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: blob-report-vr
           path: blob-report
@@ -340,7 +340,7 @@ jobs:
 
       - name: Upload JSON report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: results-json-vr
           path: reports/results.json
@@ -348,7 +348,7 @@ jobs:
 
       - name: Upload visual diffs
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: visual-diffs
           path: test-results
@@ -382,7 +382,7 @@ jobs:
 
       - name: Upload Allure results
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: allure-results-api
           path: allure-results
@@ -392,7 +392,7 @@ jobs:
       # outcome, so it is what the suite health page is built from.
       - name: Upload JSON report
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: results-json-api
           path: reports/results.json
@@ -400,7 +400,7 @@ jobs:
 
       - name: Upload failure artifacts
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: api-traces
           path: test-results
@@ -478,7 +478,7 @@ jobs:
       # pins yarn 4 through packageManager.
       - run: corepack enable
 
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: "24"
           cache: yarn
@@ -500,7 +500,7 @@ jobs:
           echo "run_id=${prior:-${{ github.run_id }}}" >> "$GITHUB_OUTPUT"
 
       - name: Collect functional results
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: allure-results-e2e-chromium
           path: results/functional
@@ -508,7 +508,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Collect visual results
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: allure-results-vr
           path: results/visual
@@ -516,7 +516,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Collect WebKit results
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: allure-results-e2e-webkit
           path: results/webkit
@@ -524,7 +524,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Collect API results
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: allure-results-api
           path: results/api
@@ -622,7 +622,7 @@ jobs:
           yarn allure generate results/api --clean -o allure-report/api
 
       - name: Collect JSON reports
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           pattern: results-json-*
           path: json-reports
@@ -656,7 +656,7 @@ jobs:
       # The HTML report is published alongside Allure because it carries the
       # traces: Allure shows what failed, the trace viewer shows why.
       - name: Collect blob reports
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           pattern: blob-report-*
           path: all-blob-reports
