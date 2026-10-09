@@ -24,6 +24,12 @@
     "description": "The public demo host shed the request. Infrastructure noise, not a product regression."
   },
   {
+    "name": "Unexpected response shape",
+    "messageRegex": ".*Unexpected response shape.*",
+    "matchedStatuses": ["failed", "broken"],
+    "description": "The endpoint answered JSON, but without the numeric responseCode every endpoint under /api carries. The answer changed shape rather than the test being wrong, which is why it is named here instead of surfacing as an assertion on an undefined field."
+  },
+  {
     "name": "Page did not load",
     "traceRegex": "(?s).*\\sat \\w+\\.goto(\\w*Page)? \\(.*",
     "matchedStatuses": ["failed", "broken"],

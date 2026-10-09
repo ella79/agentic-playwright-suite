@@ -2,8 +2,11 @@ import fs from "fs";
 import path from "path";
 import { type TestInfo } from "@playwright/test";
 import {
+  allureId,
   epic,
+  historyId,
   feature,
+  issue,
   link,
   parameter,
   parentSuite,
@@ -13,6 +16,8 @@ import {
   subSuite,
   suite,
   tag,
+  testCaseId,
+  tms,
 } from "allure-js-commons";
 
 const REPO_BLOB =
@@ -46,12 +51,33 @@ const PROJECTS: Record<string, { parent: string; engine: string }> = {
  * Page" and "Signup Page" when login and signup became separate specs, and
  * this set was never updated to match, so nothing had matched it since.
  */
-const CRITICAL_AREAS = new Set([
-  "Checkout Page",
-  "Cart Page",
-  "Login Page",
-  "Signup Page",
-]);
+const CRITICAL_AREAS = new Set(["Cart Page", "Login Page", "Signup Page"]);
+
+/** Where a failure stops a purchase outright, rather than making one harder. */
+const BLOCKER_AREAS = new Set(["Checkout Page", "Payment Page"]);
+
+/** `TC-05`, `VR-30`, `API-20`: the identifier every case title opens with. */
+const CASE_ID = /^((?:TC|VR|API)-\d+)\b/;
+
+/** A parked case names its defect as `#123` in the `test.fixme` reason. */
+const ISSUE_REFERENCE = /#(\d+)/;
+
+/**
+ * Visual drift is minor on purpose: worth knowing, not worth paging anyone, and
+ * it keeps the chart readable when a browser update moves every baseline at
+ * once. The seed is the generator's template, not coverage.
+ */
+function severityFor(
+  area: string,
+  isVisual: boolean,
+  isSeed: boolean,
+): Severity {
+  if (isSeed) return Severity.TRIVIAL;
+  if (isVisual) return Severity.MINOR;
+  if (BLOCKER_AREAS.has(area)) return Severity.BLOCKER;
+  if (CRITICAL_AREAS.has(area)) return Severity.CRITICAL;
+  return Severity.NORMAL;
+}
 
 /** The `// spec:` header every spec file carries, so the link is never stale. */
 function readPlanPath(specFile: string): string | undefined {
@@ -99,22 +125,40 @@ export async function applyAllureLabels(testInfo: TestInfo): Promise<void> {
 
   await tag(isVisual ? "visual" : isApi ? "api" : "functional");
 
-  // API has nothing a user could be mid-purchase in, so it never carries
-  // critical severity regardless of area name.
-  await severity(
-    CRITICAL_AREAS.has(area) && !isVisual && !isApi
-      ? Severity.CRITICAL
-      : Severity.NORMAL,
-  );
+  await severity(severityFor(area, isVisual, testInfo.project.name === "seed"));
+
+  const caseId = CASE_ID.exec(testInfo.title)?.[1];
+  if (caseId) {
+    // History and retries key on `historyId`, normally derived from the full
+    // name plus the parameters, so a rename orphans a case's history. The
+    // engine stays in the key, or Chromium and WebKit share one history and a
+    // failure on either hides. `testCaseId` is parameter independent by
+    // design; `allureId` is the test plan identifier.
+    await historyId(`${caseId}.${project.engine}`);
+    await testCaseId(caseId);
+    await allureId(caseId);
+  }
 
   // Recorded as a parameter rather than only in the suite name, so Allure
   // treats the same case run on two engines as one case in two configurations
   // instead of two unrelated results.
   await parameter("browser", project.engine);
 
+  // The path alone: the reporter's `links` option turns it into an address.
   const plan = readPlanPath(testInfo.file);
   if (plan) {
-    await link(`${REPO_BLOB}/${plan}`, "Test plan", "test-plan");
+    await tms(plan);
+  }
+
+  // So the report answers why a skipped case is skipped.
+  const parked = testInfo.annotations.find(
+    (annotation) => annotation.type === "fixme",
+  );
+  const defect = parked?.description
+    ? ISSUE_REFERENCE.exec(parked.description)?.[1]
+    : undefined;
+  if (defect) {
+    await issue(defect);
   }
   // POSIX separators, so the link works when the run happened on Windows.
   const sourcePath = path

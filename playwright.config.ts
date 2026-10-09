@@ -27,10 +27,25 @@ const IS_API = SUITE === "-api";
  * the report's Environment widget, so a run says what it executed against
  * instead of leaving a reader to guess which branch or host produced it.
  */
+const REPO_URL = "https://github.com/ella79/agentic-playwright-suite";
+
+const REPO_BLOB = `${REPO_URL}/blob/main`;
+
 const allureReporter: ReporterDescription = [
   "allure-playwright",
   {
     resultsDir: "allure-results",
+    // So a test names an identifier and nothing repeats this repository's URL.
+    links: {
+      tms: {
+        nameTemplate: "Test plan",
+        urlTemplate: `${REPO_BLOB}/%s`,
+      },
+      issue: {
+        nameTemplate: "#%s",
+        urlTemplate: `${REPO_URL}/issues/%s`,
+      },
+    },
     environmentInfo: {
       "Base URL": BASE_URL,
       // What actually ran. The WebKit job overrides these, because a report
