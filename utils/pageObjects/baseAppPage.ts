@@ -1,5 +1,18 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
+/**
+ * Every navigation below stops here rather than at Playwright's default, the
+ * `load` event. `load` waits for every subresource, and one image the demo
+ * host leaves unanswered holds it open for as long as the caller allows: of
+ * the 58 requests the home page made in the WebKit run of #117, all but one
+ * settled inside 3.4 seconds, and the product photo that never responded kept
+ * the navigation waiting until the budget below expired — so the landmark that
+ * decides whether the page arrived was never asserted once. A landmark is the
+ * proof, the photography is not, and the cases that do need the images wait
+ * for them through `waitForImagesLoaded`.
+ */
+const DOCUMENT_READY = "domcontentloaded" as const;
+
 export abstract class BaseAppPage {
   readonly page: Page;
   readonly header: Locator;
@@ -59,7 +72,7 @@ export abstract class BaseAppPage {
    */
   protected async goto(path: string, landmark?: Locator): Promise<void> {
     if (!landmark) {
-      await this.page.goto(path);
+      await this.page.goto(path, { waitUntil: DOCUMENT_READY });
       return;
     }
 
@@ -68,7 +81,7 @@ export abstract class BaseAppPage {
     // carries is the only proof the application arrived. Navigating again is
     // the fix, not a longer wait: the holding page never becomes the app.
     await expect(async () => {
-      await this.page.goto(path);
+      await this.page.goto(path, { waitUntil: DOCUMENT_READY });
       await expect(landmark).toBeVisible({ timeout: 5_000 });
     }).toPass({ intervals: [1_000, 3_000], timeout: 20_000 });
   }
