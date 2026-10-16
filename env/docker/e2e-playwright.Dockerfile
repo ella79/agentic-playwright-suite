@@ -3,7 +3,7 @@
 # The tag must track the @playwright/test version in package.json: the image
 # ships browser binaries built for that exact release, and a mismatch changes
 # text rendering, which silently invalidates every visual regression baseline.
-FROM mcr.microsoft.com/playwright:v1.64.0-noble@sha256:06a9939e57531807f8d5fd76ce44b53165ffb7d7501d87ab10e285c20b1e971f
+FROM mcr.microsoft.com/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
 
 WORKDIR /workspace
 
