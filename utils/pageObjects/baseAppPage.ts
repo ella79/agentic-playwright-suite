@@ -1,5 +1,25 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
+/**
+ * Every navigation below stops here rather than at Playwright's default, the
+ * `load` event. `load` waits for every subresource, and one image the demo
+ * host leaves unanswered holds it open for as long as the caller allows: of
+ * the 58 requests the home page made in the WebKit run of #117, all but one
+ * settled inside 3.4 seconds, and the product photo that never responded kept
+ * the navigation waiting until the budget below expired — so the landmark that
+ * decides whether the page arrived was never asserted once. A landmark is the
+ * proof, the photography is not, and the cases that do need the images wait
+ * for them through `waitForImagesLoaded`.
+ */
+const DOCUMENT_READY = "domcontentloaded" as const;
+
+interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export abstract class BaseAppPage {
   readonly page: Page;
   readonly header: Locator;
@@ -57,18 +77,13 @@ export abstract class BaseAppPage {
    * verified against all 78 published browser-driven results, every one
    * carrying the same doomed three-second wait.
    */
-  protected async goto(path: string, landmark?: Locator): Promise<void> {
-    if (!landmark) {
-      await this.page.goto(path);
-      return;
-    }
-
+  protected async goto(path: string, landmark: Locator): Promise<void> {
     // The demo host sheds load with a holding page that answers on the right
     // URL and renders none of the application, so a landmark the page always
     // carries is the only proof the application arrived. Navigating again is
     // the fix, not a longer wait: the holding page never becomes the app.
     await expect(async () => {
-      await this.page.goto(path);
+      await this.page.goto(path, { waitUntil: DOCUMENT_READY });
       await expect(landmark).toBeVisible({ timeout: 5_000 });
     }).toPass({ intervals: [1_000, 3_000], timeout: 20_000 });
   }
@@ -116,9 +131,11 @@ export abstract class BaseAppPage {
    * viewport needs the same framing every run, which this guarantees.
    */
   async scrollToTop(target: Locator): Promise<void> {
-    // Where the target lands depends on layout, which is only final once the
-    // document, stylesheets included, has loaded.
-    await this.page.waitForLoadState("load");
+    // Where the target lands depends on layout. What says the layout is final
+    // is the layout itself holding still, not the document reporting itself
+    // loaded: that report is withheld for good by a single photo the host
+    // never answers, which is why navigation no longer waits for it either.
+    await this.settledBoundingBoxes([target]);
     await target.evaluate((element: Element) =>
       element.scrollIntoView({ block: "start", behavior: "instant" }),
     );
@@ -130,21 +147,79 @@ export abstract class BaseAppPage {
    * existing container tight enough to scope to directly, such as a heading
    * and the block it titles when the two are rendered as plain siblings.
    */
-  async unionBoundingBox(
-    locators: Locator[],
-  ): Promise<{ x: number; y: number; width: number; height: number }> {
-    // A clip is computed from layout, and layout is only final once the
-    // document, stylesheets included, has loaded.
-    await this.page.waitForLoadState("load");
-    const boxes = await Promise.all(
-      locators.map((locator) => locator.boundingBox()),
-    );
-    const resolved = boxes.filter((box) => box !== null);
-    const left = Math.min(...resolved.map((box) => box.x));
-    const top = Math.min(...resolved.map((box) => box.y));
-    const right = Math.max(...resolved.map((box) => box.x + box.width));
-    const bottom = Math.max(...resolved.map((box) => box.y + box.height));
+  async unionBoundingBox(locators: Locator[]): Promise<BoundingBox> {
+    let boxes = await this.settledBoundingBoxes(locators);
+    if (!this.fitsInViewport(this.union(boxes))) {
+      // A clip is read against the viewport, so a union the viewport no longer
+      // holds cannot be captured at all — VR-08 subscribed, and the images
+      // arriving behind it pushed the widget it had scrolled to back out of
+      // sight. Bringing the locators in costs the captures that already frame
+      // correctly nothing: `scrollIntoViewIfNeeded` leaves an element that is
+      // already fully visible exactly where it is. Reversed, so the first
+      // locator is the one the page ends up anchored on.
+      for (const locator of [...locators].reverse()) {
+        await locator.scrollIntoViewIfNeeded();
+      }
+      boxes = await this.settledBoundingBoxes(locators);
+    }
+    return this.union(boxes);
+  }
+
+  private union(boxes: BoundingBox[]): BoundingBox {
+    const left = Math.min(...boxes.map((box) => box.x));
+    const top = Math.min(...boxes.map((box) => box.y));
+    const right = Math.max(...boxes.map((box) => box.x + box.width));
+    const bottom = Math.max(...boxes.map((box) => box.y + box.height));
     return { x: left, y: top, width: right - left, height: bottom - top };
+  }
+
+  private fitsInViewport(box: BoundingBox): boolean {
+    const viewport = this.page.viewportSize();
+    if (!viewport) {
+      return true;
+    }
+    return (
+      box.x >= 0 &&
+      box.y >= 0 &&
+      box.x + box.width <= viewport.width &&
+      box.y + box.height <= viewport.height
+    );
+  }
+
+  /**
+   * Every given locator's own box, read once two consecutive reads agree.
+   *
+   * A box is measured against the viewport, and this page keeps moving under
+   * its own photography: navigation returns as soon as the document is
+   * parsed, so the images that size the page arrive while a spec is already
+   * working. A box read mid-reflow describes a place the element has since
+   * left. Two readings that agree is the condition worth waiting for — how
+   * long this host takes to send a photo is not something a number here could
+   * honestly state.
+   */
+  private async settledBoundingBoxes(
+    locators: Locator[],
+  ): Promise<BoundingBox[]> {
+    let previous = "";
+    let settled: BoundingBox[] = [];
+    await expect(async () => {
+      const boxes = await Promise.all(
+        locators.map((locator) => locator.boundingBox()),
+      );
+      // A locator can read back without a box and still paint: this site's
+      // Bootstrap rows collapse to zero height around floated children, the
+      // newsletter success banner's among them. Those are left out of the
+      // union rather than waited on, which is what the capture has always
+      // done — only the reading has to be whole.
+      const resolved = boxes.filter((box) => box !== null);
+      expect(resolved.length).toBeGreaterThan(0);
+      const reading = JSON.stringify(resolved);
+      const agrees = reading === previous;
+      previous = reading;
+      settled = resolved;
+      expect(agrees).toBe(true);
+    }).toPass();
+    return settled;
   }
 
   /**
@@ -159,13 +234,7 @@ export abstract class BaseAppPage {
    * itself.
    */
   async waitForStableBoundingBox(locator: Locator): Promise<void> {
-    let previousHeight: number | null = null;
-    await expect(async () => {
-      const box = await locator.boundingBox();
-      const stable = box !== null && box.height === previousHeight;
-      previousHeight = box?.height ?? null;
-      expect(stable).toBe(true);
-    }).toPass();
+    await this.settledBoundingBoxes([locator]);
   }
 
   /**

@@ -36,7 +36,10 @@ export class CartPage extends BaseAppPage {
   }
 
   async gotoCartPage(): Promise<void> {
-    await this.goto(url.cart);
+    // `#cart_items` is the landmark for both of this page's states: it wraps
+    // the table when the cart holds something and the empty-cart message when
+    // it does not, which is why VR-25 captures it empty. Verified live.
+    await this.goto(url.cart, this.cartItemsSection);
     await expect(this.page).toHaveURL(new RegExp(`${url.cart}$`));
   }
 
