@@ -1,1 +1,1 @@
-{"reportName":"API","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":19,"unknown":0,"total":19},"time":{"start":1792516369012,"stop":1792516373499,"duration":4487,"minDuration":170,"maxDuration":820,"sumDuration":8452}}
+{"reportName":"API","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":19,"unknown":0,"total":19},"time":{"start":1792614212280,"stop":1792614215122,"duration":2842,"minDuration":113,"maxDuration":585,"sumDuration":5139}}
