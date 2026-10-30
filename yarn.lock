@@ -472,7 +472,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.71.2"
     "@typescript-eslint/parser": "npm:8.71.2"
     allure-commandline: "npm:2.46.1"
-    allure-playwright: "npm:3.13.0"
+    allure-playwright: "npm:3.14.0"
     eslint: "npm:10.13.0"
     eslint-config-prettier: "npm:10.1.8"
     eslint-plugin-playwright: "npm:2.12.1"
@@ -502,28 +502,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-js-commons@npm:3.13.0":
-  version: 3.13.0
-  resolution: "allure-js-commons@npm:3.13.0"
+"allure-js-commons@npm:3.14.0":
+  version: 3.14.0
+  resolution: "allure-js-commons@npm:3.14.0"
   dependencies:
     md5: "npm:^2.3.0"
   peerDependencies:
-    allure-playwright: 3.13.0
+    allure-playwright: 3.14.0
   peerDependenciesMeta:
     allure-playwright:
       optional: true
-  checksum: 10c0/1f196e61e16e342805238688a70dcb39f801fa5bb16204e8a4fe297b44f88ed6fa100c64488ac660d07ad73467ed448dadb91b9da06e43419ceef066cefbd288
+  checksum: 10c0/a61218f7852a88732a37e45d05d7b6f087f51ecb9dd2fdaf85540904d8664f3166a6fdb6a4d078bf84416cdebbe2852551c4b286569f2d328169249fec342b47
   languageName: node
   linkType: hard
 
-"allure-playwright@npm:3.13.0":
-  version: 3.13.0
-  resolution: "allure-playwright@npm:3.13.0"
+"allure-playwright@npm:3.14.0":
+  version: 3.14.0
+  resolution: "allure-playwright@npm:3.14.0"
   dependencies:
-    allure-js-commons: "npm:3.13.0"
+    allure-js-commons: "npm:3.14.0"
   peerDependencies:
     "@playwright/test": ">=1.62.0"
-  checksum: 10c0/96d0c437d0caa5e4c7170309ea7bbafa84cb7985435e88f8dc4272f756988d7d1e44caffabad383bff54c8fbfc8df9b1021fd6ff4215ecc897223301db8b6b67
+  checksum: 10c0/e2ac3c640f9bbf303623da28a37ef08a58c2b3280614e74ebf480dadd264a4efbb8088f1c7ced83da7552b71e66050158797c1611be898ee99565fbcd724b4ca
   languageName: node
   linkType: hard
 
