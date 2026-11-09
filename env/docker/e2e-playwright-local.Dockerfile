@@ -7,7 +7,7 @@
 #
 # The repository is mounted rather than copied so changes are picked up without
 # a rebuild. See docker-compose.yml.
-FROM mcr.microsoft.com/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
+FROM mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d
 
 WORKDIR /workspace
 
