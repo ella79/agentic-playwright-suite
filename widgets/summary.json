@@ -1,1 +1,1 @@
-{"reportName":"Agentic Playwright Suite","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":96,"unknown":0,"total":96},"time":{"start":1794146177875,"stop":1794146318811,"duration":140936,"minDuration":126,"maxDuration":11484,"sumDuration":290214}}
+{"reportName":"Agentic Playwright Suite","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":96,"unknown":0,"total":96},"time":{"start":1794189782264,"stop":1794189913021,"duration":130757,"minDuration":160,"maxDuration":15534,"sumDuration":281798}}
