@@ -42,8 +42,8 @@
   },
   "devDependencies": {
     "@microsoft/eslint-formatter-sarif": "3.1.0",
-    "@playwright/mcp": "0.0.83",
-    "@playwright/test": "1.64.1",
+    "@playwright/mcp": "0.0.84",
+    "@playwright/test": "1.65.0",
     "@types/node": "24.19.2",
     "@typescript-eslint/eslint-plugin": "8.72.1",
     "@typescript-eslint/parser": "8.72.1",

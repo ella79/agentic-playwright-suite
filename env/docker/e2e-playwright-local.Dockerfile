@@ -7,13 +7,20 @@
 #
 # The repository is mounted rather than copied so changes are picked up without
 # a rebuild. See docker-compose.yml.
-FROM mcr.microsoft.com/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
+FROM mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d
 
 WORKDIR /workspace
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 COPY package.json yarn.lock .yarnrc.yml ./
-RUN corepack enable && yarn install --immutable
+# Node.js 25 and later no longer ship Corepack, and the image runs Node.js 26
+# from Playwright 1.65 on, so it is installed from npm before Yarn can be enabled.
+# The image already has Yarn 1 installed globally through npm; it is removed
+# first, because Corepack's own yarn shim cannot be installed over it.
+RUN npm uninstall -g yarn \
+ && npm install -g corepack@0.36.0 \
+ && corepack enable \
+ && yarn install --immutable
 
 CMD ["yarn", "test:vr"]
