@@ -14,6 +14,8 @@ WORKDIR /workspace
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 COPY package.json yarn.lock .yarnrc.yml ./
-RUN corepack enable && yarn install --immutable
+# Node.js 25 and later no longer ship Corepack, and the image runs Node.js 26
+# from Playwright 1.65 on, so it is installed from npm before Yarn can be enabled.
+RUN npm install -g corepack@0.36.0 && corepack enable && yarn install --immutable
 
 CMD ["yarn", "test:vr"]
