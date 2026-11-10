@@ -1,1 +1,1 @@
-{"total":0,"items":[]}
+{"total":2,"items":[{"uid":"dd60b5ce60406a353ca4f53159d9ff7f","name":"Host unavailable","statistic":{"failed":2,"broken":0,"skipped":0,"passed":0,"unknown":0,"total":2}},{"uid":"96090a193a86aa86436a515428beaadf","name":"Flaky","statistic":{"failed":0,"broken":0,"skipped":0,"passed":2,"unknown":0,"total":2}}]}
