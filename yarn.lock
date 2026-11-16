@@ -459,7 +459,7 @@ __metadata:
     allure-playwright: "npm:3.14.0"
     eslint: "npm:10.14.0"
     eslint-config-prettier: "npm:10.1.8"
-    eslint-plugin-playwright: "npm:2.12.1"
+    eslint-plugin-playwright: "npm:2.12.2"
     prettier: "npm:3.9.10"
     typescript: "npm:6.0.3"
   languageName: unknown
@@ -691,14 +691,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-playwright@npm:2.12.1":
-  version: 2.12.1
-  resolution: "eslint-plugin-playwright@npm:2.12.1"
+"eslint-plugin-playwright@npm:2.12.2":
+  version: 2.12.2
+  resolution: "eslint-plugin-playwright@npm:2.12.2"
   dependencies:
     globals: "npm:^17.3.0"
   peerDependencies:
     eslint: ">=8.40.0"
-  checksum: 10c0/498699568260e14b7c5258e714c75504d9abf5e6d36d32500e78dea33c5a072fa643ef826dc528248fd50d1936b12c4f47df8d18ad93d0c6b27c3bf1825e0e83
+  checksum: 10c0/a755ee10fd7733642969b853f980c8445ade3de46570f56f9f02d2c7c91d6f2b25fa79b83ee191e36471cba4691cf48962e68f3f079f1148d2b2af09e47edcfe
   languageName: node
   linkType: hard
 

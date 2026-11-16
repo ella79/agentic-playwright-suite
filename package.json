@@ -51,7 +51,7 @@
     "allure-playwright": "3.14.0",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-playwright": "2.12.1",
+    "eslint-plugin-playwright": "2.12.2",
     "prettier": "3.9.10",
     "typescript": "6.0.3"
   }
