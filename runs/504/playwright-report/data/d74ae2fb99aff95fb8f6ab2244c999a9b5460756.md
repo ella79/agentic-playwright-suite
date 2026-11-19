@@ -1,0 +1,279 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: vr-tests/product-detail.vr.spec.ts >> Visual regression - Product Detail Page >> VR-24: Review submitted
+- Location: vr-tests/product-detail.vr.spec.ts:51:3
+
+# Error details
+
+```
+Error: expect(page).toHaveScreenshot(expected) failed
+
+  34673 pixels (ratio 0.02 of all image pixels) are different.
+
+  Snapshot: product-detail-review-sent.png
+
+Call log:
+  - Expect "toHaveScreenshot(product-detail-review-sent.png)" with timeout 5000ms
+    - verifying given screenshot expectation
+  - taking page screenshot
+    - disabled all CSS animations
+  - waiting for fonts to load...
+  - fonts loaded
+  - 34673 pixels (ratio 0.02 of all image pixels) are different.
+  - waiting 100ms before taking screenshot
+  - taking page screenshot
+    - disabled all CSS animations
+  - waiting for fonts to load...
+  - fonts loaded
+  - captured a stable screenshot
+  - 34673 pixels (ratio 0.02 of all image pixels) are different.
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e5]:
+      - link [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "Website for automation practice" [ref=e9]
+      - list [ref=e12]:
+        - listitem [ref=e13]:
+          - link " Home" [ref=e14] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e15]: 
+            - text: Home
+        - listitem [ref=e16]:
+          - link " Products" [ref=e17] [cursor=pointer]:
+            - /url: /products
+            - generic [ref=e18]: 
+            - text: Products
+        - listitem [ref=e19]:
+          - link " Cart" [ref=e20] [cursor=pointer]:
+            - /url: /view_cart
+            - generic [ref=e21]: 
+            - text: Cart
+        - listitem [ref=e22]:
+          - link " Logout" [ref=e23] [cursor=pointer]:
+            - /url: /logout
+            - generic [ref=e24]: 
+            - text: Logout
+        - listitem [ref=e25]:
+          - link " Delete Account" [ref=e26] [cursor=pointer]:
+            - /url: /delete_account
+            - generic [ref=e27]: 
+            - text: Delete Account
+        - listitem [ref=e28]:
+          - link " Test Cases" [ref=e29] [cursor=pointer]:
+            - /url: /test_cases
+            - generic [ref=e30]: 
+            - text: Test Cases
+        - listitem [ref=e31]:
+          - link " API Testing" [ref=e32] [cursor=pointer]:
+            - /url: /api_list
+            - generic [ref=e33]: 
+            - text: API Testing
+        - listitem [ref=e34]:
+          - link " Video Tutorials" [ref=e35] [cursor=pointer]:
+            - /url: https://www.youtube.com/c/AutomationExercise
+            - generic [ref=e36]: 
+            - text: Video Tutorials
+        - listitem [ref=e37]:
+          - link " Contact us" [ref=e38] [cursor=pointer]:
+            - /url: /contact_us
+            - generic [ref=e39]: 
+            - text: Contact us
+        - listitem [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: 
+            - text: Logged in as Jon Doe
+  - generic [ref=e45]:
+    - generic [ref=e47]:
+      - heading "Category" [level=2] [ref=e48]
+      - generic [ref=e49]:
+        - heading [level=4] [ref=e52]:
+          - link " Women" [ref=e53] [cursor=pointer]:
+            - /url: "#Women"
+            - generic [ref=e54]: 
+            - text: Women
+        - heading [level=4] [ref=e58]:
+          - link " Men" [ref=e59] [cursor=pointer]:
+            - /url: "#Men"
+            - generic [ref=e60]: 
+            - text: Men
+        - heading [level=4] [ref=e64]:
+          - link " Kids" [ref=e65] [cursor=pointer]:
+            - /url: "#Kids"
+            - generic [ref=e66]: 
+            - text: Kids
+      - generic [ref=e68]:
+        - heading "Brands" [level=2] [ref=e69]
+        - list [ref=e71]:
+          - listitem [ref=e72]:
+            - link "(6) Polo" [ref=e73] [cursor=pointer]:
+              - /url: /brand_products/Polo
+              - generic [ref=e74]: (6)
+              - text: Polo
+          - listitem [ref=e75]:
+            - link "(5) H&M" [ref=e76] [cursor=pointer]:
+              - /url: /brand_products/H&M
+              - generic [ref=e77]: (5)
+              - text: H&M
+          - listitem [ref=e78]:
+            - link "(5) Madame" [ref=e79] [cursor=pointer]:
+              - /url: /brand_products/Madame
+              - generic [ref=e80]: (5)
+              - text: Madame
+          - listitem [ref=e81]:
+            - link "(3) Mast & Harbour" [ref=e82] [cursor=pointer]:
+              - /url: /brand_products/Mast & Harbour
+              - generic [ref=e83]: (3)
+              - text: Mast & Harbour
+          - listitem [ref=e84]:
+            - link "(4) Babyhug" [ref=e85] [cursor=pointer]:
+              - /url: /brand_products/Babyhug
+              - generic [ref=e86]: (4)
+              - text: Babyhug
+          - listitem [ref=e87]:
+            - link "(3) Allen Solly Junior" [ref=e88] [cursor=pointer]:
+              - /url: /brand_products/Allen Solly Junior
+              - generic [ref=e89]: (3)
+              - text: Allen Solly Junior
+          - listitem [ref=e90]:
+            - link "(3) Kookie Kids" [ref=e91] [cursor=pointer]:
+              - /url: /brand_products/Kookie Kids
+              - generic [ref=e92]: (3)
+              - text: Kookie Kids
+          - listitem [ref=e93]:
+            - link "(5) Biba" [ref=e94] [cursor=pointer]:
+              - /url: /brand_products/Biba
+              - generic [ref=e95]: (5)
+              - text: Biba
+    - generic [ref=e96]:
+      - generic [ref=e97]:
+        - img "ecommerce website products" [ref=e100]
+        - generic [ref=e102]:
+          - img "ecommerce website products" [ref=e103]
+          - heading "Men Tshirt" [level=2] [ref=e104]
+          - paragraph [ref=e105]: "Category: Men > Tshirts"
+          - img "ecommerce website products" [ref=e106]
+          - generic [ref=e107]:
+            - generic [ref=e108]: Rs. 400
+            - generic [ref=e109]: "Quantity:"
+            - spinbutton [ref=e110]: "1"
+            - button " Add to cart" [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]: 
+              - text: Add to cart
+          - paragraph [ref=e113]: "Availability: In Stock"
+          - paragraph [ref=e114]: "Condition: New"
+          - paragraph [ref=e115]: "Brand: H&M"
+      - generic [ref=e116]:
+        - list [ref=e118]:
+          - listitem [ref=e119]:
+            - link "Write Your Review" [ref=e120]:
+              - /url: "#reviews"
+        - generic [ref=e122]:
+          - generic [ref=e123]:
+            - textbox "Your Name" [ref=e124]: Jon Doe
+            - textbox "Email Address" [ref=e125]: vr.reviewer@example.com
+          - textbox "Add Review Here!" [ref=e126]: Fits the description. Submitted by the automated suite.
+          - generic: Thank you for your review.
+          - button "Submit" [active] [ref=e130] [cursor=pointer]
+  - contentinfo [ref=e131]:
+    - generic [ref=e136]:
+      - heading "Subscription" [level=2] [ref=e137]
+      - generic [ref=e138]:
+        - textbox "Your email address" [ref=e139]
+        - button "" [ref=e140] [cursor=pointer]
+        - paragraph [ref=e142]: Get the most recent updates from our site and be updated your self...
+    - paragraph [ref=e146]: Copyright © 2021 All rights reserved
+  - text: 
+```
+
+# Test source
+
+```ts
+  1  | // spec: specs/vr-test-plans/product-detail-vr-test-plan.md
+  2  | // seed: specs/seed.spec.ts
+  3  | import { expect, test } from "../utils/fixtures/testFixtures";
+  4  | import { products } from "../utils/testData";
+  5  | 
+  6  | test.describe("Visual regression - Product Detail Page", () => {
+  7  |   test.beforeEach(async ({ productDetailPage }) => {
+  8  |     await productDetailPage.gotoProductDetailPage(products.menTshirt.id);
+  9  |   });
+  10 | 
+  11 |   test("VR-21: Product showcase", async ({ page, productDetailPage }) => {
+  12 |     await expect(productDetailPage.productImage).toBeVisible();
+  13 |     await productDetailPage.waitForImagesLoaded();
+  14 | 
+  15 |     // A viewport capture, not an element one: the row holding the image and
+  16 |     // information columns carries Bootstrap's own negative row margins with
+  17 |     // no containing block to clip them, so an element screenshot of it paints
+  18 |     // the sidebar sitting in the same region rather than just its own two
+  19 |     // children. Verified live. The viewport at page load is exactly this
+  20 |     // showcase anyway, since the page opens scrolled to the top.
+  21 |     await expect(page).toHaveScreenshot("product-detail-showcase.png", {
+  22 |       maxDiffPixelRatio: 0.05, // VR: product photography compresses inconsistently
+  23 |     });
+  24 |   });
+  25 | 
+  26 |   test("VR-22: Write Your Review form, default", async ({
+  27 |     productDetailPage,
+  28 |   }) => {
+  29 |     await productDetailPage.reviewSection.scrollIntoViewIfNeeded();
+  30 |     await expect(productDetailPage.reviewNameInput).toBeVisible();
+  31 | 
+  32 |     await expect(productDetailPage.reviewSection).toHaveScreenshot(
+  33 |       "product-detail-review-form.png",
+  34 |     );
+  35 |   });
+  36 | 
+  37 |   test("VR-23: Write Your Review form, validation", async ({
+  38 |     productDetailPage,
+  39 |   }) => {
+  40 |     // No fields filled: name, email and review all carry `required`, verified
+  41 |     // live, so the browser's own field validation blocks the submit, the same
+  42 |     // mechanism as `payment-vr-test-plan.md`'s VR-32.
+  43 |     await productDetailPage.reviewSection.scrollIntoViewIfNeeded();
+  44 |     await productDetailPage.reviewSubmitButton.click();
+  45 | 
+  46 |     await expect(productDetailPage.reviewSection).toHaveScreenshot(
+  47 |       "product-detail-review-validation.png",
+  48 |     );
+  49 |   });
+  50 | 
+  51 |   test("VR-24: Review submitted", async ({ page, productDetailPage }) => {
+  52 |     // A fixed, literal reviewer rather than `buildAccount()`: the submitted
+  53 |     // form is not cleared, so a per-run generated email would leave the
+  54 |     // field's own text different on every capture.
+  55 |     await productDetailPage.submitReview(
+  56 |       "Jon Doe",
+  57 |       "vr.reviewer@example.com",
+  58 |       "Fits the description. Submitted by the automated suite.",
+  59 |     );
+  60 |     await expect(productDetailPage.reviewSuccessMessage).toBeVisible({
+  61 |       timeout: 15_000,
+  62 |     });
+  63 |     await productDetailPage.reviewSuccessMessage.scrollIntoViewIfNeeded();
+  64 | 
+  65 |     // A viewport capture, not an element one: the success banner's own row
+  66 |     // (`#review-section`, a `.form-row`) collapses to zero height for the
+  67 |     // same reason as VR-21's `.row`, floated children with no clearfix, and
+  68 |     // sits exactly at `#review-form`'s own bottom edge, verified live, so an
+  69 |     // element screenshot of `reviewSection` clips the banner's text out
+  70 |     // entirely instead of just cropping tightly around it.
+> 71 |     await expect(page).toHaveScreenshot("product-detail-review-sent.png");
+     |                        ^ Error: expect(page).toHaveScreenshot(expected) failed
+  72 |   });
+  73 | });
+  74 | 
+```
