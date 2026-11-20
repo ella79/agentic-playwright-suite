@@ -126,6 +126,13 @@ export class HomePage extends BaseAppPage {
     });
   }
 
+  /**
+   * The confirmation this reveals is local and short lived. `subscription.js`
+   * answers the submit with `return false`, so nothing is sent, shows the
+   * banner at once and hides it again after 1.5 seconds. Whatever reads that
+   * banner has to read it immediately: a longer timeout cannot make a banner
+   * that is never late arrive sooner, it only delays the verdict.
+   */
   async subscribeToNewsletter(email: string): Promise<void> {
     await this.subscriptionHeading.scrollIntoViewIfNeeded();
     await this.subscriptionEmailInput.fill(email);

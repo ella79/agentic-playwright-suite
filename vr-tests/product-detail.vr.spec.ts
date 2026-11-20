@@ -57,9 +57,7 @@ test.describe("Visual regression - Product Detail Page", () => {
       "vr.reviewer@example.com",
       "Fits the description. Submitted by the automated suite.",
     );
-    await expect(productDetailPage.reviewSuccessMessage).toBeVisible({
-      timeout: 15_000,
-    });
+    await expect(productDetailPage.reviewSuccessMessage).toBeVisible();
     await productDetailPage.reviewSuccessMessage.scrollIntoViewIfNeeded();
 
     // A viewport capture, not an element one: the success banner's own row

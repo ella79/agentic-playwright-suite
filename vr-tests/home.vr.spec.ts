@@ -99,9 +99,7 @@ test.describe("Visual regression - Home Page", () => {
     // cleared after success, so a per-run generated address would leave its
     // own text different on every capture.
     await homePage.subscribeToNewsletter("vr.subscriber@example.com");
-    await expect(homePage.subscriptionSuccessMessage).toBeVisible({
-      timeout: 15_000,
-    });
+    await expect(homePage.subscriptionSuccessMessage).toBeVisible();
 
     // A clip, not an element screenshot: the success banner (`#success-subscribe`)
     // is the widget's sibling, not its parent, so no single locator's own box

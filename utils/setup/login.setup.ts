@@ -5,7 +5,7 @@
 // outright as an unannounced suite. Verified live, in that run's own logs.
 import { AccountApiClient } from "../apiClients/accountApiClient";
 import { test as setup, expect } from "../fixtures/testFixtures";
-import { HomePage, LoginPage } from "../pageObjects";
+import { LoginPage } from "../pageObjects";
 import { buildAccount } from "../testData";
 
 const authFile = "./.auth/user.json";
@@ -37,8 +37,8 @@ setup("authenticate", async ({ page, request }) => {
   const account = buildAccount({ email, password });
 
   // API first, and idempotent on purpose: the account already existing from a
-  // previous run is the steady state, not a failure. Retried with growing
-  // pauses, because every project waits on this one call and the demo host
+  // previous run is the steady state, not a failure. Re-sent rather than
+  // waited on, because every project waits on this one call and the demo host
   // sheds load for seconds at a time.
   await expect(async () => {
     const body = await new AccountApiClient(request).createAccount(account);
@@ -50,18 +50,13 @@ setup("authenticate", async ({ page, request }) => {
         `POST /api/createAccount answered ${body.responseCode}: ${body.message}`,
       );
     }
-  }).toPass({ intervals: [2_000, 5_000], timeout: 20_000 });
+  }).toPass();
 
   // UI second, and not optional: verifyLogin answers JSON with no Set-Cookie
   // header, so it proves credentials are valid without ever starting a
   // session a browser could use. The real session, and the storageState this
   // project produces, can only come from the login form itself.
-  const loginPage = new LoginPage(page);
-  const homePage = new HomePage(page);
-
-  await loginPage.gotoLoginPage();
-  await loginPage.login(account.email, account.password);
-  await expect(homePage.logoutLink).toBeVisible();
+  await new LoginPage(page).signIn(account.email, account.password);
 
   await page.context().storageState({ path: authFile });
 });

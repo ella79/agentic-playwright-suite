@@ -46,9 +46,7 @@ test.describe("Product Detail Page", () => {
         "Fits the description. Submitted by the automated suite.",
       );
 
-      await expect(productDetailPage.reviewSuccessMessage).toBeVisible({
-        timeout: 15_000,
-      });
+      await expect(productDetailPage.reviewSuccessMessage).toBeVisible();
     });
   });
 });

@@ -83,9 +83,18 @@ export abstract class BaseAppPage {
     // carries is the only proof the application arrived. Navigating again is
     // the fix, not a longer wait: the holding page never becomes the app.
     await expect(async () => {
-      await this.page.goto(path, { waitUntil: DOCUMENT_READY });
-      await expect(landmark).toBeVisible({ timeout: 5_000 });
-    }).toPass({ intervals: [1_000, 3_000], timeout: 20_000 });
+      await this.navigate(path);
+      await expect(landmark).toBeVisible();
+    }).toPass();
+  }
+
+  /**
+   * One navigation, with no retry of its own: for a caller that already
+   * retries a block this is a step of, where a second retry nested inside the
+   * first would spend the whole budget before the outer one gets a turn.
+   */
+  protected async navigate(path: string): Promise<void> {
+    await this.page.goto(path, { waitUntil: DOCUMENT_READY });
   }
 
   /**
