@@ -87,6 +87,11 @@ export class ProductDetailPage extends BaseAppPage {
     return modal;
   }
 
+  /**
+   * The confirmation behaves like the newsletter's: the inline handler on
+   * `#review-form` returns false, reveals the banner at once and hides it
+   * again after 2 seconds. Nothing is sent, and nothing stays.
+   */
   async submitReview(
     name: string,
     email: string,
