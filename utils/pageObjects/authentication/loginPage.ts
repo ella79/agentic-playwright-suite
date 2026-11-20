@@ -61,6 +61,26 @@ export class LoginPage extends BaseAppPage {
     await this.loginButton.click();
   }
 
+  /**
+   * Signs in as a precondition, for a caller that needs a session rather than
+   * proof that the form works; a case about the form itself drives
+   * `gotoLoginPage` and `login` directly, and asserts its own outcome.
+   *
+   * Submitted again rather than waited on. The host sheds load on this POST
+   * too, and what comes back then is a page instead of a session: the form
+   * submits, and the header never gains the link an assertion could wait for.
+   * Arriving at the form is part of the retry because that page is gone once
+   * the submission lands somewhere else. Credentials that are genuinely wrong
+   * fail every attempt, so this cannot turn a real failure into a pass.
+   */
+  async signIn(email: string, password: string): Promise<void> {
+    await expect(async () => {
+      await this.navigate(url.login);
+      await this.login(email, password);
+      await expect(this.logoutLink).toBeVisible();
+    }).toPass();
+  }
+
   async startSignup(name: string, email: string): Promise<void> {
     await this.signupNameInput.fill(name);
     await this.signupEmailInput.fill(email);

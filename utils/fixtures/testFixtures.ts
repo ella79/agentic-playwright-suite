@@ -259,10 +259,7 @@ async function signInAsNewAccount(
     }
   }).toPass();
 
-  const loginPage = new LoginPage(page);
-  await loginPage.gotoLoginPage();
-  await loginPage.login(account.email, account.password);
-  await expect(loginPage.logoutLink).toBeVisible();
+  await new LoginPage(page).signIn(account.email, account.password);
 }
 
 /** Confirms the deletion, so a failed cleanup surfaces instead of leaking accounts. */
