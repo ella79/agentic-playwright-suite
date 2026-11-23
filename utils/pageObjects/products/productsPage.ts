@@ -61,6 +61,10 @@ export class ProductsPage extends BaseAppPage {
   async searchFor(term: string): Promise<void> {
     await this.searchInput.fill(term);
     await this.searchButton.click();
+    // The search replaces the document, and the caller measures or asserts on
+    // the results, so it waits for the one that answered rather than for
+    // whatever grid was still on screen.
+    await this.page.waitForLoadState("domcontentloaded");
   }
 
   getProductCard(productName: string): Locator {
