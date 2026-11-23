@@ -28,11 +28,27 @@ import { readJson } from "./readJson";
 export async function sendJson<T>(
   send: () => Promise<APIResponse>,
 ): Promise<T> {
-  let body: T | undefined;
+  return (await sendJsonResponse<T>(send)).body;
+}
+
+/**
+ * The same re-send, handing back the response as well.
+ *
+ * A client wrapping an endpoint wants the body alone, which is why `sendJson`
+ * keeps the response to itself. A case whose own subject is the transport —
+ * the ones proving an unsupported method is answered with HTTP 200 and the
+ * refusal in `responseCode` — has to assert on both, and reaching for the raw
+ * `readJson` to get there is what left those cases with no re-send at all.
+ */
+export async function sendJsonResponse<T>(
+  send: () => Promise<APIResponse>,
+): Promise<{ response: APIResponse; body: T }> {
+  let result: { response: APIResponse; body: T } | undefined;
 
   await expect(async () => {
-    body = await readJson<T>(await send());
+    const response = await send();
+    result = { response, body: await readJson<T>(response) };
   }).toPass();
 
-  return body as T;
+  return result as { response: APIResponse; body: T };
 }

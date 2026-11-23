@@ -5,7 +5,7 @@ import {
   type SearchProductBody,
 } from "../utils/apiClients/catalogApiClient";
 import { type ApiResponseBody } from "../utils/apiClients/accountApiClient";
-import { readJson } from "../utils/apiClients/readJson";
+import { sendJson, sendJsonResponse } from "../utils/apiClients/sendJson";
 import { products, searchTerms } from "../utils/testData";
 
 test.describe("Catalog API", () => {
@@ -68,8 +68,9 @@ test.describe("Catalog API", () => {
   });
 
   test("API-12: Searching without a term is rejected", async ({ request }) => {
-    const response = await request.post("/api/searchProduct");
-    const body = await readJson<ApiResponseBody>(response);
+    const body = await sendJson<ApiResponseBody>(() =>
+      request.post("/api/searchProduct"),
+    );
 
     expect(body.responseCode).toBe(400);
     expect(body.message).toContain("search_product parameter is missing");
@@ -80,8 +81,9 @@ test.describe("Catalog API", () => {
   }) => {
     // Unlike the account endpoints, this one answers HTTP 200 with the real
     // outcome inside the body rather than a transport-level 405. Verified live.
-    const response = await request.get("/api/searchProduct");
-    const body = await readJson<ApiResponseBody>(response);
+    const { response, body } = await sendJsonResponse<ApiResponseBody>(() =>
+      request.get("/api/searchProduct"),
+    );
 
     expect(response.status()).toBe(200);
     expect(body.responseCode).toBe(405);
@@ -91,20 +93,22 @@ test.describe("Catalog API", () => {
     request,
   }) => {
     // Same shape as searchProduct: HTTP 200 with the outcome in the body.
-    const response = await request.post("/api/productsList");
+    const { response, body } = await sendJsonResponse<ApiResponseBody>(() =>
+      request.post("/api/productsList"),
+    );
 
     expect(response.status()).toBe(200);
-    const body = await readJson<ApiResponseBody>(response);
     expect(body.responseCode).toBe(405);
   });
 
   test("API-15: An unsupported method on the brands list endpoint is rejected", async ({
     request,
   }) => {
-    const response = await request.put("/api/brandsList");
+    const { response, body } = await sendJsonResponse<ApiResponseBody>(() =>
+      request.put("/api/brandsList"),
+    );
 
     expect(response.status()).toBe(200);
-    const body = await readJson<ApiResponseBody>(response);
     expect(body.responseCode).toBe(405);
   });
 });
