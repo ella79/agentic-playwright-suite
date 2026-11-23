@@ -46,12 +46,6 @@ export abstract class BaseAppPage {
     this.page = page;
     this.header = page.getByRole("banner");
     this.footer = page.getByRole("contentinfo");
-    // Every nav link is scoped to the header rather than matched page-wide:
-    // "Cart"'s accessible name carries a leading space from its icon markup,
-    // which exact matching does not trim, and several of these names are also
-    // used elsewhere on the page (the hero's own "Test Cases" button, the
-    // add-to-cart modal's "View Cart" link) that an unscoped match would also
-    // resolve to. Verified live.
     this.homeLink = this.header.getByRole("link", { name: "Home" });
     this.productsLink = this.header.getByRole("link", { name: "Products" });
     this.cartLink = this.header.getByRole("link", { name: "Cart" });
@@ -71,33 +65,10 @@ export abstract class BaseAppPage {
       name: "Delete Account",
     });
     this.loggedInAs = page.getByText("Logged in as");
-    // No text and no role: a decorative anchor the scrollUp plugin injects.
     this.scrollUpButton = page.locator("#scrollUp");
   }
 
-  /**
-   * No consent-dismiss step here: `testFixtures.ts` blocks
-   * `fundingchoicesmessages`, the host that would render that banner, as
-   * third-party noise. A banner that can never load has nothing to dismiss —
-   * verified against all 78 published browser-driven results, every one
-   * carrying the same doomed three-second wait.
-   */
   protected async goto(path: string, landmark: Locator): Promise<void> {
-    // Two different failures used to be answered the same way, and only one of
-    // them deserved it.
-    //
-    // The demo host sheds load with a holding page that renders none of the
-    // application. That page never becomes the application, so it is
-    // re-requested rather than waited on, and the status it carries is what
-    // names it: the application answers 2xx or 3xx even when it is slow.
-    //
-    // A page that did arrive is a different matter. Asserting the landmark
-    // inside this block capped the wait for it at the expect default, so a
-    // host that was merely slow had its half-rendered page thrown away and the
-    // navigation started over, every attempt losing the ground the last one
-    // gained until the test's own budget ran out. The landmark is asserted
-    // once, below, against the page that answered: Playwright waits for it to
-    // become visible on its own.
     await expect(async () => {
       const response = await this.navigate(path);
 
@@ -109,87 +80,48 @@ export abstract class BaseAppPage {
     await expect(landmark).toBeVisible();
   }
 
-  /**
-   * One navigation, with no retry of its own: for a caller that already
-   * retries a block this is a step of, where a second retry nested inside the
-   * first would spend the whole budget before the outer one gets a turn.
-   *
-   * Hands back what answered, so the caller can tell the holding page from the
-   * application without reading the body.
-   */
   protected async navigate(path: string): Promise<Response | null> {
     return this.page.goto(path, { waitUntil: DOCUMENT_READY });
   }
 
   /**
-   * Resolves once every image inside the scope has finished decoding.
-   *
-   * Product photography streams in after load, so a region holding it keeps
-   * reflowing. A screenshot assertion waits for stability, and under parallel
-   * load that wait can expire mid-arrival, failing on stability rather than on
-   * any visual difference. Waiting for the images fixes the cause; a longer
-   * screenshot timeout only moves the deadline. A broken image settles through
-   * its error event, so it cannot hang this.
-   *
-   * Scope defaults to the document body, for a capture that takes the whole
-   * viewport rather than one element. `body` is the one place CSS is
-   * unavoidable: the document body carries no role and no accessible name, and
-   * keeping it here means no spec has to spell a locator out.
+   * Waits for the images in a visual capture to settle before Playwright
+   * takes its screenshot. `complete` is the browser's settled-state signal:
+   * it covers both successful loads and failed/aborted loads. Listening for
+   * load/error after `complete` is too late for an image that already settled,
+   * and can leave the Promise pending until the test timeout.
    */
   async waitForImagesLoaded(scope?: Locator): Promise<void> {
     await (scope ?? this.page.locator("body")).evaluate(
       async (element: HTMLElement) => {
-        const images: HTMLImageElement[] = Array.from(
-          element.querySelectorAll("img"),
-        );
+        const images = Array.from(element.querySelectorAll("img"));
+
         await Promise.all(
-          images.map((image) =>
-            image.complete && image.naturalWidth > 0
-              ? Promise.resolve()
-              : new Promise((resolve) => {
-                  image.addEventListener("load", resolve, { once: true });
-                  image.addEventListener("error", resolve, { once: true });
-                }),
-          ),
+          images.map((image) => {
+            if (image.complete) {
+              return Promise.resolve();
+            }
+
+            return new Promise<void>((resolve) => {
+              image.addEventListener("load", () => resolve(), { once: true });
+              image.addEventListener("error", () => resolve(), { once: true });
+            });
+          }),
         );
       },
     );
   }
 
-  /**
-   * Aligns an element to the top of the viewport.
-   *
-   * `scrollIntoViewIfNeeded` scrolls the minimum distance required, so where it
-   * lands depends on where the page already was. A visual capture of the
-   * viewport needs the same framing every run, which this guarantees.
-   */
   async scrollToTop(target: Locator): Promise<void> {
-    // Where the target lands depends on layout. What says the layout is final
-    // is the layout itself holding still, not the document reporting itself
-    // loaded: that report is withheld for good by a single photo the host
-    // never answers, which is why navigation no longer waits for it either.
     await this.settledBoundingBoxes([target]);
     await target.evaluate((element: Element) =>
       element.scrollIntoView({ block: "start", behavior: "instant" }),
     );
   }
 
-  /**
-   * The smallest rectangle enclosing every given locator's own box, for a
-   * `page.screenshot({ clip })` capture spanning elements with no single
-   * existing container tight enough to scope to directly, such as a heading
-   * and the block it titles when the two are rendered as plain siblings.
-   */
   async unionBoundingBox(locators: Locator[]): Promise<BoundingBox> {
     let boxes = await this.settledBoundingBoxes(locators);
     if (!this.fitsInViewport(this.union(boxes))) {
-      // A clip is read against the viewport, so a union the viewport no longer
-      // holds cannot be captured at all — VR-08 subscribed, and the images
-      // arriving behind it pushed the widget it had scrolled to back out of
-      // sight. Bringing the locators in costs the captures that already frame
-      // correctly nothing: `scrollIntoViewIfNeeded` leaves an element that is
-      // already fully visible exactly where it is. Reversed, so the first
-      // locator is the one the page ends up anchored on.
       for (const locator of [...locators].reverse()) {
         await locator.scrollIntoViewIfNeeded();
       }
@@ -219,17 +151,6 @@ export abstract class BaseAppPage {
     );
   }
 
-  /**
-   * Every given locator's own box, read once two consecutive reads agree.
-   *
-   * A box is measured against the viewport, and this page keeps moving under
-   * its own photography: navigation returns as soon as the document is
-   * parsed, so the images that size the page arrive while a spec is already
-   * working. A box read mid-reflow describes a place the element has since
-   * left. Two readings that agree is the condition worth waiting for — how
-   * long this host takes to send a photo is not something a number here could
-   * honestly state.
-   */
   private async settledBoundingBoxes(
     locators: Locator[],
   ): Promise<BoundingBox[]> {
@@ -239,11 +160,6 @@ export abstract class BaseAppPage {
       const boxes = await Promise.all(
         locators.map((locator) => locator.boundingBox()),
       );
-      // A locator can read back without a box and still paint: this site's
-      // Bootstrap rows collapse to zero height around floated children, the
-      // newsletter success banner's among them. Those are left out of the
-      // union rather than waited on, which is what the capture has always
-      // done — only the reading has to be whole.
       const resolved = boxes.filter((box) => box !== null);
       expect(resolved.length).toBeGreaterThan(0);
       const reading = JSON.stringify(resolved);
@@ -255,26 +171,10 @@ export abstract class BaseAppPage {
     return settled;
   }
 
-  /**
-   * Waits until a locator's own bounding box stops changing between two
-   * consecutive reads, for content whose *presence* is a poor proxy for its
-   * *final size* — a Bootstrap accordion panel, for instance, keeps pushing
-   * later siblings down for a moment after the panel's own text is already
-   * visible, verified live: a `unionBoundingBox` taken right after that text
-   * appears can still miss a sibling that has not finished being pushed into
-   * place. `animations: "disabled"` does not cover this, since the sibling is
-   * being repositioned by the transitioning element's layout, not animating
-   * itself.
-   */
   async waitForStableBoundingBox(locator: Locator): Promise<void> {
     await this.settledBoundingBoxes([locator]);
   }
 
-  /**
-   * Scrolls with the wheel rather than the API on purpose. The control is fixed
-   * at a negative offset until the plugin animates it in, and it listens for a
-   * real scroll: `window.scrollTo` leaves it off screen and unclickable.
-   */
   async scrollDownAndReturnToTop(): Promise<void> {
     await this.page.mouse.wheel(0, 2500);
     await this.scrollUpButton.click();
