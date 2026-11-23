@@ -177,6 +177,11 @@ export class HomePage extends BaseAppPage {
   ): Promise<void> {
     await this.getCategoryLink(parentCategory).click();
     await this.getSubCategoryLink(parentCategory, subCategory).click();
+    // The same reason `CartPage.proceedToCheckout` waits: `waitForURL` waits
+    // for the load event, not only for the new address, so the caller asserts
+    // against a listing that has rendered rather than against one that has
+    // merely been asked for.
+    await this.page.waitForURL(/\/category_products\/\d+$/);
   }
 
   async openBrand(brandName: string): Promise<void> {
@@ -184,6 +189,7 @@ export class HomePage extends BaseAppPage {
       .getByRole("link", { name: brandName })
       .first()
       .click();
+    await this.page.waitForURL(/\/brand_products\/.+$/);
   }
 
   /**
