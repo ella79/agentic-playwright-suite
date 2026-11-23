@@ -120,6 +120,24 @@ export default defineConfig({
       name: "setup",
       testDir: "./utils/setup",
       testMatch: /.*\.setup\.ts/,
+      // Retries of its own, which is one of the two reasons Playwright's own
+      // guide gives for preferring a setup project over `globalSetup`:
+      // "Parallelism and retries: supported via standard config".
+      //
+      // It needs them more than a test does, because every project depends on
+      // it: when it fails nothing runs. One job of #147 reported 22 cases
+      // skipped and a red suite while the same setup passed in that run's
+      // other three jobs and locally, which is a failure of the host in front
+      // of the application, not of this suite — and the only answer to a
+      // request a third party turns down is to send another.
+      //
+      // It cannot buy a false green. `signIn` waits for the header's logout
+      // link before any state is written, so no attempt can save an
+      // unauthenticated session for the rest of the suite to run against, and
+      // credentials that are genuinely wrong fail every attempt. Repeating is
+      // safe for the same reason it always was: the shared account already
+      // existing is read as created.
+      retries: process.env.CI ? 3 : 0,
       use: {
         trace: "off",
         video: "off",
