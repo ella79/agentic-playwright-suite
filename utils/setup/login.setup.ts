@@ -4,7 +4,7 @@
 // first real run of the consumer contract's `exact: true` check rejected it
 // outright as an unannounced suite. Verified live, in that run's own logs.
 import { AccountApiClient } from "../apiClients/accountApiClient";
-import { test as setup, expect } from "../fixtures/testFixtures";
+import { test as setup } from "../fixtures/testFixtures";
 import { LoginPage } from "../pageObjects";
 import { buildAccount } from "../testData";
 
@@ -37,20 +37,22 @@ setup("authenticate", async ({ page, request }) => {
   const account = buildAccount({ email, password });
 
   // API first, and idempotent on purpose: the account already existing from a
-  // previous run is the steady state, not a failure. Re-sent rather than
-  // waited on, because every project waits on this one call and the demo host
-  // sheds load for seconds at a time.
-  await expect(async () => {
-    const body = await new AccountApiClient(request).createAccount(account);
-    const alreadyExists =
-      body.responseCode === 400 && body.message.includes("already exists");
+  // previous run is the steady state, not a failure.
+  //
+  // No retry of its own. The client re-sends what the host sheds, and that
+  // re-send is uncapped, so a second retry wrapped around it could never take
+  // a turn: the inner one held the budget until this test's own ran out, and
+  // every project waits on this one call. What reaches the check below is the
+  // application's own answer, which is not worth asking twice.
+  const body = await new AccountApiClient(request).createAccount(account);
+  const alreadyExists =
+    body.responseCode === 400 && body.message.includes("already exists");
 
-    if (body.responseCode !== 201 && !alreadyExists) {
-      throw new Error(
-        `POST /api/createAccount answered ${body.responseCode}: ${body.message}`,
-      );
-    }
-  }).toPass();
+  if (body.responseCode !== 201 && !alreadyExists) {
+    throw new Error(
+      `POST /api/createAccount answered ${body.responseCode}: ${body.message}`,
+    );
+  }
 
   // UI second, and not optional: verifyLogin answers JSON with no Set-Cookie
   // header, so it proves credentials are valid without ever starting a
