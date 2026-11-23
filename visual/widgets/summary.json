@@ -1,1 +1,1 @@
-{"reportName":"Visual Regression","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":33,"unknown":0,"total":33},"time":{"start":1795424574378,"stop":1795424830783,"duration":256405,"minDuration":1206,"maxDuration":25182,"sumDuration":225101}}
+{"reportName":"Visual Regression","testRuns":[],"statistic":{"failed":0,"broken":0,"skipped":0,"passed":33,"unknown":0,"total":33},"time":{"start":1795438559768,"stop":1795438665139,"duration":105371,"minDuration":667,"maxDuration":10794,"sumDuration":98565}}
