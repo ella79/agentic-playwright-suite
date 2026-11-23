@@ -1,5 +1,5 @@
 import { type APIRequestContext } from "@playwright/test";
-import { readJson } from "./readJson";
+import { sendJson } from "./sendJson";
 import { type TestAccount } from "../testData";
 
 export interface ApiResponseBody {
@@ -43,40 +43,45 @@ export class AccountApiClient {
   }
 
   async createAccount(account: TestAccount): Promise<ApiResponseBody> {
-    const response = await this.request.post("/api/createAccount", {
-      form: this.accountForm(account),
-    });
-    return readJson(response);
+    return sendJson(() =>
+      this.request.post("/api/createAccount", {
+        form: this.accountForm(account),
+      }),
+    );
   }
 
   async updateAccount(account: TestAccount): Promise<ApiResponseBody> {
-    const response = await this.request.put("/api/updateAccount", {
-      form: this.accountForm(account),
-    });
-    return readJson(response);
+    return sendJson(() =>
+      this.request.put("/api/updateAccount", {
+        form: this.accountForm(account),
+      }),
+    );
   }
 
   async deleteAccount(
     email: string,
     password: string,
   ): Promise<ApiResponseBody> {
-    const response = await this.request.delete("/api/deleteAccount", {
-      form: { email, password },
-    });
-    return readJson(response);
+    return sendJson(() =>
+      this.request.delete("/api/deleteAccount", {
+        form: { email, password },
+      }),
+    );
   }
 
   async verifyLogin(email: string, password: string): Promise<ApiResponseBody> {
-    const response = await this.request.post("/api/verifyLogin", {
-      form: { email, password },
-    });
-    return readJson(response);
+    return sendJson(() =>
+      this.request.post("/api/verifyLogin", {
+        form: { email, password },
+      }),
+    );
   }
 
   async getUserDetailByEmail(email: string): Promise<UserDetailBody> {
-    const response = await this.request.get(
-      `/api/getUserDetailByEmail?email=${encodeURIComponent(email)}`,
+    return sendJson(() =>
+      this.request.get(
+        `/api/getUserDetailByEmail?email=${encodeURIComponent(email)}`,
+      ),
     );
-    return readJson(response);
   }
 }
