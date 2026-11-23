@@ -61,6 +61,13 @@ export class ProductsPage extends BaseAppPage {
   async searchFor(term: string): Promise<void> {
     await this.searchInput.fill(term);
     await this.searchButton.click();
+    // The address, not the load state. A search reaches `?search=`, which the
+    // page it was issued from does not carry, so waiting for it cannot be
+    // satisfied by the document already on screen — `waitForLoadState` could,
+    // and was: it returned against the unsearched grid whenever the click had
+    // not yet started the navigation, leaving the caller to assert on a
+    // heading that page never had.
+    await this.page.waitForURL(/\/products\?search=/);
   }
 
   getProductCard(productName: string): Locator {
