@@ -1,4 +1,9 @@
-import { expect, type Locator, type Page } from "@playwright/test";
+import {
+  expect,
+  type Locator,
+  type Page,
+  type Response,
+} from "@playwright/test";
 
 /**
  * Every navigation below stops here rather than at Playwright's default, the
@@ -78,23 +83,42 @@ export abstract class BaseAppPage {
    * carrying the same doomed three-second wait.
    */
   protected async goto(path: string, landmark: Locator): Promise<void> {
-    // The demo host sheds load with a holding page that answers on the right
-    // URL and renders none of the application, so a landmark the page always
-    // carries is the only proof the application arrived. Navigating again is
-    // the fix, not a longer wait: the holding page never becomes the app.
+    // Two different failures used to be answered the same way, and only one of
+    // them deserved it.
+    //
+    // The demo host sheds load with a holding page that renders none of the
+    // application. That page never becomes the application, so it is
+    // re-requested rather than waited on, and the status it carries is what
+    // names it: the application answers 2xx or 3xx even when it is slow.
+    //
+    // A page that did arrive is a different matter. Asserting the landmark
+    // inside this block capped the wait for it at the expect default, so a
+    // host that was merely slow had its half-rendered page thrown away and the
+    // navigation started over, every attempt losing the ground the last one
+    // gained until the test's own budget ran out. The landmark is asserted
+    // once, below, against the page that answered: Playwright waits for it to
+    // become visible on its own.
     await expect(async () => {
-      await this.navigate(path);
-      await expect(landmark).toBeVisible();
+      const response = await this.navigate(path);
+
+      if (response && !response.ok()) {
+        throw new Error(`GET ${path} answered HTTP ${response.status()}`);
+      }
     }).toPass();
+
+    await expect(landmark).toBeVisible();
   }
 
   /**
    * One navigation, with no retry of its own: for a caller that already
    * retries a block this is a step of, where a second retry nested inside the
    * first would spend the whole budget before the outer one gets a turn.
+   *
+   * Hands back what answered, so the caller can tell the holding page from the
+   * application without reading the body.
    */
-  protected async navigate(path: string): Promise<void> {
-    await this.page.goto(path, { waitUntil: DOCUMENT_READY });
+  protected async navigate(path: string): Promise<Response | null> {
+    return this.page.goto(path, { waitUntil: DOCUMENT_READY });
   }
 
   /**
