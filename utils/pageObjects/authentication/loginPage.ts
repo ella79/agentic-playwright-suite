@@ -81,27 +81,22 @@ export class LoginPage extends BaseAppPage {
    * the submission lands somewhere else. Credentials that are genuinely wrong
    * fail every attempt, so this cannot turn a real failure into a pass.
    *
-   * The session is waited for with `waitFor` rather than asserted. An
-   * assertion inside a retry brings its own cap, and that cap, not the host,
-   * was deciding how long a submission had to land: five seconds of a slow
-   * host's time was enough to throw a submission away and send another, each
-   * one starting the wait over until the test's own budget ran out and
-   * reported a timeout that named nothing. `waitFor` is how Playwright waits
-   * for anything else, so a submission that is merely slow is waited out, and
-   * the resubmission is left for the one it was written for: a submission
-   * that never landed.
+   * The session is asserted, not merely waited for, and the assertion's own
+   * cap is the point rather than an oversight. An uncapped wait here was
+   * tried: it waits out a slow submission, but a shed one has nothing to
+   * wait for, and the wait then spends the test's whole budget without the
+   * retry around it ever taking a turn. Waiting and retrying cannot both have
+   * the budget; the cap is what hands it from one to the other, and the host
+   * this suite runs against sheds submissions rather than merely delaying
+   * them. Measured, not assumed: the uncapped version left the sign-in
+   * reporting a bare test timeout with neither a session nor a rejection on
+   * the page, which is the shed answer and the one only a resubmission
+   * reaches.
    */
   async signIn(email: string, password: string): Promise<void> {
     await expect(async () => {
       await this.navigate(url.login);
       await this.login(email, password);
-      // The submission has two answers and the wait ends on either: the header
-      // gains the session's link, or the form comes back carrying its
-      // rejection. Waiting for only the first made every rejection cost the
-      // whole budget before anything could be sent again; waiting for either
-      // keeps the slow answer waited out and the absent one, which is the host
-      // shedding, resubmitted.
-      await this.logoutLink.or(this.loginErrorMessage).first().waitFor();
       await expect(this.logoutLink).toBeVisible();
     }).toPass();
   }
