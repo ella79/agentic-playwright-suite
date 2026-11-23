@@ -72,12 +72,22 @@ export class LoginPage extends BaseAppPage {
    * Arriving at the form is part of the retry because that page is gone once
    * the submission lands somewhere else. Credentials that are genuinely wrong
    * fail every attempt, so this cannot turn a real failure into a pass.
+   *
+   * The session is waited for with `waitFor` rather than asserted. An
+   * assertion inside a retry brings its own cap, and that cap, not the host,
+   * was deciding how long a submission had to land: five seconds of a slow
+   * host's time was enough to throw a submission away and send another, each
+   * one starting the wait over until the test's own budget ran out and
+   * reported a timeout that named nothing. `waitFor` is how Playwright waits
+   * for anything else, so a submission that is merely slow is waited out, and
+   * the resubmission is left for the one it was written for: a submission
+   * that never landed.
    */
   async signIn(email: string, password: string): Promise<void> {
     await expect(async () => {
       await this.navigate(url.login);
       await this.login(email, password);
-      await expect(this.logoutLink).toBeVisible();
+      await this.logoutLink.waitFor();
     }).toPass();
   }
 
