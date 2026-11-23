@@ -4,6 +4,7 @@ import {
   type Page,
   type Response,
 } from "@playwright/test";
+import { url } from "../url";
 
 /**
  * Every navigation below stops here rather than at Playwright's default, the
@@ -280,11 +281,22 @@ export abstract class BaseAppPage {
     await this.scrollUpButton.click();
   }
 
+  /**
+   * Both of these leave the page behind, so both wait for the one they reach,
+   * for the reason `CartPage.proceedToCheckout` gives: `waitForURL` waits for
+   * the load event, not only for the new address. Returning on the click alone
+   * handed the caller a page mid-navigation, and the assertion that followed
+   * then had the expect default to find content the host had not finished
+   * sending — TC-09 and TC-10 both failed that way, on a banner and a header
+   * link that were never missing, only late.
+   */
   async logout(): Promise<void> {
     await this.logoutLink.click();
+    await this.page.waitForURL(new RegExp(`${url.login}$`));
   }
 
   async deleteAccount(): Promise<void> {
     await this.deleteAccountLink.click();
+    await this.page.waitForURL(new RegExp(`${url.deleteAccount}$`));
   }
 }

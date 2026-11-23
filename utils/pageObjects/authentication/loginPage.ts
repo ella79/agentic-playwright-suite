@@ -59,6 +59,14 @@ export class LoginPage extends BaseAppPage {
     await this.loginEmailInput.fill(email);
     await this.loginPasswordInput.fill(password);
     await this.loginButton.click();
+    // The submit replaces the document whichever way it goes: a session lands
+    // on the home page, a rejection re-renders the form carrying its error.
+    // Neither is a new address in both cases, so there is no URL to wait for —
+    // the document itself is what the caller needs, and returning on the click
+    // alone left it asserting against whatever was still on screen. TC-07 and
+    // TC-08 both failed that way, on an error message and a header that were
+    // never missing, only late.
+    await this.page.waitForLoadState("domcontentloaded");
   }
 
   /**
