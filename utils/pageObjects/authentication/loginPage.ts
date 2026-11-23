@@ -95,7 +95,14 @@ export class LoginPage extends BaseAppPage {
     await expect(async () => {
       await this.navigate(url.login);
       await this.login(email, password);
-      await this.logoutLink.waitFor();
+      // The submission has two answers and the wait ends on either: the header
+      // gains the session's link, or the form comes back carrying its
+      // rejection. Waiting for only the first made every rejection cost the
+      // whole budget before anything could be sent again; waiting for either
+      // keeps the slow answer waited out and the absent one, which is the host
+      // shedding, resubmitted.
+      await this.logoutLink.or(this.loginErrorMessage).first().waitFor();
+      await expect(this.logoutLink).toBeVisible();
     }).toPass();
   }
 
@@ -103,5 +110,9 @@ export class LoginPage extends BaseAppPage {
     await this.signupNameInput.fill(name);
     await this.signupEmailInput.fill(email);
     await this.signupButton.click();
+    // Either the account information form or this one again carrying its
+    // error: both replace the document, neither is a single address to wait
+    // for.
+    await this.page.waitForLoadState("domcontentloaded");
   }
 }

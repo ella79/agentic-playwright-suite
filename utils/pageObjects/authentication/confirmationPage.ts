@@ -32,5 +32,8 @@ export class ConfirmationPage extends BaseAppPage {
 
   async continue(): Promise<void> {
     await this.continueButton.click();
+    // Leaves the confirmation behind, and serves both the created and the
+    // deleted one, so the document is what there is to wait for.
+    await this.page.waitForLoadState("domcontentloaded");
   }
 }

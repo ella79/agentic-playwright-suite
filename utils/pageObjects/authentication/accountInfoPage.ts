@@ -92,5 +92,10 @@ export class AccountInfoPage extends BaseAppPage {
     await this.fillAccountDetails(account);
     await this.fillAddressDetails(account);
     await this.createAccountButton.click();
+    // The submit replaces the document, so the caller asserts on the
+    // confirmation rather than on the form it has just left. VR-17 failed on
+    // the created banner for want of this, and the wait is for the document
+    // rather than an address because this one has no constant of its own.
+    await this.page.waitForLoadState("domcontentloaded");
   }
 }
