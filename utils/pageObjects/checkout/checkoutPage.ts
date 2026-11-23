@@ -1,5 +1,6 @@
 import { type Locator, type Page } from "@playwright/test";
 import { BaseAppPage } from "../baseAppPage";
+import { url } from "../../url";
 
 export class CheckoutPage extends BaseAppPage {
   readonly addressDetailsHeading: Locator;
@@ -42,5 +43,10 @@ export class CheckoutPage extends BaseAppPage {
 
   async placeOrder(): Promise<void> {
     await this.placeOrderLink.click();
+    // The same reason `CartPage.proceedToCheckout` waits: `waitForURL` waits
+    // for the load event, not only for the new address, so the caller asserts
+    // against a payment page that has rendered rather than one that has merely
+    // been asked for.
+    await this.page.waitForURL(new RegExp(`${url.payment}$`));
   }
 }

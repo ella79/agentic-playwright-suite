@@ -44,11 +44,44 @@ export async function sendJsonResponse<T>(
   send: () => Promise<APIResponse>,
 ): Promise<{ response: APIResponse; body: T }> {
   let result: { response: APIResponse; body: T } | undefined;
+  let refused: APIResponse | undefined;
 
   await expect(async () => {
     const response = await send();
+
+    // A refusal is not load shedding, and the two are worth telling apart.
+    // Shedding passes if the call is made again; a refusal answers the same
+    // way however many times it is asked, so re-sending one only spends the
+    // test's whole budget to arrive at the answer the first call already
+    // gave. It leaves the block instead, and is thrown below.
+    if (isRefusal(response.status())) {
+      refused = response;
+      return;
+    }
+
     result = { response, body: await readJson<T>(response) };
   }).toPass();
 
+  if (refused) {
+    const { pathname } = new URL(refused.url());
+    throw new Error(
+      `Host refused: ${pathname} answered HTTP ${refused.status()}, which re-sending does not change`,
+    );
+  }
+
   return result as { response: APIResponse; body: T };
+}
+
+/**
+ * Whether the host is turning the call down rather than buckling under it.
+ *
+ * Everything this application answers normally, a rejection included, arrives
+ * as HTTP 200 with the outcome in `responseCode`, so a 4xx here is never the
+ * application speaking: it is the host in front of it, and 403 is the one it
+ * uses on traffic it has decided not to serve. 429 is the exception, since
+ * being asked to slow down is precisely an invitation to ask again, and 5xx
+ * is the shedding this whole helper exists for.
+ */
+function isRefusal(status: number): boolean {
+  return status >= 400 && status < 500 && status !== 429;
 }

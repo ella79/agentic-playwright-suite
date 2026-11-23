@@ -59,6 +59,14 @@ export class LoginPage extends BaseAppPage {
     await this.loginEmailInput.fill(email);
     await this.loginPasswordInput.fill(password);
     await this.loginButton.click();
+    // The submit replaces the document whichever way it goes: a session lands
+    // on the home page, a rejection re-renders the form carrying its error.
+    // Neither is a new address in both cases, so there is no URL to wait for —
+    // the document itself is what the caller needs, and returning on the click
+    // alone left it asserting against whatever was still on screen. TC-07 and
+    // TC-08 both failed that way, on an error message and a header that were
+    // never missing, only late.
+    await this.page.waitForLoadState("domcontentloaded");
   }
 
   /**
@@ -72,6 +80,18 @@ export class LoginPage extends BaseAppPage {
    * Arriving at the form is part of the retry because that page is gone once
    * the submission lands somewhere else. Credentials that are genuinely wrong
    * fail every attempt, so this cannot turn a real failure into a pass.
+   *
+   * The session is asserted, not merely waited for, and the assertion's own
+   * cap is the point rather than an oversight. An uncapped wait here was
+   * tried: it waits out a slow submission, but a shed one has nothing to
+   * wait for, and the wait then spends the test's whole budget without the
+   * retry around it ever taking a turn. Waiting and retrying cannot both have
+   * the budget; the cap is what hands it from one to the other, and the host
+   * this suite runs against sheds submissions rather than merely delaying
+   * them. Measured, not assumed: the uncapped version left the sign-in
+   * reporting a bare test timeout with neither a session nor a rejection on
+   * the page, which is the shed answer and the one only a resubmission
+   * reaches.
    */
   async signIn(email: string, password: string): Promise<void> {
     await expect(async () => {
@@ -85,5 +105,9 @@ export class LoginPage extends BaseAppPage {
     await this.signupNameInput.fill(name);
     await this.signupEmailInput.fill(email);
     await this.signupButton.click();
+    // Either the account information form or this one again carrying its
+    // error: both replace the document, neither is a single address to wait
+    // for.
+    await this.page.waitForLoadState("domcontentloaded");
   }
 }
