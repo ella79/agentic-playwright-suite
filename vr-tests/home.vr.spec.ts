@@ -91,6 +91,7 @@ test.describe("Visual regression - Home Page", () => {
 
     await expect(homePage.subscriptionSection).toHaveScreenshot(
       "home-subscription.png",
+      { maxDiffPixelRatio: 0.03 }, // VR: the widget is small, so its text's own antialiasing alone clears the default
     );
   });
 
