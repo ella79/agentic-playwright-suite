@@ -59,6 +59,9 @@ test.describe("Visual regression - Product Detail Page", () => {
     );
     await expect(productDetailPage.reviewSuccessMessage).toBeVisible();
     await productDetailPage.reviewSuccessMessage.scrollIntoViewIfNeeded();
+    // The capture spans the whole viewport, so it carries the showcase's
+    // product photograph exactly as VR-21 does, and needs the same wait.
+    await productDetailPage.waitForImagesLoaded();
 
     // A viewport capture, not an element one: the success banner's own row
     // (`#review-section`, a `.form-row`) collapses to zero height for the
@@ -66,6 +69,8 @@ test.describe("Visual regression - Product Detail Page", () => {
     // sits exactly at `#review-form`'s own bottom edge, verified live, so an
     // element screenshot of `reviewSection` clips the banner's text out
     // entirely instead of just cropping tightly around it.
-    await expect(page).toHaveScreenshot("product-detail-review-sent.png");
+    await expect(page).toHaveScreenshot("product-detail-review-sent.png", {
+      maxDiffPixelRatio: 0.05, // VR: product photography compresses inconsistently
+    });
   });
 });

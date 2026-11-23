@@ -243,21 +243,19 @@ async function signInAsNewAccount(
   accounts: AccountApiClient,
   account: TestAccount,
 ): Promise<void> {
-  // The host answers 5xx with a page instead of JSON for seconds at a time,
-  // so the call is re-sent rather than waited on. Re-sending a signup is why
-  // the account already existing counts as created here.
-  await expect(async () => {
-    const created = await accounts.createAccount(account);
-    const exists =
-      created.responseCode === 400 &&
-      created.message.includes("already exists");
+  // No retry of its own: the client re-sends what the host sheds, so what
+  // arrives here is the application's own answer and a second retry around it
+  // would only re-ask a question already answered. A re-sent signup is why the
+  // account already existing counts as created here.
+  const created = await accounts.createAccount(account);
+  const exists =
+    created.responseCode === 400 && created.message.includes("already exists");
 
-    if (created.responseCode !== 201 && !exists) {
-      throw new Error(
-        `POST /api/createAccount answered ${created.responseCode}: ${created.message}`,
-      );
-    }
-  }).toPass();
+  if (created.responseCode !== 201 && !exists) {
+    throw new Error(
+      `POST /api/createAccount answered ${created.responseCode}: ${created.message}`,
+    );
+  }
 
   await new LoginPage(page).signIn(account.email, account.password);
 }
@@ -267,23 +265,21 @@ async function removeAccount(
   accounts: AccountApiClient,
   account: TestAccount,
 ): Promise<void> {
-  // Re-sent for the same reason the signup is: a 5xx here is the host
-  // shedding load, not the account surviving. A re-sent deletion answers 404
-  // once the first one landed, which is the outcome this wants either way.
-  // The lookup below is what proves the account is gone.
-  await expect(async () => {
-    const deleted = await accounts.deleteAccount(
-      account.email,
-      account.password,
+  // No retry here either, for the reason the signup carries. A re-sent
+  // deletion answers 404 once the first one landed, which is the outcome this
+  // wants either way. The lookup below is what proves the account is gone.
+  const deleted = await accounts.deleteAccount(account.email, account.password);
+
+  if (deleted.responseCode !== 200 && deleted.responseCode !== 404) {
+    throw new Error(
+      `DELETE /api/deleteAccount answered ${deleted.responseCode}: ${deleted.message}`,
     );
+  }
 
-    if (deleted.responseCode !== 200 && deleted.responseCode !== 404) {
-      throw new Error(
-        `DELETE /api/deleteAccount answered ${deleted.responseCode}: ${deleted.message}`,
-      );
-    }
-  }).toPass();
-
+  // The one retry left, and the only one here that is not about the host: it
+  // waits for the account to actually be gone, a state the application reaches
+  // on its own schedule. The client's own re-send sits under it and answers a
+  // different question, so neither stands in for the other.
   await expect(async () => {
     const lookup = await accounts.getUserDetailByEmail(account.email);
     expect(lookup.responseCode).toBe(404);

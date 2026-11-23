@@ -1,5 +1,5 @@
 import { type APIRequestContext } from "@playwright/test";
-import { readJson } from "./readJson";
+import { sendJson } from "./sendJson";
 
 export interface CatalogProduct {
   id: number;
@@ -29,24 +29,28 @@ export type SearchProductBody =
 /**
  * Wraps the read-only catalog endpoints under `/api`: the same data the
  * products page and its sidebar render, available without a browser.
+ *
+ * Every read goes through `sendJson`, so the host shedding load is re-sent
+ * rather than reported as a missing catalog. Nothing here is ever called from
+ * inside a block that already retries, which is what lets the retry sit at
+ * this boundary instead of at each caller.
  */
 export class CatalogApiClient {
   constructor(private readonly request: APIRequestContext) {}
 
   async getProductsList(): Promise<ProductsListBody> {
-    const response = await this.request.get("/api/productsList");
-    return readJson(response);
+    return sendJson(() => this.request.get("/api/productsList"));
   }
 
   async getBrandsList(): Promise<BrandsListBody> {
-    const response = await this.request.get("/api/brandsList");
-    return readJson(response);
+    return sendJson(() => this.request.get("/api/brandsList"));
   }
 
   async searchProduct(term: string): Promise<SearchProductBody> {
-    const response = await this.request.post("/api/searchProduct", {
-      form: { search_product: term },
-    });
-    return readJson(response);
+    return sendJson(() =>
+      this.request.post("/api/searchProduct", {
+        form: { search_product: term },
+      }),
+    );
   }
 }
