@@ -47,7 +47,7 @@
     "@types/node": "26.6.6",
     "@typescript-eslint/eslint-plugin": "8.72.2",
     "@typescript-eslint/parser": "8.72.2",
-    "allure-commandline": "2.46.1",
+    "allure-commandline": "2.46.2",
     "allure-playwright": "3.15.0",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
