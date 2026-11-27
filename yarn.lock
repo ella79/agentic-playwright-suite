@@ -478,7 +478,7 @@ __metadata:
     "@types/node": "npm:26.6.6"
     "@typescript-eslint/eslint-plugin": "npm:8.72.2"
     "@typescript-eslint/parser": "npm:8.72.2"
-    allure-commandline: "npm:2.46.1"
+    allure-commandline: "npm:2.46.2"
     allure-playwright: "npm:3.15.0"
     eslint: "npm:10.14.0"
     eslint-config-prettier: "npm:10.1.8"
@@ -500,12 +500,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-commandline@npm:2.46.1":
-  version: 2.46.1
-  resolution: "allure-commandline@npm:2.46.1"
+"allure-commandline@npm:2.46.2":
+  version: 2.46.2
+  resolution: "allure-commandline@npm:2.46.2"
   bin:
     allure: bin/allure
-  checksum: 10c0/ef65e458bd9875c2ddf19f0a27329dd8ebe7996d3b6f6ab40ea1ac4c548d9528315ebcdd7accab30816eae5d90fad3945e2914706705029b849a1349de9538c4
+  checksum: 10c0/66b37e9330b50612474ca6c31b97d49ef087f289b6178bd12984afe64084a989d1862d597436ad985f65a7422da7abc2a5737d8a9ebe84e89273ca9a0b9a8bcd
   languageName: node
   linkType: hard
 
