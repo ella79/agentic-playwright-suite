@@ -283,12 +283,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:26.6.6":
-  version: 26.6.6
-  resolution: "@types/node@npm:26.6.6"
+"@types/node@npm:26.6.10":
+  version: 26.6.10
+  resolution: "@types/node@npm:26.6.10"
   dependencies:
     undici-types: "npm:~8.9.0"
-  checksum: 10c0/5cb63f644f6e85a257a9cd2403cbcbe196760e2a35fd3ec9fb8b5cff663e14cc832b198cc17b53f870a2e30900ed45a1fb3f53e6589aba26b8e8c484aa672053
+  checksum: 10c0/d249c40c72ee1e61aeb9633263e5ebf428359206926a2ca12435cf7112e09a49aa5ef7a787e413fdf66b9ad8f41fb474eeb4e18e31e9b49a64033393e888ce56
   languageName: node
   linkType: hard
 
@@ -475,7 +475,7 @@ __metadata:
     "@microsoft/eslint-formatter-sarif": "npm:3.1.0"
     "@playwright/mcp": "npm:0.0.86"
     "@playwright/test": "npm:1.65.1"
-    "@types/node": "npm:26.6.6"
+    "@types/node": "npm:26.6.10"
     "@typescript-eslint/eslint-plugin": "npm:8.72.2"
     "@typescript-eslint/parser": "npm:8.72.2"
     allure-commandline: "npm:2.46.1"

@@ -44,7 +44,7 @@
     "@microsoft/eslint-formatter-sarif": "3.1.0",
     "@playwright/mcp": "0.0.86",
     "@playwright/test": "1.65.1",
-    "@types/node": "26.6.6",
+    "@types/node": "26.6.10",
     "@typescript-eslint/eslint-plugin": "8.72.2",
     "@typescript-eslint/parser": "8.72.2",
     "allure-commandline": "2.46.1",
